@@ -1,0 +1,16 @@
+{
+  "projectId": "project-1",
+  "name": "Modern House Floor Plan",
+  "style": "modern",
+  "imageUrl": "/uploads/floor-plans/project-1/modern-floor-plan.svg",
+  "description": "Floor plan for a modern style house with 3 bedrooms and 2 bathrooms",
+  "dimensions": {
+    "width": 40,
+    "length": 60,
+    "unit": "ft"
+  },
+  "area": 2200,
+  "bedrooms": 3,
+  "bathrooms": 2,
+  "createdAt": "2025-04-15T13:58:53.832Z"
+}

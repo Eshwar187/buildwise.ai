@@ -1,0 +1,16 @@
+{
+  "projectId": "project-3",
+  "name": "Cottage Floor Plan",
+  "style": "cottage",
+  "imageUrl": "/uploads/floor-plans/project-3/cottage-floor-plan.svg",
+  "description": "Floor plan for a cottage style house with 2 bedrooms and 1 bathrooms",
+  "dimensions": {
+    "width": 40,
+    "length": 60,
+    "unit": "ft"
+  },
+  "area": 1500,
+  "bedrooms": 2,
+  "bathrooms": 1,
+  "createdAt": "2025-04-15T13:58:53.848Z"
+}

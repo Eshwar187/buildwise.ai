@@ -1,0 +1,2859 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<meta name="viewport" content="width=device-width, user-scalable=yes, initial-scale=1.0 minimum-scale=1.0" />
+		<meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+		<meta content="zs_q8g3GZg3H1Yp0Ov2RsUpL_NjZF_TVLwKvXAQNvPw" name="google-site-verification" />
+		<meta name="format-detection" content="telephone=no">
+
+		<!-- Favicon & OS Tiles -->
+		<link rel="apple-touch-icon" sizes="180x180" href="/static/tiles/apple-touch-icon.png?v=2">
+		<link rel="icon" type="image/png" sizes="32x32" href="/static/tiles/favicon-32x32.png?v=2">
+		<link rel="icon" type="image/png" sizes="16x16" href="/static/tiles/favicon-16x16.png?v=2">
+		<link rel="manifest" href="/static/tiles/site.webmanifest?v=2" crossorigin="use-credentials">
+		<link rel="mask-icon" href="/static/tiles/safari-pinned-tab.svg?v=2" color="#213a71">
+		<link rel="shortcut icon" href="/static/tiles/favicon.ico?v=2">
+		<meta name="apple-mobile-web-app-title" content="ABHP">
+		<meta name="application-name" content="ABHP">
+		<meta name="msapplication-TileColor" content="#213a71">
+		<meta name="msapplication-config" content="/static/tiles/browserconfig.xml?v=2">
+		<meta name="theme-color" content="#ffffff">
+
+		<!-- Set the page's Meta Image -->
+					<!-- Do nothing - let Wordpress set the page image -->
+		
+		
+		
+		<!-- houseplans.net global css -->
+		<link rel="stylesheet" type="text/css" href="https://www.houseplans.net/static/css/fonts.css?ver=prod-2025-04-04-1">
+		<link rel="stylesheet" type="text/css" href="https://www.houseplans.net/static/css/main.css?ver=prod-2025-04-04-1">  
+		<link rel="stylesheet" type="text/css" href="https://www.houseplans.net/static/css/homepage-new.css?ver=prod-2025-04-04-1">
+		
+<!-- Consent Manager -->
+<link rel="stylesheet" id="silktide-consent-manager-css" href="/static/css/consent-default.css?ver=prod-2025-04-04-1">
+<script src="/static/js/consent-default.js?ver=prod-2025-04-04-1"></script>
+		<script>
+			silktideCookieBannerManager.updateCookieBannerConfig({
+			  position: {
+			    banner: "bottomRight"
+			  },
+			  cookieIcon: {
+			    position: "bottomLeft"
+			  },
+
+			  cookieTypes: [
+			    {
+			      id: "necessary",
+			      name: "Required",
+			      description: "<p>These cookies are necessary for the website to function properly, and they also help us improve the site by tracking which pages are most popular and how visitors move around the site.</p>",
+			      required: true,
+			      defaultValue: true,
+			      onAccept: function() {
+			        console.log('Required Cookies Accepted');
+			      }
+			    },
+
+			    {
+			      id: "advertising",
+			      name: "Advertising",
+			      description: "<p>These cookies provide extra features and personalization to improve your experience. They may be set by us or by partners whose services we use.</p>",
+			      required: false,
+			      defaultValue: true,
+			      onAccept: function() {
+			        dataLayer.push({
+			          'event': 'consent_update',
+			        });
+			        console.log('Advertising Cookies Accepted (consent_update event fired)');
+			      },
+			      onReject: function() {
+			        dataLayer.push({
+			          'event': 'consent_update',
+			        });
+			        console.log('Advertising Cookies Rejected (consent_update event fired)');
+			      }
+			    }
+			  ],
+
+			  text: {
+			    banner: {
+			      description: "<p>We use cookies on our site to enhance the user experience, provide personalized content, and analyze how visitors interact with the site. They may be set by us or by partners whose services we use.</p>",
+			      acceptAllButtonText: "Accept",
+			      acceptAllButtonAccessibleLabel: "Accept Cookies",
+			      preferencesButtonText: "Cookie Settings",
+			      preferencesButtonAccessibleLabel: "Cookie Settings"
+			    },
+
+			    preferences: {
+			      title: "Customize your cookie preferences",
+			      description: "<p>We respect your right to privacy. You can choose not to allow some types of cookies. Your cookie preferences will apply across our website.</p>",
+			    }
+			  }
+			});
+		</script>
+
+		<!-- PostHog -->
+				<script>
+		    !function(t,e){var o,n,p,r;e.__SV||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init capture register register_once register_for_session unregister unregister_for_session getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSessionId getSurveys getActiveMatchingSurveys renderSurvey canRenderSurvey getNextSurveyStep identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException loadToolbar get_property getSessionProperty createPersonProfile opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing clear_opt_in_out_capturing debug".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+		    posthog.init('phc_u2Qf5badEKiVQNmrQQ2Q2tDxw0vDmTXxGZP3SARId63',{api_host:'https://us.i.posthog.com', person_profiles: 'always' 
+		    	// Use 'identified_only' to create profiles for known users only
+		    	// Use 'always' to create profiles for anonymous users as well
+		        })
+		</script>
+	
+		<!-- reCaptcha -->
+		<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+
+		<!-- Google Tag Manager -->
+		<script>
+			(function(w, d, s, l, i) {
+				w[l] = w[l] || [];
+				w[l].push({
+					'gtm.start': new Date().getTime(),
+					event: 'gtm.js'
+				});
+				var f = d.getElementsByTagName(s)[0],
+				j = d.createElement(s),
+				dl = l != 'dataLayer' ? '&l=' + l : '';
+				j.async = true;
+				j.src = 'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
+				f.parentNode.insertBefore(j, f);
+			})(window, document, 'script', 'dataLayer', 'GTM-PHB8SM');
+		</script>
+
+
+
+		<!-- Google Analytics -->
+		<script>
+			(function(i, s, o, g, r, a, m) {
+				i['GoogleAnalyticsObject'] = r;
+				i[r] = i[r] || function() {
+				(i[r].q = i[r].q || []).push(arguments)
+				}, i[r].l = 1 * new Date();
+				a = s.createElement(o),
+				m = s.getElementsByTagName(o)[0];
+				a.async = 1;
+				a.src = g;
+				m.parentNode.insertBefore(a, m)
+			})(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
+
+							ga('create', 'UA-395929-2', 'auto');
+				ga('send', 'pageview');
+			
+			ga('create', 'UA-395929-11', 'auto', 'test');
+
+							ga('test.set', 'dimension1', 'Visitor') // Visitor
+			
+			ga('test.send', 'pageview');
+		</script>
+
+		<script type="application/ld+json">
+		{
+			"@context": "https://schema.org/",
+			"@type": "WebSite",
+			"name": "America's Best House Plans",
+			"url": "https://www.houseplans.net",
+			"potentialAction": {
+				"@type": "SearchAction",
+				"target": "https://www.houseplans.net/floorplans/{search_term_string}",
+				"query-input": "required name=search_term_string"
+			}
+		}
+		</script>
+
+		<script>
+    dataLayer.push({ ecommerce: null });  // Clear the previous ecommerce object.
+    dataLayer.push({
+        'event': 'pageView',
+        'event_name': 'page_view',
+        'page': { 
+           'page_type': 'blog',
+           'environment': 'production'
+      },
+    });
+    </script>
+		<script>
+			var cardSwiperConfig = {
+				loop: true,
+				autoplay: false,
+				navigation: {
+					nextEl: ".swiper-button-next",
+					prevEl: ".swiper-button-prev",
+				},
+				pagination: {
+					enabled: false 
+				},
+				on: {
+					init: function (swiper_el) {
+						let dots_size = 16;
+
+						let dots_width = dots_size * 5;
+
+						if (swiper_el.slides.length < 5) {
+							dots_width = dots_size * swiper_el.slides.length;
+						}
+
+						swiper_el.el
+							.querySelector(".swiper-pagination")
+							.insertAdjacentHTML('afterend', '<div class="swiper-dots" style="width:' + dots_width + 'px"><div class="swiper-dots-slider"></div></div>');
+
+						for (let i = 0; i < swiper_el.slides.length; i++) {
+							let dot = document.createElement('a');
+							dot.classList.add('swiper-dot');
+							dot.setAttribute('data-slide', i);
+							
+							if(swiper_el.realIndex == i) {
+								dot.classList.add('active-dot');
+							}
+
+							dot.addEventListener('click', function (e) {
+								e.preventDefault();
+								console.log("slide to:" + i);
+								swiper_el.slideToLoop(i);
+							});
+
+							swiper_el.el.querySelector(".swiper-dots-slider").appendChild(dot);
+						}
+
+						shrinkSwiperDots(swiper_el, 0);
+					},
+					slideChange : function(swiper_el) {
+						let dots = swiper_el.el.querySelectorAll(".swiper-dot");
+						for (let i = 0; i < dots.length; i++) {
+							dots[i].classList.remove('active-dot');
+						}
+
+						dots[swiper_el.realIndex].classList.add('active-dot');
+
+						let first_visible_dot_index = swiper_el.realIndex - 2;
+						swiper_el.el.querySelector(".swiper-dots").scrollTo({
+							left: first_visible_dot_index * 16,
+							behavior: 'smooth'
+						});
+
+						shrinkSwiperDots(swiper_el, first_visible_dot_index);
+					}
+				}
+			};      
+
+			function shrinkSwiperDots(swiper_el, first_visible_dot_index) {
+				let small_dots = swiper_el.el.querySelectorAll(".small-dot");
+
+				for (let i = 0; i < small_dots.length; i++) {
+					small_dots[i].classList.remove('small-dot');
+				}
+
+				let last_visible_dot_index = first_visible_dot_index + 4;
+
+				if (first_visible_dot_index > swiper_el.slides.length - 5) {
+					first_visible_dot_index = swiper_el.slides.length - 5;
+				}
+
+				if (first_visible_dot_index > 0) {
+					swiper_el.el.querySelectorAll(".swiper-dot")[first_visible_dot_index].classList.add('small-dot');
+				}
+
+				if (last_visible_dot_index < 5) {
+					last_visible_dot_index = 4;
+				}
+
+				if (last_visible_dot_index < swiper_el.slides.length - 1) {
+					swiper_el.el.querySelectorAll(".swiper-dot")[last_visible_dot_index].classList.add('small-dot');
+				}
+			}
+
+			var cardContainerSwiperConfig = {
+				slidesPerView: 1,
+				spaceBetween: 30,
+				navigation: {
+					nextEl: ".outer-swiper-button-next",
+					prevEl: ".outer-swiper-button-prev",
+				},
+
+				breakpoints: {
+					993: {
+						slidesPerView: 3,
+						spaceBetween: 20,
+					},
+					769: {
+						slidesPerView: 2,
+						spaceBetween: 35,
+					},
+				},
+			};
+		</script>
+
+		<style>
+			span.swiper-pagination-bullet-active-next , span.swiper-pagination-bullet-active-next-next{
+				display: none !important;	
+			}	
+
+			.swiper-dots {
+				height: 16px;
+				width: 80px;
+				position: absolute;
+				left: 50%;
+				bottom: 10px;
+				z-index: 1;
+				transform: translateX(-50%);
+				overflow: hidden;
+			}
+
+			.swiper-dots-slider {
+				display: flex;
+			}
+
+			.swiper-dots a.swiper-dot {
+				width: 16px;
+				height: 16px;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				min-width: 16px;
+				cursor: pointer;
+			}
+
+			.swiper-dots a.swiper-dot:before {
+				content: "";
+				display: block;
+				width: 8px;
+				height: 8px;
+				border-radius: 50%;
+				background-color: white;
+				opacity: 0.4;
+				box-shadow: 0 0 5px #000;
+			}
+
+			.swiper-dots a.swiper-dot.active-dot:before {
+				opacity: 1;
+			}
+
+			.swiper-dots a.swiper-dot.small-dot:before {
+				width: 5px;
+				height: 5px;
+			}
+
+			.favouritePlansSection .fovCard .swiper-button-next,
+			.favouritePlansSection .fovCard .swiper-button-next:hover,
+			.favouritePlansSection .fovCard .swiper-button-prev,
+			.favouritePlansSection .fovCard .swiper-button-prev:hover,
+			.favouritePlansSection .fovCard .swiper-dots,
+			.swiper-pagination {
+				visibility: hidden !important;
+				opacity: 0 !important;
+			}
+		</style>
+
+<link rel="stylesheet" type="text/css" href="https://www.houseplans.net/static/css/blog.css?ver=prod-2025-04-04-1">
+
+<title>
+    Page not found - America&#039;s Best House Plans Blog | America&#039;s Best House Plans Blog</title>
+
+    <meta name="description" content="Learn key tips on finding the right new home builder for your dream house, from assessing reputation to comparing portfolios and customer feedback.">
+
+
+
+<style>
+    .abh_tabs li {
+        display: none !important;
+    }
+</style>
+
+</head>
+<body class="hp-about-our-plans">
+        <!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-PHB8SM"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->    <div id="wrapper">
+    	
+
+		<div class='sale-banner' style='background-color: #ffc7c7;'>
+			<img src='/images/banners/-Flash Sale  (3).jpg'/>
+		</div>
+		
+<div class="notification-bar" style="padding: 5px 20px; text-align: right; color: #fff;">
+
+	<div class="flex-row justify-between bigger-container d-flex">
+
+		<div></div>
+
+		<div style="color: #E7DB74;">
+					</div>
+
+		<div>
+			<a href="tel:+18885017526" style="position: relative; top: 1px; color: #fff; font-size: 13px;"><img style="height: 15px;" src="/static/img/white-phone.png" alt="Phone"><span style="padding-left: 8px; font-weight: bold; position: relative; top: -2px;">1-888-501-7526</span></a>
+		</div>
+
+	</div>
+
+</div>
+
+<div id="header" class="hp-header">
+	<div id="new-header" class="flex-row new-hp-header d-flex align-center">
+    <div class="bigger-container">
+        <div class="flex-row justify-between header-content d-flex">
+
+            <a href="/" title="home" class="d-flex" style="align-self: center;">
+                <img itemprop="logo" class="hp-header-logo" src="/static/img/abh-toplogo.svg?ver=prod-2025-04-04-1" alt="America's Best House Plans logo">
+            </a>
+
+            
+
+                <div class="hp-primary-nav" style="align-self: center;">
+                    <ul>
+
+                        <li id="shop-menu-btn" class="link-nav-primary-item ">
+                            <a href="/floorplans/">SHOP</a>
+                        </li>
+
+                        <li id="styles-menu-btn" class="nav-primary-item dropdown-menu-element goes-down" onClick="toggleDropdownMenu('styles')">
+                            <a href="javascript://">STYLES</a>
+                        </li>
+
+                        <li id="collections-menu-btn" class="nav-primary-item dropdown-menu-element goes-down" onClick="toggleDropdownMenu('collections')">
+                            <a href="javascript://">COLLECTIONS</a>
+                        </li>
+
+                        <li id="garage-menu-btn" class="nav-primary-item dropdown-menu-element goes-down" onClick="toggleDropdownMenu('garage')">
+                            <a href="javascript://">PLAN TYPES</a>
+                        </li>
+
+                        <li id="learn-menu-btn" class="nav-primary-item dropdown-menu-element goes-down" onClick="toggleDropdownMenu('learn')">
+                            <a href="javascript://">ABOUT OUR PLANS</a>
+                        </li>
+
+                    </ul>
+                </div><!-- .hp-primary-nav -->
+
+            
+
+            <div id="secondary-nav-header" class="flex-row hp-secondary-nav d-flex">
+
+                <div class="flex-row secondary-nav-buttons d-flex">
+
+                    <div class="secondary-nav-item">
+                        <form method="get" action="/floorplans/" id="find-by-plan-form" name="find-by-plan-form" style="position:relative;" class="flex-row d-flex position-relative">
+                            <input maxlength="10" type="text" id="find-by-plan-input" class="search-input-desktop" placeholder="Search By Plan #" name="plan_name" value="" />
+                            <button id="find-by-plan-button" type="submit" name="submit" class="submit" value="GO">
+                                <i class="fa fa-search"></i>
+                            </button>
+                        </form>
+                    </div>
+
+                    <div class="secondary-nav-item secondary-nav-desktop">
+                        <a href="javascript://" id="showAuthModal">
+                            <img src="/static/img/account-icon.png" class="secondary-nav-icon" alt="Account">
+                            <span class="sign-in">Sign In</span>
+                        </a>
+                    </div>
+
+                    <div class="secondary-nav-item secondary-nav-desktop">
+                        <a href="javascript://" id="showAuthModal" class="favorite-icon-container">
+                            <img src="/static/img/fav-icon.png?ver=prod-2025-04-04-1" class="secondary-nav-icon" alt="Favorites">
+                                                    </a>
+                    </div>
+
+                    <div class="secondary-nav-item secondary-nav-desktop">
+                        <a class="cart-icon-container" href="/cart/">
+                            <img src="/static/img/cart-icons.png" class="secondary-nav-icon" alt="Cart">
+                                                    </a>
+                    </div>
+
+                    <!-- Mobile Hamburger Menu Button -->
+                    <button class="menu-icon-btn" onClick="toggleMobileMenu()">
+                        <i id="iconx" class="fas fa-times"></i>
+                        <i id="iconbars" class="fas fa-bars"></i>
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- Menu dropdowns for desktop nav -->
+<div id="styles-list-block" class="hp-header__dropdown menu-dropdown dropdown-only-desktop d-none">
+    <div class="hp-header__dropmenu-wrapper">
+        <ul>
+            
+                <li>
+                    <a href="/modernfarmhouse-house-plans/">
+                        <div>
+                            <img loading="lazy" src="/uploads/styles/62-288.jpg?v=120823160223" alt="Modern Farmhouse">
+                        </div>
+                        <span>Modern Farmhouse</span>
+                    </a>
+                </li>
+            
+                <li>
+                    <a href="/barn-house-plans/">
+                        <div>
+                            <img loading="lazy" src="/uploads/styles/63-288.jpg?v=120823154341" alt="Barndominium">
+                        </div>
+                        <span>Barndominium</span>
+                    </a>
+                </li>
+            
+                <li>
+                    <a href="/craftsman-house-plans/">
+                        <div>
+                            <img loading="lazy" src="/uploads/styles/12-288.jpg?v=120823154746" alt="Craftsman">
+                        </div>
+                        <span>Craftsman</span>
+                    </a>
+                </li>
+            
+                <li>
+                    <a href="/small-house-plans/">
+                        <div>
+                            <img loading="lazy" src="/uploads/styles/54-288.jpg?v=120823155920" alt="Small">
+                        </div>
+                        <span>Small</span>
+                    </a>
+                </li>
+            
+                <li>
+                    <a href="/farmhouse-house-plans/">
+                        <div>
+                            <img loading="lazy" src="/uploads/styles/16-288.jpg?v=120823154827" alt="Farmhouse">
+                        </div>
+                        <span>Farmhouse</span>
+                    </a>
+                </li>
+            
+                <li>
+                    <a href="/ranch-house-plans/">
+                        <div>
+                            <img loading="lazy" src="/uploads/styles/30-288.jpg?v=120823155858" alt="Ranch">
+                        </div>
+                        <span>Ranch</span>
+                    </a>
+                </li>
+            
+                <li>
+                    <a href="/country-house-plans/">
+                        <div>
+                            <img loading="lazy" src="/uploads/styles/11-288.jpg?v=120823154725" alt="Country">
+                        </div>
+                        <span>Country</span>
+                    </a>
+                </li>
+            
+                <li>
+                    <a href="/modern-house-plans/">
+                        <div>
+                            <img loading="lazy" src="/uploads/styles/50-288.jpg?v=120823155504" alt="Modern">
+                        </div>
+                        <span>Modern</span>
+                    </a>
+                </li>
+            
+                <li>
+                    <a href="/cottage-house-plans/">
+                        <div>
+                            <img loading="lazy" src="/uploads/styles/10-288.jpg?v=120823154711" alt="Cottage">
+                        </div>
+                        <span>Cottage</span>
+                    </a>
+                </li>
+            
+                <li>
+                    <a href="/mountain-house-plans/">
+                        <div>
+                            <img loading="lazy" src="/uploads/styles/26-288.jpg?v=120823155751" alt="Mountain">
+                        </div>
+                        <span>Mountain</span>
+                    </a>
+                </li>
+            
+                <li>
+                    <a href="/lakefront-house-plans/">
+                        <div>
+                            <img loading="lazy" src="/uploads/styles/22-288.jpg?v=120823155312" alt="Lake">
+                        </div>
+                        <span>Lake</span>
+                    </a>
+                </li>
+            
+                <li>
+                    <a href="/traditional-house-plans/">
+                        <div>
+                            <img loading="lazy" src="/uploads/styles/34-288.jpg?v=120823160019" alt="Traditional">
+                        </div>
+                        <span>Traditional</span>
+                    </a>
+                </li>
+                    </ul>
+        <a class="see-all-styles-btn button" href="/styles/" style="text-transform: uppercase;">See all styles</a>
+    </div>
+</div><!-- #styles-list-block -->
+
+<div id="collections-list-block" class="hp-header__dropdown menu-dropdown dropdown-only-desktop d-none">
+
+    <!-- current collections dropdown version -->
+    <div id="dropmenu-wrapper-collections" class="hp-header__dropmenu-wrapper">
+        <div id="link-block">
+            <ul>
+                                    <li>
+                        <a href="/new-house-plans/">
+                            <div>
+                                <img loading="lazy" src="/uploads/searches/1-288.jpg?v=" alt="New Plans">
+                            </div>
+                            <span>New Plans</span>
+                        </a>
+                    </li>
+                                    <li>
+                        <a href="/open-floor-plans/">
+                            <div>
+                                <img loading="lazy" src="/uploads/searches/23-288.jpg?v=" alt="Open Floor Plans">
+                            </div>
+                            <span>Open Floor Plans</span>
+                        </a>
+                    </li>
+                                    <li>
+                        <a href="/best-selling-house-plans/">
+                            <div>
+                                <img loading="lazy" src="/uploads/searches/2-288.jpg?v=" alt="Best Selling">
+                            </div>
+                            <span>Best Selling</span>
+                        </a>
+                    </li>
+                                    <li>
+                        <a href="/exclusive-house-plans/">
+                            <div>
+                                <img loading="lazy" src="/uploads/searches/29-288.jpg?v=" alt="Exclusive Designs">
+                            </div>
+                            <span>Exclusive Designs</span>
+                        </a>
+                    </li>
+                                    <li>
+                        <a href="/basement-house-plans/">
+                            <div>
+                                <img loading="lazy" src="/uploads/searches/25-288.jpg?v=" alt="Basement">
+                            </div>
+                            <span>Basement</span>
+                        </a>
+                    </li>
+                                    <li>
+                        <a href="/house-plans-with-in-law-suites/">
+                            <div>
+                                <img loading="lazy" src="/uploads/searches/27-288.jpg?v=" alt="In-Law Suites">
+                            </div>
+                            <span>In-Law Suites</span>
+                        </a>
+                    </li>
+                                    <li>
+                        <a href="/accessory-dwelling-unit-plans/">
+                            <div>
+                                <img loading="lazy" src="/uploads/searches/41-288.jpg?v=" alt="ADU Plans">
+                            </div>
+                            <span>ADU Plans</span>
+                        </a>
+                    </li>
+                                    <li>
+                        <a href="/house-plans-with-videos/">
+                            <div>
+                                <img loading="lazy" src="/uploads/searches/24-288.jpg?v=" alt="Plans with Videos">
+                            </div>
+                            <span>Plans with Videos</span>
+                        </a>
+                    </li>
+                                    <li>
+                        <a href="/house-plans-with-photos/">
+                            <div>
+                                <img loading="lazy" src="/uploads/searches/8-288.jpg?v=" alt="Plans with Photos">
+                            </div>
+                            <span>Plans with Photos</span>
+                        </a>
+                    </li>
+                                    <li>
+                        <a href="/house-plans-with-360-virtual-tours/">
+                            <div>
+                                <img loading="lazy" src="/uploads/searches/30-288.jpg?v=" alt="Plans with 360 Virtual Tours">
+                            </div>
+                            <span>Plans with 360 Virtual Tours</span>
+                        </a>
+                    </li>
+                                    <li>
+                        <a href="/one-story-house-plans/">
+                            <div>
+                                <img loading="lazy" src="/uploads/searches/10-288.jpg?v=" alt="One Story House Plans">
+                            </div>
+                            <span>One Story House Plans</span>
+                        </a>
+                    </li>
+                                    <li>
+                        <a href="/two-story-house-plans/">
+                            <div>
+                                <img loading="lazy" src="/uploads/searches/12-288.jpg?v=" alt="Two Story House Plans">
+                            </div>
+                            <span>Two Story House Plans</span>
+                        </a>
+                    </li>
+                            </ul>
+
+            <ul id="sqft-links">
+                <li style="margin-top: 10px;">
+                    <h4>Plans By Square Foot</h4>
+                </li>
+                <li><a href="/house-plans-under-1000-sq-ft/"><i class="fa fa-circle" aria-hidden="true"></i>1000 Sq. Ft. and under</a></li>
+                <li><a href="/house-plans-1001-1500-sq-ft/"><i class="fa fa-circle" aria-hidden="true"></i>1001-1500 Sq. Ft.</a></li>
+                <li><a href="/house-plans-1501-2000-sq-ft/"><i class="fa fa-circle" aria-hidden="true"></i>1501-2000 Sq. Ft.</a></li>
+                <li><a href="/house-plans-2001-2500-sq-ft/"><i class="fa fa-circle" aria-hidden="true"></i>2001-2500 Sq. Ft.</a></li>
+                <li><a href="/house-plans-2501-3000-sq-ft/"><i class="fa fa-circle" aria-hidden="true"></i>2501-3000 Sq. Ft.</a></li>
+                <li><a href="/house-plans-3001-3500-sq-ft/"><i class="fa fa-circle" aria-hidden="true"></i>3001-3500 Sq. Ft.</a></li>
+                <li><a href="/house-plans-3501-4000-sq-ft/"><i class="fa fa-circle" aria-hidden="true"></i>3501-4000 Sq. Ft.</a></li>
+                <li><a href="/house-plans-4001-5000-sq-ft/"><i class="fa fa-circle" aria-hidden="true"></i>4001-5000 Sq. Ft.</a></li>
+                <li><a href="/house-plans-over-5000-sq-ft/"><i class="fa fa-circle" aria-hidden="true"></i>5001 Sq. Ft. and up</a></li>
+            </ul>
+
+        </div>
+        <a class="see-all-styles-btn all-button button" href="/collections/" style="text-transform: uppercase;">See all collections</a>
+    </div>
+</div><!-- #collections-list-block -->
+
+<div id="garage-list-block" class="hp-header__dropdown menu-dropdown dropdown-only-desktop d-none">
+    <div id="dropmenu-wrapper-garage" class="hp-header__dropmenu-wrapper">
+        <ul>
+            <li>
+                <h4><img loading="lazy" src="/static/img/icon/universal/house-solid.svg" style="height: 15px; margin-right: 4px;" />Single Family Plans</h4>
+            </li>
+                            <li><a href="/floorplans/?&category_id=1"><i class="fa fa-circle" aria-hidden="true"></i>View All Single-Family Plans</a></li>
+                            <li><a href="/new-house-plans"><i class="fa fa-circle" aria-hidden="true"></i>New Plans</a></li>
+                            <li><a href="/open-floor-plans"><i class="fa fa-circle" aria-hidden="true"></i>Open Floor Plans</a></li>
+                            <li><a href="/best-selling-house-plans"><i class="fa fa-circle" aria-hidden="true"></i>Best-Selling</a></li>
+                            <li><a href="/exclusive-house-plans"><i class="fa fa-circle" aria-hidden="true"></i>Exclusive</a></li>
+                            <li><a href="/house-plans-with-360-virtual-tours"><i class="fa fa-circle" aria-hidden="true"></i>Plans With 360 Virtual Tours</a></li>
+                        <li><a class="see-all-styles-btn button" href="/collections/" style="text-transform: uppercase;">More Single-Family Collections</a></li>
+        </ul>
+
+        <ul>
+            <li>
+                <h4><img loading="lazy" src="/static/img/garage_icon.png" style="height: 15px; margin-right: 4px;" />Garage Plans</h4>
+            </li>
+                            <li><a href="/garage-house-plans/"><i class="fa fa-circle" aria-hidden="true"></i>View All Garage Plans</a></li>
+                            <li><a href="/floorplans/?category_id=4&bedrooms[1]=1&bedrooms[2]=2"><i class="fa fa-circle" aria-hidden="true"></i>Garages With Apartments</a></li>
+                            <li><a href="/floorplans/?category_id=4&garages[2]=3"><i class="fa fa-circle" aria-hidden="true"></i>3 Car Garage Plans</a></li>
+                            <li><a href="/floorplans/?category_id=4&garages[2]=2"><i class="fa fa-circle" aria-hidden="true"></i>2 Car Garage Plans</a></li>
+                            <li><a href="/floorplans/?category_id=4&garages[2]=1"><i class="fa fa-circle" aria-hidden="true"></i>1 Car Garage Plans</a></li>
+                            <li><a href="/floorplans/?category_id=4&keywords[0][10]=10"><i class="fa fa-circle" aria-hidden="true"></i>Garages With A Loft</a></li>
+                        <li><a class="see-all-styles-btn button" href="/garage-plans/" style="text-transform: uppercase;">More Garage Collections</a></li>
+        </ul>
+
+        <ul>
+            <li>
+                <h4><img loading="lazy" src="/static/img/garage_icon.png" style="height: 15px; margin-right: 4px;" />Recreation Plans</h4>
+            </li>
+                            <li><a href="/pool-house-plans"><i class="fa fa-circle" aria-hidden="true"></i>Pool Houses</a></li>
+                            <li><a href="/shed-plans"><i class="fa fa-circle" aria-hidden="true"></i>Sheds</a></li>
+                            <li><a href="/gazebo-plans"><i class="fa fa-circle" aria-hidden="true"></i>Gazebos</a></li>
+                            <li><a href="/workshop-plans"><i class="fa fa-circle" aria-hidden="true"></i>Workshops</a></li>
+                        <li><a class="see-all-styles-btn button" href="/recreation-plans/" style="text-transform: uppercase;">View All Recreation Plans</a></li>
+        </ul>
+
+        <ul>
+            <li>
+                <h4><img loading="lazy" src="/static/img/icon/universal/people-roof-solid.svg" style="height: 15px; margin-right: 4px;" />Multi-Family Plans</h4>
+            </li>
+                            <li><a href="/duplex-plans/"><i class="fa fa-circle" aria-hidden="true"></i>Duplex Plans</a></li>
+                            <li><a href="/triplex-plans/"><i class="fa fa-circle" aria-hidden="true"></i>Tri-Plex Plans</a></li>
+                            <li><a href="/fourplex-plans/"><i class="fa fa-circle" aria-hidden="true"></i>Four-Plex Plans</a></li>
+                        <li><a class="see-all-styles-btn button" href="/multi-family-house-plans/" style="text-transform: uppercase;">View All Multi-Family Plans</a></li>
+        </ul>
+
+    </div>
+</div><!-- #garage-list-block -->
+
+<div id="learn-list-block" class="hp-header__dropdown menu-dropdown dropdown-only-desktop d-none">
+    <div id="dropmenu-wrapper-learn" class="hp-header__dropmenu-wrapper">
+        <ul>
+            <li>
+                <h4>Learn</h4>
+            </li>
+                            <li><a href="/about-our-plans/"><i class="fa fa-circle" aria-hidden="true"></i>What Plans Include</a></li>
+                            <li><a href="/about-our-plans/options/"><i class="fa fa-circle" aria-hidden="true"></i>Plan Options</a></li>
+                            <li><a href="/about-our-plans/codes/"><i class="fa fa-circle" aria-hidden="true"></i>Local Building Codes</a></li>
+                            <li><a href="/about-our-plans/terms/"><i class="fa fa-circle" aria-hidden="true"></i>The Purchase Agreement</a></li>
+                        <li style="margin-top: 10px;">
+                <h4>Plan Services</h4>
+            </li>
+                            <li><a href="/about-our-plans/costs/"><i class="fa fa-circle" aria-hidden="true"></i>Cost To Build</a></li>
+                            <li><a href="/about-our-plans/modifications/"><i class="fa fa-circle" aria-hidden="true"></i>Modifications</a></li>
+                            <li><a href="/pro-services/"><i class="fa fa-circle" aria-hidden="true"></i>PRO Services</a></li>
+                        <li class="d-flex justify-center"><a class="see-all-styles-btn all-button button" href="/contact/" style="text-transform: uppercase;">Contact Us</a></li>
+        </ul>
+    </div>
+</div><!-- #learn-list-block -->
+	<!-- Mobile menu -->
+<div id="mobile-menu" class="d-flex flex-column">
+    <div id="hp-nav-mobile" class="hp-primary-nav-mobile" style="align-self: center;">
+
+        <div id="nav-scroll">
+
+            
+                <ul>
+
+                    <!-- Shop mobile -->
+                    <li id="shop-menu-btn-mobile" class="nav-primary-item ">
+                        <a href="/floorplans/" class="d-flex align-center">
+                            Shop
+                        </a>
+                    </li>
+
+                    <!-- Styles mobile -->
+                    <li id="styles-menu-btn-mobile" class="nav-primary-item dropdown-menu-element goes-down" onClick="toggleDropdownMenu('styles')">
+                        <a href="javascript://" class="d-flex align-center">
+                            Styles
+                        </a>
+                    </li>
+
+                    <div id="styles-list-block-mobile" class="hp-header__dropdown menu-dropdown d-none">
+                        <div class="hp-header__dropmenu-wrapper">
+                            <ul>
+                                
+                                    <li>
+                                        <a href="/modernfarmhouse-house-plans/">
+                                            <div>
+                                                <img loading="lazy" src="/uploads/styles/62-288.jpg?v=120823160223" alt="Modern Farmhouse">
+                                            </div>
+                                            <span>Modern Farmhouse</span>
+                                        </a>
+                                    </li>
+                                
+                                    <li>
+                                        <a href="/barn-house-plans/">
+                                            <div>
+                                                <img loading="lazy" src="/uploads/styles/63-288.jpg?v=120823154341" alt="Barndominium">
+                                            </div>
+                                            <span>Barndominium</span>
+                                        </a>
+                                    </li>
+                                
+                                    <li>
+                                        <a href="/craftsman-house-plans/">
+                                            <div>
+                                                <img loading="lazy" src="/uploads/styles/12-288.jpg?v=120823154746" alt="Craftsman">
+                                            </div>
+                                            <span>Craftsman</span>
+                                        </a>
+                                    </li>
+                                
+                                    <li>
+                                        <a href="/small-house-plans/">
+                                            <div>
+                                                <img loading="lazy" src="/uploads/styles/54-288.jpg?v=120823155920" alt="Small">
+                                            </div>
+                                            <span>Small</span>
+                                        </a>
+                                    </li>
+                                
+                                    <li>
+                                        <a href="/farmhouse-house-plans/">
+                                            <div>
+                                                <img loading="lazy" src="/uploads/styles/16-288.jpg?v=120823154827" alt="Farmhouse">
+                                            </div>
+                                            <span>Farmhouse</span>
+                                        </a>
+                                    </li>
+                                
+                                    <li>
+                                        <a href="/ranch-house-plans/">
+                                            <div>
+                                                <img loading="lazy" src="/uploads/styles/30-288.jpg?v=120823155858" alt="Ranch">
+                                            </div>
+                                            <span>Ranch</span>
+                                        </a>
+                                    </li>
+                                
+                                    <li>
+                                        <a href="/country-house-plans/">
+                                            <div>
+                                                <img loading="lazy" src="/uploads/styles/11-288.jpg?v=120823154725" alt="Country">
+                                            </div>
+                                            <span>Country</span>
+                                        </a>
+                                    </li>
+                                
+                                    <li>
+                                        <a href="/modern-house-plans/">
+                                            <div>
+                                                <img loading="lazy" src="/uploads/styles/50-288.jpg?v=120823155504" alt="Modern">
+                                            </div>
+                                            <span>Modern</span>
+                                        </a>
+                                    </li>
+                                
+                                    <li>
+                                        <a href="/cottage-house-plans/">
+                                            <div>
+                                                <img loading="lazy" src="/uploads/styles/10-288.jpg?v=120823154711" alt="Cottage">
+                                            </div>
+                                            <span>Cottage</span>
+                                        </a>
+                                    </li>
+                                
+                                    <li>
+                                        <a href="/mountain-house-plans/">
+                                            <div>
+                                                <img loading="lazy" src="/uploads/styles/26-288.jpg?v=120823155751" alt="Mountain">
+                                            </div>
+                                            <span>Mountain</span>
+                                        </a>
+                                    </li>
+                                
+                                    <li>
+                                        <a href="/lakefront-house-plans/">
+                                            <div>
+                                                <img loading="lazy" src="/uploads/styles/22-288.jpg?v=120823155312" alt="Lake">
+                                            </div>
+                                            <span>Lake</span>
+                                        </a>
+                                    </li>
+                                
+                                    <li>
+                                        <a href="/traditional-house-plans/">
+                                            <div>
+                                                <img loading="lazy" src="/uploads/styles/34-288.jpg?v=120823160019" alt="Traditional">
+                                            </div>
+                                            <span>Traditional</span>
+                                        </a>
+                                    </li>
+                                                            </ul>
+                            <a class="see-all-styles-btn button" href="/styles/" style="text-transform: uppercase;">See all styles</a>
+                        </div>
+                    </div><!-- #styles-list-block - mobile -->
+
+                    <!-- Collections mobile -->
+                    <li id="collections-menu-btn-mobile" class="nav-primary-item dropdown-menu-element goes-down" onClick="toggleDropdownMenu('collections')">
+                        <a href="javascript://" class="d-flex align-center">
+                            Collections
+                        </a>
+                    </li>
+
+                    <div id="collections-list-block-mobile" class="hp-header__dropdown menu-dropdown d-none">
+                        <div id="dropmenu-wrapper-collections" class="hp-header__dropmenu-wrapper">
+                            <div id="link-block">
+                                <ul>
+                                                                            <li>
+                                            <a href="/new-house-plans/">
+                                                <div>
+                                                    <img loading="lazy" src="/uploads/searches/1-288.jpg?v=" alt="New Plans">
+                                                </div>
+                                                <span>New Plans</span>
+                                            </a>
+                                        </li>
+                                                                            <li>
+                                            <a href="/open-floor-plans/">
+                                                <div>
+                                                    <img loading="lazy" src="/uploads/searches/23-288.jpg?v=" alt="Open Floor Plans">
+                                                </div>
+                                                <span>Open Floor Plans</span>
+                                            </a>
+                                        </li>
+                                                                            <li>
+                                            <a href="/best-selling-house-plans/">
+                                                <div>
+                                                    <img loading="lazy" src="/uploads/searches/2-288.jpg?v=" alt="Best Selling">
+                                                </div>
+                                                <span>Best Selling</span>
+                                            </a>
+                                        </li>
+                                                                            <li>
+                                            <a href="/exclusive-house-plans/">
+                                                <div>
+                                                    <img loading="lazy" src="/uploads/searches/29-288.jpg?v=" alt="Exclusive Designs">
+                                                </div>
+                                                <span>Exclusive Designs</span>
+                                            </a>
+                                        </li>
+                                                                            <li>
+                                            <a href="/basement-house-plans/">
+                                                <div>
+                                                    <img loading="lazy" src="/uploads/searches/25-288.jpg?v=" alt="Basement">
+                                                </div>
+                                                <span>Basement</span>
+                                            </a>
+                                        </li>
+                                                                            <li>
+                                            <a href="/house-plans-with-in-law-suites/">
+                                                <div>
+                                                    <img loading="lazy" src="/uploads/searches/27-288.jpg?v=" alt="In-Law Suites">
+                                                </div>
+                                                <span>In-Law Suites</span>
+                                            </a>
+                                        </li>
+                                                                            <li>
+                                            <a href="/accessory-dwelling-unit-plans/">
+                                                <div>
+                                                    <img loading="lazy" src="/uploads/searches/41-288.jpg?v=" alt="ADU Plans">
+                                                </div>
+                                                <span>ADU Plans</span>
+                                            </a>
+                                        </li>
+                                                                            <li>
+                                            <a href="/house-plans-with-videos/">
+                                                <div>
+                                                    <img loading="lazy" src="/uploads/searches/24-288.jpg?v=" alt="Plans with Videos">
+                                                </div>
+                                                <span>Plans with Videos</span>
+                                            </a>
+                                        </li>
+                                                                            <li>
+                                            <a href="/house-plans-with-photos/">
+                                                <div>
+                                                    <img loading="lazy" src="/uploads/searches/8-288.jpg?v=" alt="Plans with Photos">
+                                                </div>
+                                                <span>Plans with Photos</span>
+                                            </a>
+                                        </li>
+                                                                            <li>
+                                            <a href="/house-plans-with-360-virtual-tours/">
+                                                <div>
+                                                    <img loading="lazy" src="/uploads/searches/30-288.jpg?v=" alt="Plans with 360 Virtual Tours">
+                                                </div>
+                                                <span>Plans with 360 Virtual Tours</span>
+                                            </a>
+                                        </li>
+                                                                            <li>
+                                            <a href="/one-story-house-plans/">
+                                                <div>
+                                                    <img loading="lazy" src="/uploads/searches/10-288.jpg?v=" alt="One Story House Plans">
+                                                </div>
+                                                <span>One Story House Plans</span>
+                                            </a>
+                                        </li>
+                                                                            <li>
+                                            <a href="/two-story-house-plans/">
+                                                <div>
+                                                    <img loading="lazy" src="/uploads/searches/12-288.jpg?v=" alt="Two Story House Plans">
+                                                </div>
+                                                <span>Two Story House Plans</span>
+                                            </a>
+                                        </li>
+                                                                    </ul>
+
+                                <ul id="sqft-links">
+                                    <li style="margin-top: 10px;">
+                                        <h4>Plans By Square Foot</h4>
+                                    </li>
+                                    <li><a href="/house-plans-under-1000-sq-ft/"><i class="fa fa-circle" aria-hidden="true"></i>1000 Sq. Ft. and under</a></li>
+                                    <li><a href="/house-plans-1001-1500-sq-ft/"><i class="fa fa-circle" aria-hidden="true"></i>1001-1500 Sq. Ft.</a></li>
+                                    <li><a href="/house-plans-1501-2000-sq-ft/"><i class="fa fa-circle" aria-hidden="true"></i>1501-2000 Sq. Ft.</a></li>
+                                    <li><a href="/house-plans-2001-2500-sq-ft/"><i class="fa fa-circle" aria-hidden="true"></i>2001-2500 Sq. Ft.</a></li>
+                                    <li><a href="/house-plans-2501-3000-sq-ft/"><i class="fa fa-circle" aria-hidden="true"></i>2501-3000 Sq. Ft.</a></li>
+                                    <li><a href="/house-plans-3001-3500-sq-ft/"><i class="fa fa-circle" aria-hidden="true"></i>3001-3500 Sq. Ft.</a></li>
+                                    <li><a href="/house-plans-3501-4000-sq-ft/"><i class="fa fa-circle" aria-hidden="true"></i>3501-4000 Sq. Ft.</a></li>
+                                    <li><a href="/house-plans-4001-5000-sq-ft/"><i class="fa fa-circle" aria-hidden="true"></i>4001-5000 Sq. Ft.</a></li>
+                                    <li><a href="/house-plans-over-5000-sq-ft/"><i class="fa fa-circle" aria-hidden="true"></i>5001 Sq. Ft. and up</a></li>
+                                </ul>
+
+                            </div>
+                            <a class="see-all-styles-btn all-button button" href="/collections/" style="text-transform: uppercase;">See all collections</a>
+                        </div>
+                    </div><!-- #collections-list-block - mobile -->
+
+                    <!-- Plan Types mobile -->
+                    <li id="garage-menu-btn-mobile" class="nav-primary-item dropdown-menu-element goes-down" onClick="toggleDropdownMenu('garage')">
+                        <a href="javascript://" class="d-flex align-center">
+                            Plan Types
+                        </a>
+                    </li>
+
+                    <div id="garage-list-block-mobile" class="hp-header__dropdown menu-dropdown d-none">
+                        <div id="garage-mobile" class="hp-header__dropmenu-wrapper">
+                            <ul>
+                                <li>
+                                    <h4><img loading="lazy" src="/static/img/icon/universal/house-solid.svg" style="height: 15px; margin-right: 4px;" />Single Family Plans</h4>
+                                </li>
+                                                                    <li><a href="/floorplans/?&category_id=1"><i class="fa fa-circle" aria-hidden="true"></i>View All Single-Family Plans</a></li>
+                                                                    <li><a href="/new-house-plans"><i class="fa fa-circle" aria-hidden="true"></i>New Plans</a></li>
+                                                                    <li><a href="/open-floor-plans"><i class="fa fa-circle" aria-hidden="true"></i>Open Floor Plans</a></li>
+                                                                    <li><a href="/best-selling-house-plans"><i class="fa fa-circle" aria-hidden="true"></i>Best-Selling</a></li>
+                                                                    <li><a href="/exclusive-house-plans"><i class="fa fa-circle" aria-hidden="true"></i>Exclusive</a></li>
+                                                                    <li><a href="/house-plans-with-360-virtual-tours"><i class="fa fa-circle" aria-hidden="true"></i>Plans With 360 Virtual Tours</a></li>
+                                                                <li><a class="see-all-styles-btn button" href="/collections/" style="text-transform: uppercase;">More Single-Family Collections</a></li>
+                            </ul>
+
+                            <ul>
+                                <li style="margin-top: 20px;">
+                                    <h4><img loading="lazy" src="/static/img/garage_icon.png" style="height: 15px; margin-right: 4px;" />Garage Plans</h4>
+                                </li>
+                                                                    <li><a href="/garage-house-plans/"><i class="fa fa-circle" aria-hidden="true"></i>View All Garage Plans</a></li>
+                                                                    <li><a href="/floorplans/?category_id=4&bedrooms[1]=1&bedrooms[2]=2"><i class="fa fa-circle" aria-hidden="true"></i>Garages With Apartments</a></li>
+                                                                    <li><a href="/floorplans/?category_id=4&garages[2]=3"><i class="fa fa-circle" aria-hidden="true"></i>3 Car Garage Plans</a></li>
+                                                                    <li><a href="/floorplans/?category_id=4&garages[2]=2"><i class="fa fa-circle" aria-hidden="true"></i>2 Car Garage Plans</a></li>
+                                                                    <li><a href="/floorplans/?category_id=4&garages[2]=1"><i class="fa fa-circle" aria-hidden="true"></i>1 Car Garage Plans</a></li>
+                                                                    <li><a href="/floorplans/?category_id=4&keywords[0][10]=10"><i class="fa fa-circle" aria-hidden="true"></i>Garages With A Loft</a></li>
+                                                                <li><a class="see-all-styles-btn button" href="/garage-plans/" style="text-transform: uppercase;">More Garage Collections</a></li>
+                            </ul>
+
+                            <ul>
+                                <li style="margin-top: 20px;">
+                                    <h4><img loading="lazy" src="/static/img/garage_icon.png" style="height: 15px; margin-right: 4px;" />Recreation Plans</h4>
+                                </li>
+                                                                    <li><a href="/pool-house-plans"><i class="fa fa-circle" aria-hidden="true"></i>Pool Houses</a></li>
+                                                                    <li><a href="/shed-plans"><i class="fa fa-circle" aria-hidden="true"></i>Sheds</a></li>
+                                                                    <li><a href="/gazebo-plans"><i class="fa fa-circle" aria-hidden="true"></i>Gazebos</a></li>
+                                                                    <li><a href="/workshop-plans"><i class="fa fa-circle" aria-hidden="true"></i>Workshops</a></li>
+                                                                <li><a class="see-all-styles-btn button" href="/recreation-plans/" style="text-transform: uppercase;">View All Recreation Plans</a></li>
+                            </ul>
+
+
+                            <ul>
+                                <li style="margin-top: 20px;">
+                                    <h4><img loading="lazy" src="/static/img/icon/universal/house-solid.svg" style="height: 15px; margin-right: 4px;" />Multi-Family Plans</h4>
+                                </li>
+                                                                    <li><a href="/duplex-plans/"><i class="fa fa-circle" aria-hidden="true"></i>Duplex Plans</a></li>
+                                                                    <li><a href="/triplex-plans/"><i class="fa fa-circle" aria-hidden="true"></i>Tri-Plex Plans</a></li>
+                                                                    <li><a href="/fourplex-plans/"><i class="fa fa-circle" aria-hidden="true"></i>Four-Plex Plans</a></li>
+                                                                <li><a class="see-all-styles-btn button" href="/multi-family-house-plans/" style="text-transform: uppercase;">View All Multi-Family Plans</a></li>
+                            </ul>
+
+                            
+                        </div>
+                    </div><!-- #garage-list-block - mobile -->
+
+                    <!-- Learn mobile -->
+                    <li id="learn-menu-btn-mobile" class="nav-primary-item dropdown-menu-element goes-down" onClick="toggleDropdownMenu('learn')">
+                        <a href="javascript://" class="d-flex align-center">
+                            About Our Plans
+                        </a>
+                    </li>
+
+                    <div id="learn-list-block-mobile" class="hp-header__dropdown menu-dropdown d-none">
+                        <div id="lear-mobile" class="hp-header__dropmenu-wrapper">
+                            <ul>
+                                <li>
+                                    <h4>About Our Plans</h4>
+                                </li>
+                                                                    <li>
+                                        <a href="/about-our-plans/"><i class="fa fa-circle" aria-hidden="true"></i>What Plans Include</a>
+                                    </li>
+                                                                    <li>
+                                        <a href="/about-our-plans/options/"><i class="fa fa-circle" aria-hidden="true"></i>Plan Options</a>
+                                    </li>
+                                                                    <li>
+                                        <a href="/about-our-plans/codes/"><i class="fa fa-circle" aria-hidden="true"></i>Local Building Codes</a>
+                                    </li>
+                                                                    <li>
+                                        <a href="/about-our-plans/terms/"><i class="fa fa-circle" aria-hidden="true"></i>The Purchase Agreement</a>
+                                    </li>
+                                                            </ul>
+                            <ul>
+                                <li style="margin-top: 20px">
+                                    <h4>Services</h4>
+                                </li>
+                                                                    <li><a href="/about-our-plans/costs/"><i class="fa fa-circle" aria-hidden="true"></i>Cost To Build</a></li>
+                                                                    <li><a href="/about-our-plans/modifications/"><i class="fa fa-circle" aria-hidden="true"></i>Modifications</a></li>
+                                                                    <li><a href="/pro-services/"><i class="fa fa-circle" aria-hidden="true"></i>PRO Services</a></li>
+                                                                <li><a class="contact-us-btn button" href="/contact/" style="text-transform: uppercase;">Contact Us</a></li>
+                            </ul>
+                        </div>
+                    </div><!-- #learn-list-block - mobile -->
+
+                </ul>
+            
+
+            <div class="d-flex justify-left align-center mobile-menu-icons-container">
+
+                <!-- COPIED FROM MOBILE NAVIGATOR -->
+                <a href="javascript://" id="showAuthModal" class="d-flex flex-column justify-center align-center">
+                    <img loading="lazy" src="/static/img/account-icon.png" class="mobile-navigator-icon" alt="Account">
+                    <span class="mobile-navigator-label">
+                        Sign In                    </span>
+                </a>
+
+                <a href="javascript://" id="showAuthModal" class="d-flex flex-column justify-center align-center">
+                    <div class="favorite-icon-container">
+                        <img loading="lazy" src="/static/img/fav-icon.png?ver=prod-2025-04-04-1" class="mobile-navigator-icon" alt="Account">
+                                            </div>
+                    <span class="mobile-navigator-label">
+                        Favorites
+                    </span>
+                </a>
+
+                <a href="/cart/" class="d-flex flex-column justify-center align-center">
+                    <div class="cart-icon-container">
+                        <img loading="lazy" src="/static/img/cart-icons.png" class="mobile-navigator-icon" alt="Cart">
+                                            </div>
+                    <span class="mobile-navigator-label">
+                        Cart
+                    </span>
+                </a>
+
+            </div>
+
+            <div class="d-flex justify-left align-center mobile-menu-icons-container">
+
+                <a href="javascript://" onclick="LC_API.open_chat_window({source:'button'});return false;" class="phone-number-link d-flex align-center">
+                    <img loading="lazy" src="/static/img/chat-icons.png" class="mobile-navigator-icon" style="margin-bottom: 4px; width: 36px; height: 36px;" alt="Chat With Us"><span id="number-mobile">Chat With Us</span>
+                </a>
+
+                <a id="a-number-m" href="tel:+18885017526" class="phone-number-link d-flex align-center">
+                    <img loading="lazy" src="/static/img/phone-icons.png" class="mobile-navigator-icon" style="margin-bottom: 4px; width: 24px; height: 24px;" alt="Call Us"><span id="number-mobile">1-888-501-7526</span>
+                </a>
+
+            </div><!-- .end menu-icons -->
+
+            <div class="secondary-nav-search-bar-mobile">
+
+                <form method="get" action="/floorplans/" id="find-by-plan-form" name="find-by-plan-form" style="position:relative;" class="position-relative">
+                    <input maxlength="10" type="text" id="find-by-plan-input-mobile" class="search-input-mobile" placeholder="Search By Plan #" name="plan_name" value="" />
+                    <button id="find-by-plan-button" type="submit" name="submit" class="submit" value="GO">
+                        <i class="fa fa-search"></i>
+                    </button>
+                </form>
+
+            </div>
+
+        </div> <!-- end #nav-scroll -->
+
+    </div><!-- .hp-primary-nav -->
+</div>
+</div>
+
+<style>
+	.notification-title {
+		font-weight: 900;
+		text-transform: uppercase;
+	}
+	.notification-text {
+		font-weight: 500;
+		padding: 0 10px;
+	}
+	.notification-subtext {
+		font-weight: 400;
+		font-style: italic;
+		font-size: 85%;
+
+	}
+
+	.sale-banner {
+		line-height: 0;
+		text-align: center;
+		background: #000;
+	}
+	.sale-banner img {
+		width: 600px;
+		max-width: 100%;
+	}
+</style>
+
+<script>
+	// show/hide dropdown menu
+	function toggleDropdownMenu(menuBtn) {
+		const mb = document.querySelector('body').clientWidth < 992;
+		const mbSelector = mb ? '-mobile' : '';
+
+		// set chevron down icon for all menu buttons
+		document.querySelector('.dropdown-menu-element').classList.remove('goes-up');
+		document.querySelector('.dropdown-menu-element').classList.remove('menu-active');
+		document.querySelector('.dropdown-menu-element').classList.add('goes-down');
+
+		if (document.querySelector('#' + menuBtn + '-list-block' + mbSelector).clientHeight > 0) {
+		  hideDropDownMenu(menuBtn, mbSelector);
+		} else {
+			// first close all dropdowns
+			const openedDropdown = document.querySelector(".hp-header__dropdown[id*='-list-block']:not(.d-none)")
+
+			if (openedDropdown) {
+			  const openedMenuBtn = openedDropdown.id.replace('-list-block-mobile', '').replace('-list-block', '');
+			  hideDropDownMenu(openedMenuBtn, mbSelector);
+			}
+
+			showDropDownMenu(menuBtn, mbSelector);
+		}
+	}
+
+	function showDropDownMenu(menuBtn, mbSelector) {
+	  // open the selected dropdown
+	  document.querySelector('#' + menuBtn + '-list-block' + mbSelector).classList.remove('d-none');
+
+	  // update menu button icon
+	  document.querySelector('#' + menuBtn + '-menu-btn' + mbSelector).classList.add('goes-up');
+	  document.querySelector('#' + menuBtn + '-menu-btn').classList.add('menu-active');
+	  document.querySelector('#' + menuBtn + '-menu-btn' + mbSelector).classList.remove('goes-down');
+
+	  window.openedMenuBtn = menuBtn;
+	  window.openedMenuBtnMbSelector = mbSelector;
+	}
+
+	function hideDropDownMenu(menuBtn, mbSelector) {
+	  // its already open, close dropdown
+	  document.querySelector('#' + menuBtn + '-list-block' + mbSelector).classList.add('d-none');
+
+	  // update menu button icon
+	  document.querySelector('#' + menuBtn + '-menu-btn' + mbSelector).classList.add('goes-down');
+	  document.querySelector('#' + menuBtn + '-menu-btn' + mbSelector).classList.remove('goes-up');
+	  document.querySelector('#' + menuBtn + '-menu-btn').classList.remove('menu-active');
+
+	  window.openedMenuBtn = null;
+	  window.openedMenuBtnMbSelector = null;
+	}
+
+	document.body.addEventListener("click", function() {    
+		//Menu is open and click is not the menu button
+		if (window.openedMenuBtn && !event.target.closest('li.dropdown-menu-element')) {
+			
+			const dropdownMenu = document.getElementById(window.openedMenuBtn + '-list-block' + window.openedMenuBtnMbSelector).querySelector('.hp-header__dropmenu-wrapper')        
+
+			if (dropdownMenu) {
+				const dropdownMenuRect = dropdownMenu.getBoundingClientRect();
+				const clickX = event.clientX;
+				const clickY = event.clientY;
+
+				if (clickX >= dropdownMenuRect.left && clickX <= dropdownMenuRect.right && clickY >= dropdownMenuRect.top && clickY <= dropdownMenuRect.bottom) {
+					//The click is inside the drop-down menu or its margins, so do nothing
+					return
+				}
+
+				hideDropDownMenu(window.openedMenuBtn, window.openedMenuBtnMbSelector);
+			}
+		}
+	});
+
+</script>
+
+	<!-- Top House Plans Section Starts -->
+    <section class="latestBlogsSection">
+      <div class="latestBlogsMainContainer">
+        <div class="ltBlogtopContent">
+          <div class="searchBox">
+            <div class="searchCategory">
+              	      <form role="search" method="get" id="searchform" class="searchform" action="https://www.houseplans.net/news/">
+				<div>
+					<label class="screen-reader-text" for="s">Search for:</label>
+					<input type="text" value="" name="s" id="s" />
+					<input type="submit" id="searchsubmit" value="Search" />
+				</div>
+			</form>              <script>
+                document.querySelector("#searchform input[name='s']").setAttribute("placeholder", "Search Blog");
+              </script>
+
+            </div>
+          </div>
+          <h1>Latest Articles</h1>
+        </div>
+        <div class="latestBlogContentContainer">
+			
+<div class="latestBlogCategories">
+          
+<li id="search-2" class="widget-container widget_search"><form role="search" method="get" id="searchform" class="searchform" action="https://www.houseplans.net/news/">
+				<div>
+					<label class="screen-reader-text" for="s">Search for:</label>
+					<input type="text" value="" name="s" id="s" />
+					<input type="submit" id="searchsubmit" value="Search" />
+				</div>
+			</form></li><li id="categories-2" class="widget-container widget_categories"><h3 class="widget-title">Categories</h3>
+			<ul>
+					<li class="cat-item cat-item-221"><a href="https://www.houseplans.net/news/category/architectural-elements/">Architectural Elements</a>
+</li>
+	<li class="cat-item cat-item-312"><a href="https://www.houseplans.net/news/category/bathroom/">Bathroom</a>
+</li>
+	<li class="cat-item cat-item-307"><a href="https://www.houseplans.net/news/category/blog/">Blog</a>
+</li>
+	<li class="cat-item cat-item-261"><a href="https://www.houseplans.net/news/category/building-codes/">Building Codes</a>
+</li>
+	<li class="cat-item cat-item-211"><a href="https://www.houseplans.net/news/category/cabinets/">Cabinets</a>
+</li>
+	<li class="cat-item cat-item-231"><a href="https://www.houseplans.net/news/category/ceilings/">Ceilings</a>
+</li>
+	<li class="cat-item cat-item-227"><a href="https://www.houseplans.net/news/category/cost-to-build/">Cost to Build</a>
+</li>
+	<li class="cat-item cat-item-214"><a href="https://www.houseplans.net/news/category/countertops/">Countertops</a>
+</li>
+	<li class="cat-item cat-item-447"><a href="https://www.houseplans.net/news/category/customer-photos/">Customer Photos</a>
+</li>
+	<li class="cat-item cat-item-473"><a href="https://www.houseplans.net/news/category/engineering/">Engineering</a>
+</li>
+	<li class="cat-item cat-item-7"><a href="https://www.houseplans.net/news/category/featured-house-plans/">Featured House Plans</a>
+</li>
+	<li class="cat-item cat-item-38"><a href="https://www.houseplans.net/news/category/featured-styles/">Featured Styles</a>
+</li>
+	<li class="cat-item cat-item-225"><a href="https://www.houseplans.net/news/category/foundations/">Foundations</a>
+</li>
+	<li class="cat-item cat-item-465"><a href="https://www.houseplans.net/news/category/history/">History</a>
+</li>
+	<li class="cat-item cat-item-1"><a href="https://www.houseplans.net/news/category/house-plans/">House Plans</a>
+</li>
+	<li class="cat-item cat-item-321"><a href="https://www.houseplans.net/news/category/infographic/">Infographic</a>
+</li>
+	<li class="cat-item cat-item-216"><a href="https://www.houseplans.net/news/category/kitchen/">Kitchen</a>
+</li>
+	<li class="cat-item cat-item-308"><a href="https://www.houseplans.net/news/category/main/">Main</a>
+</li>
+	<li class="cat-item cat-item-472"><a href="https://www.houseplans.net/news/category/modifications/">Modifications</a>
+</li>
+	<li class="cat-item cat-item-315"><a href="https://www.houseplans.net/news/category/outdoor-space/">Outdoor Space</a>
+</li>
+	<li class="cat-item cat-item-318"><a href="https://www.houseplans.net/news/category/porches/">Porches</a>
+</li>
+	<li class="cat-item cat-item-239"><a href="https://www.houseplans.net/news/category/roof/">Roof</a>
+</li>
+	<li class="cat-item cat-item-25"><a href="https://www.houseplans.net/news/category/stock-house-plans/">Stock House Plans</a>
+</li>
+			</ul>
+
+			</li>
+</div><!-- #primary .widget-area -->
+
+			  <div class="latestBlogCardsContainer">
+						<div class="latestBlogCards">
+			<div class="latestBlog">
+							<a href="https://www.houseplans.net/news/how-to-find-a-new-home-builder/" title="How to Find the Right New Home Builder" rel="bookmark">
+					<img width="700" height="438" src="https://www.houseplans.net/news/wp-content/uploads/2024/11/Image-3587-700x438.jpeg" class="attachment-post-thumb size-post-thumb wp-post-image" alt="" decoding="async" fetchpriority="high" srcset="https://www.houseplans.net/news/wp-content/uploads/2024/11/Image-3587-700x438.jpeg 700w, https://www.houseplans.net/news/wp-content/uploads/2024/11/Image-3587-300x188.jpeg 300w, https://www.houseplans.net/news/wp-content/uploads/2024/11/Image-3587-1024x640.jpeg 1024w, https://www.houseplans.net/news/wp-content/uploads/2024/11/Image-3587-768x480.jpeg 768w, https://www.houseplans.net/news/wp-content/uploads/2024/11/Image-3587.jpeg 1200w" sizes="(max-width: 700px) 100vw, 700px" />				</a>
+						<div class="date">
+				<p><span>November 19, 2024</span> / Brandon C Hall</p>
+			</div>
+			<h4><a href="https://www.houseplans.net/news/how-to-find-a-new-home-builder/" title="Permalink to How to Find the Right New Home Builder" rel="bookmark">How to Find the Right New Home Builder</a></h4>
+			<div class="lbshort">
+				<p>When it comes to building your dream home, you want it to be perfect. Of course, when building,&hellip;</p>
+			</div>
+			<a class="readmore" href="https://www.houseplans.net/news/how-to-find-a-new-home-builder/">READ MORE <img src="/static/img/Arrow1.svg" alt="" /></a>
+		</div>
+			<div class="latestBlog">
+							<a href="https://www.houseplans.net/news/how-to-choose-exterior-paint-colors-for-houses/" title="Choosing Exterior Paint Colors for Your House" rel="bookmark">
+					<img width="700" height="467" src="https://www.houseplans.net/news/wp-content/uploads/2024/10/Image-2501-700x467.jpeg" class="attachment-post-thumb size-post-thumb wp-post-image" alt="" decoding="async" srcset="https://www.houseplans.net/news/wp-content/uploads/2024/10/Image-2501-700x467.jpeg 700w, https://www.houseplans.net/news/wp-content/uploads/2024/10/Image-2501-300x200.jpeg 300w, https://www.houseplans.net/news/wp-content/uploads/2024/10/Image-2501-1024x683.jpeg 1024w, https://www.houseplans.net/news/wp-content/uploads/2024/10/Image-2501-768x512.jpeg 768w, https://www.houseplans.net/news/wp-content/uploads/2024/10/Image-2501.jpeg 1200w" sizes="(max-width: 700px) 100vw, 700px" />				</a>
+						<div class="date">
+				<p><span>October 4, 2024</span> / Brandon C Hall</p>
+			</div>
+			<h4><a href="https://www.houseplans.net/news/how-to-choose-exterior-paint-colors-for-houses/" title="Permalink to Choosing Exterior Paint Colors for Your House" rel="bookmark">Choosing Exterior Paint Colors for Your House</a></h4>
+			<div class="lbshort">
+				<p>&nbsp; Selecting the perfect exterior color for your home can be challenging. Homeowners often face&hellip;</p>
+			</div>
+			<a class="readmore" href="https://www.houseplans.net/news/how-to-choose-exterior-paint-colors-for-houses/">READ MORE <img src="/static/img/Arrow1.svg" alt="" /></a>
+		</div>
+			<div class="latestBlog">
+							<a href="https://www.houseplans.net/news/popular-exterior-house-colors-ideas-for-modern-homes/" title="Popular Exterior House Colors: Ideas for Modern Homes" rel="bookmark">
+					<img width="700" height="467" src="https://www.houseplans.net/news/wp-content/uploads/2024/09/Image-2180-700x467.jpeg" class="attachment-post-thumb size-post-thumb wp-post-image" alt="" decoding="async" srcset="https://www.houseplans.net/news/wp-content/uploads/2024/09/Image-2180-700x467.jpeg 700w, https://www.houseplans.net/news/wp-content/uploads/2024/09/Image-2180-300x200.jpeg 300w, https://www.houseplans.net/news/wp-content/uploads/2024/09/Image-2180-1024x683.jpeg 1024w, https://www.houseplans.net/news/wp-content/uploads/2024/09/Image-2180-768x512.jpeg 768w, https://www.houseplans.net/news/wp-content/uploads/2024/09/Image-2180.jpeg 1200w" sizes="(max-width: 700px) 100vw, 700px" />				</a>
+						<div class="date">
+				<p><span>September 18, 2024</span> / Brandon C Hall</p>
+			</div>
+			<h4><a href="https://www.houseplans.net/news/popular-exterior-house-colors-ideas-for-modern-homes/" title="Permalink to Popular Exterior House Colors: Ideas for Modern Homes" rel="bookmark">Popular Exterior House Colors: Ideas for Modern Homes</a></h4>
+			<div class="lbshort">
+				<p>Choosing an exterior house color can feel overwhelming. With countless options available,&hellip;</p>
+			</div>
+			<a class="readmore" href="https://www.houseplans.net/news/popular-exterior-house-colors-ideas-for-modern-homes/">READ MORE <img src="/static/img/Arrow1.svg" alt="" /></a>
+		</div>
+			<div class="latestBlog">
+							<a href="https://www.houseplans.net/news/building-an-outdoor-oasis/" title="Creating an Outdoor Oasis" rel="bookmark">
+					<img width="700" height="467" src="https://www.houseplans.net/news/wp-content/uploads/2016/08/IMG_9293-700x467.jpg" class="attachment-post-thumb size-post-thumb wp-post-image" alt="" decoding="async" loading="lazy" srcset="https://www.houseplans.net/news/wp-content/uploads/2016/08/IMG_9293-700x467.jpg 700w, https://www.houseplans.net/news/wp-content/uploads/2016/08/IMG_9293-300x200.jpg 300w, https://www.houseplans.net/news/wp-content/uploads/2016/08/IMG_9293-1024x683.jpg 1024w, https://www.houseplans.net/news/wp-content/uploads/2016/08/IMG_9293-768x512.jpg 768w, https://www.houseplans.net/news/wp-content/uploads/2016/08/IMG_9293.jpg 1368w" sizes="auto, (max-width: 700px) 100vw, 700px" />				</a>
+						<div class="date">
+				<p><span>September 10, 2024</span> / Brandon C Hall</p>
+			</div>
+			<h4><a href="https://www.houseplans.net/news/building-an-outdoor-oasis/" title="Permalink to Creating an Outdoor Oasis" rel="bookmark">Creating an Outdoor Oasis</a></h4>
+			<div class="lbshort">
+				<p>As you begin planning the details of your new home, one of the most exciting opportunities lies in&hellip;</p>
+			</div>
+			<a class="readmore" href="https://www.houseplans.net/news/building-an-outdoor-oasis/">READ MORE <img src="/static/img/Arrow1.svg" alt="" /></a>
+		</div>
+			<div class="latestBlog">
+							<a href="https://www.houseplans.net/news/porches/" title="Porches &#8211; What Are Your Options?" rel="bookmark">
+					<img width="700" height="456" src="https://www.houseplans.net/news/wp-content/uploads/2018/10/Image-1109-700x456.jpeg" class="attachment-post-thumb size-post-thumb wp-post-image" alt="" decoding="async" loading="lazy" srcset="https://www.houseplans.net/news/wp-content/uploads/2018/10/Image-1109-700x456.jpeg 700w, https://www.houseplans.net/news/wp-content/uploads/2018/10/Image-1109-300x195.jpeg 300w, https://www.houseplans.net/news/wp-content/uploads/2018/10/Image-1109-1024x666.jpeg 1024w, https://www.houseplans.net/news/wp-content/uploads/2018/10/Image-1109-768x500.jpeg 768w, https://www.houseplans.net/news/wp-content/uploads/2018/10/Image-1109-595x387.jpeg 595w, https://www.houseplans.net/news/wp-content/uploads/2018/10/Image-1109.jpeg 1200w" sizes="auto, (max-width: 700px) 100vw, 700px" />				</a>
+						<div class="date">
+				<p><span>August 13, 2024</span> / Brandon C Hall</p>
+			</div>
+			<h4><a href="https://www.houseplans.net/news/porches/" title="Permalink to Porches &#8211; What Are Your Options?" rel="bookmark">Porches &#8211; What Are Your Options?</a></h4>
+			<div class="lbshort">
+				<p>There are so many options and choices to be made when it comes to designing your dream house plan.&hellip;</p>
+			</div>
+			<a class="readmore" href="https://www.houseplans.net/news/porches/">READ MORE <img src="/static/img/Arrow1.svg" alt="" /></a>
+		</div>
+			<div class="latestBlog">
+							<a href="https://www.houseplans.net/news/what-is-a-porte-cochere/" title="What Is A Porte-Cochere?" rel="bookmark">
+					<img width="700" height="467" src="https://www.houseplans.net/news/wp-content/uploads/2019/03/Image-1000-700x467.jpeg" class="attachment-post-thumb size-post-thumb wp-post-image" alt="Modern Farmhouse 4534-00020" decoding="async" loading="lazy" srcset="https://www.houseplans.net/news/wp-content/uploads/2019/03/Image-1000-700x467.jpeg 700w, https://www.houseplans.net/news/wp-content/uploads/2019/03/Image-1000-300x200.jpeg 300w, https://www.houseplans.net/news/wp-content/uploads/2019/03/Image-1000-1024x683.jpeg 1024w, https://www.houseplans.net/news/wp-content/uploads/2019/03/Image-1000-768x512.jpeg 768w, https://www.houseplans.net/news/wp-content/uploads/2019/03/Image-1000-595x397.jpeg 595w, https://www.houseplans.net/news/wp-content/uploads/2019/03/Image-1000.jpeg 1200w" sizes="auto, (max-width: 700px) 100vw, 700px" />				</a>
+						<div class="date">
+				<p><span>August 7, 2024</span> / Brandon C Hall</p>
+			</div>
+			<h4><a href="https://www.houseplans.net/news/what-is-a-porte-cochere/" title="Permalink to What Is A Porte-Cochere?" rel="bookmark">What Is A Porte-Cochere?</a></h4>
+			<div class="lbshort">
+				<p>Do you have any idea what a porte-cochere is or where you might see one? Initially seen in large&hellip;</p>
+			</div>
+			<a class="readmore" href="https://www.houseplans.net/news/what-is-a-porte-cochere/">READ MORE <img src="/static/img/Arrow1.svg" alt="" /></a>
+		</div>
+			<div class="latestBlog">
+							<a href="https://www.houseplans.net/news/popular-interior-paint-colors/" title="Most Popular Interior Paint Colors for Your Home" rel="bookmark">
+					<img width="700" height="467" src="https://www.houseplans.net/news/wp-content/uploads/2024/07/Image-859-700x467.jpeg" class="attachment-post-thumb size-post-thumb wp-post-image" alt="" decoding="async" loading="lazy" srcset="https://www.houseplans.net/news/wp-content/uploads/2024/07/Image-859-700x467.jpeg 700w, https://www.houseplans.net/news/wp-content/uploads/2024/07/Image-859-300x200.jpeg 300w, https://www.houseplans.net/news/wp-content/uploads/2024/07/Image-859-1024x684.jpeg 1024w, https://www.houseplans.net/news/wp-content/uploads/2024/07/Image-859-768x513.jpeg 768w, https://www.houseplans.net/news/wp-content/uploads/2024/07/Image-859-595x397.jpeg 595w, https://www.houseplans.net/news/wp-content/uploads/2024/07/Image-859.jpeg 1200w" sizes="auto, (max-width: 700px) 100vw, 700px" />				</a>
+						<div class="date">
+				<p><span>July 31, 2024</span> / Brandon C Hall</p>
+			</div>
+			<h4><a href="https://www.houseplans.net/news/popular-interior-paint-colors/" title="Permalink to Most Popular Interior Paint Colors for Your Home" rel="bookmark">Most Popular Interior Paint Colors for Your Home</a></h4>
+			<div class="lbshort">
+				<p>The shades “Eggshell” and “White” are nearly identical, so how do you choose between them?&hellip;</p>
+			</div>
+			<a class="readmore" href="https://www.houseplans.net/news/popular-interior-paint-colors/">READ MORE <img src="/static/img/Arrow1.svg" alt="" /></a>
+		</div>
+			<div class="latestBlog">
+							<a href="https://www.houseplans.net/news/craftsman-style-house-plan-with-character/" title="New Craftsman House Plans with Character" rel="bookmark">
+					<img width="700" height="438" src="https://www.houseplans.net/news/wp-content/uploads/2014/06/Image-609-700x438.jpeg" class="attachment-post-thumb size-post-thumb wp-post-image" alt="Craftsman Plan 7174-00026" decoding="async" loading="lazy" srcset="https://www.houseplans.net/news/wp-content/uploads/2014/06/Image-609-700x438.jpeg 700w, https://www.houseplans.net/news/wp-content/uploads/2014/06/Image-609-300x188.jpeg 300w, https://www.houseplans.net/news/wp-content/uploads/2014/06/Image-609-1024x640.jpeg 1024w, https://www.houseplans.net/news/wp-content/uploads/2014/06/Image-609-768x480.jpeg 768w, https://www.houseplans.net/news/wp-content/uploads/2014/06/Image-609-595x372.jpeg 595w, https://www.houseplans.net/news/wp-content/uploads/2014/06/Image-609.jpeg 1200w" sizes="auto, (max-width: 700px) 100vw, 700px" />				</a>
+						<div class="date">
+				<p><span>July 25, 2024</span> / Brandon C Hall</p>
+			</div>
+			<h4><a href="https://www.houseplans.net/news/craftsman-style-house-plan-with-character/" title="Permalink to New Craftsman House Plans with Character" rel="bookmark">New Craftsman House Plans with Character</a></h4>
+			<div class="lbshort">
+				<p>&nbsp; Builders love to create homes with flair, and since the mid-19th century, the Craftsman&hellip;</p>
+			</div>
+			<a class="readmore" href="https://www.houseplans.net/news/craftsman-style-house-plan-with-character/">READ MORE <img src="/static/img/Arrow1.svg" alt="" /></a>
+		</div>
+			<div class="latestBlog">
+							<a href="https://www.houseplans.net/news/modern-mudroom-design-ideas/" title="Modern Mudroom Design Ideas &#038; Floor Plans" rel="bookmark">
+					<img width="700" height="467" src="https://www.houseplans.net/news/wp-content/uploads/2024/07/Image-368-700x467.jpeg" class="attachment-post-thumb size-post-thumb wp-post-image" alt="" decoding="async" loading="lazy" srcset="https://www.houseplans.net/news/wp-content/uploads/2024/07/Image-368-700x467.jpeg 700w, https://www.houseplans.net/news/wp-content/uploads/2024/07/Image-368-300x200.jpeg 300w, https://www.houseplans.net/news/wp-content/uploads/2024/07/Image-368-1024x683.jpeg 1024w, https://www.houseplans.net/news/wp-content/uploads/2024/07/Image-368-768x512.jpeg 768w, https://www.houseplans.net/news/wp-content/uploads/2024/07/Image-368-595x397.jpeg 595w, https://www.houseplans.net/news/wp-content/uploads/2024/07/Image-368.jpeg 1200w" sizes="auto, (max-width: 700px) 100vw, 700px" />				</a>
+						<div class="date">
+				<p><span>July 19, 2024</span> / Brandon C Hall</p>
+			</div>
+			<h4><a href="https://www.houseplans.net/news/modern-mudroom-design-ideas/" title="Permalink to Modern Mudroom Design Ideas &#038; Floor Plans" rel="bookmark">Modern Mudroom Design Ideas &#038; Floor Plans</a></h4>
+			<div class="lbshort">
+				<p>What is a Mudroom? Mudrooms are smaller areas of the home, usually placed by a side or back door,&hellip;</p>
+			</div>
+			<a class="readmore" href="https://www.houseplans.net/news/modern-mudroom-design-ideas/">READ MORE <img src="/static/img/Arrow1.svg" alt="" /></a>
+		</div>
+			<div class="latestBlog">
+							<a href="https://www.houseplans.net/news/different-types-of-fireplaces/" title="Exploring the Different Types of Fireplaces: A Comprehensive Guide" rel="bookmark">
+					<img width="700" height="467" src="https://www.houseplans.net/news/wp-content/uploads/2024/07/Image-109-700x467.jpeg" class="attachment-post-thumb size-post-thumb wp-post-image" alt="" decoding="async" loading="lazy" srcset="https://www.houseplans.net/news/wp-content/uploads/2024/07/Image-109-700x467.jpeg 700w, https://www.houseplans.net/news/wp-content/uploads/2024/07/Image-109-300x200.jpeg 300w, https://www.houseplans.net/news/wp-content/uploads/2024/07/Image-109-1024x683.jpeg 1024w, https://www.houseplans.net/news/wp-content/uploads/2024/07/Image-109-768x512.jpeg 768w, https://www.houseplans.net/news/wp-content/uploads/2024/07/Image-109-595x397.jpeg 595w, https://www.houseplans.net/news/wp-content/uploads/2024/07/Image-109.jpeg 1200w" sizes="auto, (max-width: 700px) 100vw, 700px" />				</a>
+						<div class="date">
+				<p><span>July 11, 2024</span> / Brandon C Hall</p>
+			</div>
+			<h4><a href="https://www.houseplans.net/news/different-types-of-fireplaces/" title="Permalink to Exploring the Different Types of Fireplaces: A Comprehensive Guide" rel="bookmark">Exploring the Different Types of Fireplaces: A Comprehensive Guide</a></h4>
+			<div class="lbshort">
+				<p>There&#8217;s nothing cozier than lighting up the fireplace on a cold night and snuggling up with the&hellip;</p>
+			</div>
+			<a class="readmore" href="https://www.houseplans.net/news/different-types-of-fireplaces/">READ MORE <img src="/static/img/Arrow1.svg" alt="" /></a>
+		</div>
+			<div class="latestBlog">
+							<a href="https://www.houseplans.net/news/the-all-american-front-porch/" title="The All-American Front Porch" rel="bookmark">
+					<img width="700" height="467" src="https://www.houseplans.net/news/wp-content/uploads/2016/11/Image-754-700x467.jpeg" class="attachment-post-thumb size-post-thumb wp-post-image" alt="098-00326" decoding="async" loading="lazy" srcset="https://www.houseplans.net/news/wp-content/uploads/2016/11/Image-754-700x467.jpeg 700w, https://www.houseplans.net/news/wp-content/uploads/2016/11/Image-754-300x200.jpeg 300w, https://www.houseplans.net/news/wp-content/uploads/2016/11/Image-754-1024x683.jpeg 1024w, https://www.houseplans.net/news/wp-content/uploads/2016/11/Image-754-768x512.jpeg 768w, https://www.houseplans.net/news/wp-content/uploads/2016/11/Image-754-595x397.jpeg 595w, https://www.houseplans.net/news/wp-content/uploads/2016/11/Image-754.jpeg 1200w" sizes="auto, (max-width: 700px) 100vw, 700px" />				</a>
+						<div class="date">
+				<p><span>July 3, 2024</span> / Brandon C Hall</p>
+			</div>
+			<h4><a href="https://www.houseplans.net/news/the-all-american-front-porch/" title="Permalink to The All-American Front Porch" rel="bookmark">The All-American Front Porch</a></h4>
+			<div class="lbshort">
+				<p>Overwhelmingly sought after, and culturally renowned in America&#8217;s architectural landscape, porches&hellip;</p>
+			</div>
+			<a class="readmore" href="https://www.houseplans.net/news/the-all-american-front-porch/">READ MORE <img src="/static/img/Arrow1.svg" alt="" /></a>
+		</div>
+			<div class="latestBlog">
+							<a href="https://www.houseplans.net/news/driveways-as-design-elements/" title="Driveways as Design Elements" rel="bookmark">
+					<img width="700" height="466" src="https://www.houseplans.net/news/wp-content/uploads/2014/08/Image-615-700x466.jpeg" class="attachment-post-thumb size-post-thumb wp-post-image" alt="" decoding="async" loading="lazy" srcset="https://www.houseplans.net/news/wp-content/uploads/2014/08/Image-615-700x466.jpeg 700w, https://www.houseplans.net/news/wp-content/uploads/2014/08/Image-615-300x200.jpeg 300w, https://www.houseplans.net/news/wp-content/uploads/2014/08/Image-615-1024x682.jpeg 1024w, https://www.houseplans.net/news/wp-content/uploads/2014/08/Image-615-768x511.jpeg 768w, https://www.houseplans.net/news/wp-content/uploads/2014/08/Image-615-595x396.jpeg 595w, https://www.houseplans.net/news/wp-content/uploads/2014/08/Image-615.jpeg 1200w" sizes="auto, (max-width: 700px) 100vw, 700px" />				</a>
+						<div class="date">
+				<p><span>June 26, 2024</span> / Brandon C Hall</p>
+			</div>
+			<h4><a href="https://www.houseplans.net/news/driveways-as-design-elements/" title="Permalink to Driveways as Design Elements" rel="bookmark">Driveways as Design Elements</a></h4>
+			<div class="lbshort">
+				<p>There was a time when driveways were just a place to pull your car onto when returning home from a&hellip;</p>
+			</div>
+			<a class="readmore" href="https://www.houseplans.net/news/driveways-as-design-elements/">READ MORE <img src="/static/img/Arrow1.svg" alt="" /></a>
+		</div>
+	</div>
+<div class="latestBlogPagination">
+
+	<ul class='page-numbers'>
+	<li><span aria-current="page" class="page-numbers current">1</span></li>
+	<li><a class="page-numbers" href="https://www.houseplans.net/news/wp-content/uploads/2020/01/Cottage_1_floorplan.jpg/page/2/">2</a></li>
+	<li><a class="page-numbers" href="https://www.houseplans.net/news/wp-content/uploads/2020/01/Cottage_1_floorplan.jpg/page/3/">3</a></li>
+	<li><span class="page-numbers dots">&hellip;</span></li>
+	<li><a class="page-numbers" href="https://www.houseplans.net/news/wp-content/uploads/2020/01/Cottage_1_floorplan.jpg/page/19/">19</a></li>
+	<li><a class="next page-numbers" href="https://www.houseplans.net/news/wp-content/uploads/2020/01/Cottage_1_floorplan.jpg/page/2/"><i class="fa fa-chevron-right"></i></a></li>
+</ul>
+</div>
+						</div>	
+						</div>
+      </div>
+    </section>
+    <!-- PAGE CONTENT GOES ABOVE THIS LINE -->
+
+
+
+<div id="footer">
+<div id="new-footer" class="new-hp-footer">
+
+	<div class="hp-footer-container">
+
+		<div class="hp-footer-logo-container d-flex flex-desktop-row justify-between">
+
+			<img loading="lazy" src="/static/img/abh-logo-white.svg" class="hp-footer-logo" alt="America's Best House Plans logo">
+
+			<div class="top-buttons-container d-flex flex-row">
+
+				
+				<a href="/floorplans/">
+					<button id="view-plans-footer-btn" class="small-footer-btn bordered-transparent-btn transparent-btn">
+						VIEW ALL PLANS
+					</button>
+				</a>
+
+				<a href="/contact/">
+					<button class="small-footer-btn bordered-transparent-btn transparent-btn">
+						CONTACT US
+					</button>
+				</a>
+
+			</div>
+
+		</div>
+
+		
+			<div class="hp-footer-options-container d-flex flex-row justify-between">
+
+				<div class="footer-collapsibles-container d-flex flex-row">
+
+					<div class="hp-footer-social-container d-flex flex-column">
+
+						<div class="social-container-collapsibles d-flex flex-row">
+
+							<!-- House Plans column -->
+							<div class="hp-footer-collapsible">
+
+								<h6 class="hp-footer-collapsible-header" onClick="toggleFooterChevron('houseplans')">
+									HOUSE PLANS <i id="footer-houseplans-icon" class="fa fa-chevron-down footer-menu-chevron-icon"></i>
+								</h6>
+
+								<div class="hp-footer-collapsible-content">
+									<ul>
+										<li><a href="/styles/">Styles</a></li>
+										<li><a href="/collections/">Collections</a></li>
+										<li><a href="/garage-plans/">Garage Plans</a></li>
+										<li><a href="/new-house-plans/">New Plans</a></li>
+										<li><a href="/exclusive-house-plans/">Exclusive Plans</a></li>
+									</ul>
+								</div>
+
+							</div>
+
+							<!-- Services column -->
+							<div class="hp-footer-collapsible">
+
+								<h6 class="hp-footer-collapsible-header" onClick="toggleFooterChevron('services')">
+									SERVICES <i id="footer-services-icon" class="fa fa-chevron-down footer-menu-chevron-icon"></i>
+								</h6>
+
+								<div class="hp-footer-collapsible-content">
+									<ul>
+										<li><a href="/about-our-plans/costs/">Cost To Build</a></li>
+										<li><a href="/about-our-plans/modifications/">Modifications</a></li>
+										<li><a href="/pro-services/">PRO Services</a></li>
+										<li><a href="/contact/">Contact Us</a></li>
+									</ul>
+								</div>
+
+							</div>
+
+							<!-- Learn column -->
+							<div class="hp-footer-collapsible">
+
+								<h6 class="hp-footer-collapsible-header" onClick="toggleFooterChevron('learn')">
+									LEARN <i id="footer-learn-icon" class="fa fa-chevron-down footer-menu-chevron-icon"></i>
+								</h6>
+
+								<div class="hp-footer-collapsible-content">
+									<ul>
+										<li><a href="/about-our-plans/">What Plans Include</a></li>
+										<li><a href="/about-our-plans/options/">Plan Options</a></li>
+										<li><a href="/about-our-plans/codes/">Local Building Codes</a></li>
+										<li><a href="/about-our-plans/terms/">The Purchase Agreement</a></li>
+										<li><a href="/news/">Blog</a></li>
+									</ul>
+								</div>
+
+							</div>
+
+							<!-- Discover column -->
+							<div class="hp-footer-collapsible">
+
+								<h6 class="hp-footer-collapsible-header" onClick="toggleFooterChevron('discover')">
+									DISCOVER <i id="footer-discover-icon" class="fa fa-chevron-down footer-menu-chevron-icon"></i>
+								</h6>
+
+								<div class="hp-footer-collapsible-content">
+									<ul>
+										<li><a href="/aboutus/">About Us</a></li>
+										<li><a href="/shipping/">Shipping Policy</a></li>
+										<li><a href="/copyright/">Copyright</a></li>
+										<li><a href="/privacy/">Privacy Policy</a></li>
+										<li><a href="/publishwithus/">Publish With Us</a></li>
+									</ul>
+								</div>
+
+							</div>
+
+						</div>
+
+													
+							<!-- Social Media icons -->
+							<div class="hp-footer-social-icons">
+
+								<h6 class="hp-footer-social-title">SOCIAL</h6>
+
+								<div class="social-items">
+									<a target="_blank" href="https://www.facebook.com/Americasbesthouseplans/">
+										<i class="fab fa-facebook-f iconsm"></i>
+									</a>
+									<a target="_blank" href="https://www.instagram.com/americasbesthouseplans/">
+										<i class="fab fa-instagram iconsm"></i>
+									</a>
+									<a target="_blank" href="https://www.tiktok.com/@americasbesthouseplans/">
+										<svg class="icontik" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+											<path fill="currentColor" d="M448,209.91a210.06,210.06,0,0,1-122.77-39.25V349.38A162.55,162.55,0,1,1,185,188.31V278.2a74.62,74.62,0,1,0,52.23,71.18V0l88,0a121.18,121.18,0,0,0,1.86,22.17h0A122.18,122.18,0,0,0,381,102.39a121.43,121.43,0,0,0,67,20.14Z"></path>
+										</svg>
+									</a>
+									<a target="_blank" href="https://www.pinterest.com/besthouseplans/">
+										<i class="fab fa-pinterest-p iconsm"></i>
+									</a>
+									<a target="_blank" href="https://www.youtube.com/user/besthouseplans">
+										<i class="fab fa-youtube iconsm"></i>
+									</a>
+									<a target="_blank" href="https://twitter.com/besthouseplans/">
+										<i class="fab fa-x-twitter iconsm"></i>
+									</a>
+									<a target="_blank" href="https://www.threads.net/@americasbesthouseplans">
+										<i class="fab fa-threads iconsm"></i>
+									</a>
+									<a target="_blank" href="https://www.houzz.com/professionals/architects-and-building-designers/america-s-best-house-plans-pfvwus-pf~344194001?">
+										<i class="fab fa-houzz iconsm"></i>
+									</a>
+								</div>
+
+							</div>
+
+						
+					</div>
+
+				</div>
+
+				
+					<!-- Contact input column -->
+					<div class="hp-footer-contact-section d-flex flex-column">
+
+						<div class="klaviyo-form-YudwBh">
+							<h6>Enter your email to receive exclusive content straight to your inbox</h6>
+						</div>
+
+						<div class="d-flex flex-row align-center hp-footer-phone-container">
+							<img loading="lazy" id="footer-phone-icon" src="/static/img/white-phone.png" alt="Phone">
+							<span class="footer-phone-container-label">
+								CALL US!
+							</span>
+							<a href="tel:+18885017526">
+								<span class="hp-footer-phone-number">
+									1-888-501-7526								</span>
+							</a>
+						</div>
+
+					</div>
+
+				
+			</div>
+
+		
+		<hr class="hp-footer-separator">
+
+		<div class="hp-footer-copyright-container d-flex flex-row justify-center">
+
+			<span>
+				&copy; 2025 <span style="color:#fff; font-weight: 700;">AMERICA'S BEST HOUSE PLANS.</span>
+			</span>
+
+			<span style="margin-left: 5px;">
+				All Rights Reserved. <span class="not-mobile" style="margin-right: 4px;">|</span>
+			</span>
+
+			<span>
+				<span>
+					<a href="/about-our-plans/terms/">Terms</a> | <a href="/privacy/">Privacy</a> | <a  id="silktide-cookie-link" href="javascript://">Cookie Settings</a> | 
+				</span>
+				<span class="accessibility"> 
+					<a id="footer-accessibility-button" href="javascript://" data-acsb-custom-trigger="true" style="font-size: 11px; vertical-align: middle; padding: 2px 16px; text-decoration: none;" role="button">
+						<span class="accessibility-label" style="margin-left: -10px;">Accessibility &nbsp;</span> 
+						<i class="fa fa-universal-access" style="font-size: 24px; vertical-align: middle;"></i>
+					</a>
+
+					<script>
+						document.getElementById('footer-accessibility-button').onclick = function clickHandler() {
+
+							// document.getElementById('equally-ai___init-button').click();
+							
+							// Init button moved to shadow-root
+							const hostElement = document.querySelector('equally-widget-ui');
+							// Check if shadowRoot is available (mode: 'open')
+							if (hostElement && hostElement.shadowRoot) {
+							  // Access the shadow root
+							  const shadowRoot = hostElement.shadowRoot;
+							  // Query element within the shadow root
+							  const targetElement = shadowRoot.getElementById('equally-ai___init-button');
+							  if (targetElement) {
+							    targetElement.click();
+							  }
+							}
+
+						};
+					</script>
+				</span>
+			</span>
+
+			</div>
+			
+			<div class="footer-blank-space"></div>
+
+		</div>
+
+		
+			<!-- staging [Dev (Testing)] Button -->
+			<!--- data-id="ePwggOH8exa" -->
+			<div data-id="ePwggOH8exa" id="live-chat-button" class="livechat_button"><a href="javascript:void(0)"> </a></div>
+
+		
+	</div>
+
+</div>
+
+<!-- login and signup modal -->
+<div class="authModal" id="authModal">
+	<div class="login-signup-wrapper">
+		<div class="authBox">
+	<div class="close" id="closeBtn">
+		<span>X</span>
+	</div>
+	<div class="authContent">
+		<div class="logo-popup">
+			<img loading="lazy" src="/static/img/logo-signup.png?v=2" alt="" />
+		</div>
+		<div class="login-signup-tabs">
+			<div class="tab-menu">
+				<ul>
+					<li>
+						<a href="javascript://" class="tab-a active-a" data-id="signInTab">Sign In</a>
+					</li>
+					<li>
+						<a href="javascript://" class="tab-a" data-id="newAccount">New Account</a>
+					</li>
+				</ul>
+			</div>
+			<div class="tabsContent">
+
+				<div class="authTab tab-active" data-id="signInTab">
+					<div id="social-signin" class="authenticate">								
+
+						<button id="googleSigninButton" class="authenticateBtn" type="button" style="border-radius: 7px; background-color: white; color: #444; border: 0px;font-size: 14px; font-weight: 500; box-shadow: 4px 0 10px gainsboro;">
+							<span style="display: flex; align-items: center;">
+								<svg viewBox="0 0 48 48" style="height: 24px; margin: 0 1rem;">
+									<g>
+										<path class="c-third_party_auth__icon__google--red" fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path>
+										<path class="c-third_party_auth__icon__google--blue" fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"></path>
+										<path class="c-third_party_auth__icon__google--yellow" fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"></path>
+										<path class="c-third_party_auth__icon__google--green" fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path>
+										<path fill="none" d="M0 0h48v48H0z"></path>
+									</g>
+								</svg>
+								<span>Sign In with Google</span>
+							</span>
+						</button>
+
+						<button class="authenticateBtn" aria-label="Sign In with Facebook" onclick="facebookLoginInit()" style="border-radius: 7px; color: #444; background-color: white; border: 0px; font-size: 14px; font-weight: 500; display: flex; align-items: center; box-shadow: 4px 0 10px gainsboro;">
+							<span style="display: flex;align-items: center;">
+								<svg viewBox="0 0 213 213" preserveAspectRatio="xMinYMin" style="height: 24px;margin: 0 1rem;">
+									<path d="M90,212v-75h-27v-31h27v-25q0,-40 40,-40q15,0 24,2v26h-14q-16,0 -16,16v21h30l-5,31h-27v75a106 106,0,1,0,-32 0" fill="rgb(26, 119, 242)"></path>
+									<path d="M90,212v-75h-27v-31h27v-25q0,-40 40,-40q15,0 24,2v26h-14q-16,0 -16,16v21h30l-5,31h-27v75a106 106,1,0,1,-32 0" fill="transparent"></path>
+								</svg>
+								<span>Sign In with Facebook</span>
+							</span>
+						</button>
+
+						<div style="display: flex; align-items: center; margin: 8px 0 0 0; font-size: 1rem; color: black; width: 100%;">
+							<hr style="border-top: 1px solid #ccc; flex-grow: 1; margin: 0;">
+							<div style="padding: 0 20px; color: #666;"><small style="position: relative; top: -2px;">OR</small></div>
+							<hr style="border-top: 1px solid #ccc; flex-grow: 1; margin: 0;">
+						</div>
+					</div>
+
+
+					<div id="magic-login-wrapper" class="login-wrapper">
+						<form class="authForm" action="/ajax.php" method="post" name="magicLoginForm" id="magicLoginForm">
+							<input type="hidden" name="adding_favorite" value="undefined" />
+							<input type="hidden" name="action" value="magicLogin" />
+							<input type="hidden" name="redirect" value="/news/wp-content/uploads/2020/01/Cottage_1_floorplan.jpg" />
+							<input type="text" placeholder="name@email.com" name="email" class="formInput" id="authForm_email" trim />
+							<div class="authenticate">
+								<button type="submit" class="authenticateBtn abhp-btn">Sign In With Email</button>
+								<div class="magicLoginSuccess">
+									<p>
+									We've sent a magic sign-in link to your email. Click the link to be instantly signed in!</p>
+								</div>
+								<div class="magicLoginMessage">
+									<p>
+										We'll email you a magic link for a password-free sign in! Or you can <a href="javascript://" id="passwordSignin">sign in manually instead.</a> 
+									</p>
+								</div>
+
+							</div>
+						</form>
+					</div>
+
+					<div id="password-login-wrapper" class="login-wrapper remove">
+						<i id="password-back" class="fas fa-chevron-left btn-back" style="margin-bottom: 8px;"></i>
+						<form class="authForm" action="/ajax.php" method="post" name="loginForm" id="loginForm">
+							<input type="hidden" name="adding_favorite" value="undefined" />
+							<input type="hidden" name="action" value="login" />
+							<div id="authForm_promoMessage" style="display: none; background: #ffffff; border-radius: 10px; padding: 10px; margin-bottom: 16px; font-size: 16px; color: green; font-weight: bold; border: 1px solid green"></div>
+							<input type="text" placeholder="name@email.com" name="email" class="formInput" id="authForm_email" trim />
+							<input type="password" placeholder="Password" name="password" class="formInput" />
+							<div class="authenticate">
+								<button type="submit" class="authenticateBtn abhp-btn">Sign In</button>
+								<a href="javascript://" id="forgetPass">Forgot Password?</a>
+							</div>
+						</form>
+					</div>
+
+					<div class="forget-pass-wrapper remove">
+						<h4 class="password">
+							<i id="forgot-back" class="fas fa-chevron-left btn-back"></i>
+							Forgot your password?
+						</h4>
+						<form class="authForm" action="/ajax.php" method="post" name="forgotPasswordForm">
+							<input type="hidden" name="action" value="forgotPassword" />
+							<label for="password">Enter your email address and we'll send you a password reset link.</label>
+							<input type="text" placeholder="name@email.com" name="email" class="formInput" />
+							<div class="g-recaptcha" data-sitekey="6LfSVSkTAAAAANU0afvm45cwyYKvD01fIjvU4A2M"></div>							<div class="authenticate">
+								<button type="submit" class="authenticateBtn abhp-btn">Send</button>
+							</div>
+						</form>
+					</div>
+				</div>
+				<div class="authTab" data-id="newAccount">
+					<form class="authForm" action="/ajax.php" method="post" name="newAccountForm">
+						<input type="hidden" name="action" value="newAccount" />
+						<input type="text" placeholder="name@email.com" name="email" class="formInput" trim />
+						<input type="password" placeholder="Password" name="password" class="formInput" />
+						<p class="note">*Passwords must be at least 8 characters, and include a lowercase letter, an uppercase letter, a number, and special character: .=!@#+\-$%^&*</p>
+						<div class="emailOptions">
+							<label class="emailOption">Notify me of promotions and discounts.
+								<input name="receive_mailings" value="y" class="checkBox" type="checkbox" checked="checked" />
+								<span class="checkmark"></span>
+							</label>
+							<label class="emailOption">I work in the home building industry.
+								<input name="industry_insider" value="y" class="checkBox" type="checkbox" />
+								<span class="checkmark"></span>
+							</label>
+						</div>
+						<div class="g-recaptcha" data-sitekey="6LfSVSkTAAAAANU0afvm45cwyYKvD01fIjvU4A2M"></div>						<div class="authenticate">
+							<button type="submit" class="authenticateBtn abhp-btn">Create Account</button>
+						</div>
+					</form>
+				</div>
+
+			</div>
+			<!--end of container-->
+		</div>
+	</div>
+</div>
+	</div>
+</div>
+<script>
+	var adding_favorite = undefined;
+
+	window.addEventListener("DOMContentLoaded", () => {
+		let authModal = document.querySelector("#authModal");
+		let showAuthModal = document.querySelectorAll("#showAuthModal");
+		let closeBtn = document.querySelector("#closeBtn");
+		let socialSignin = document.querySelector("#social-signin");
+		let forgetPass = document.querySelector("#forgetPass");
+		let passwordSignin = document.querySelector("#passwordSignin");
+		let magicLoginWrapper = document.querySelector("#magic-login-wrapper");
+		let passwordLoginWrapper = document.querySelector("#password-login-wrapper");
+		let forgetPassWrapper = document.querySelector(".forget-pass-wrapper");
+		let hpHeader = document.querySelector(".hp-header");
+
+		showAuthModal.forEach((modalBtn) => {
+			modalBtn.addEventListener("click", (event) => {
+				if (event.target.closest(".favorite-logged-out")) {
+					let plan_id = Array.from(event.target.closest(".favorite-logged-out").classList)
+						.find((c) => c.includes("plan-"))
+						.replace(/\D/g, "");
+					adding_favorite = plan_id;
+				}
+				authModal.classList.add("openAuthModal");
+				hpHeader.style.zIndex = "0";
+			});
+		});
+
+		closeBtn.addEventListener("click", () => {
+			authModal.classList.remove("openAuthModal");
+			hpHeader.style.zIndex = "500";
+		});
+
+		passwordSignin.addEventListener("click", (e) => {
+			e.preventDefault();
+			passwordLoginWrapper.classList.remove("remove");
+			magicLoginWrapper.classList.add("remove");
+			socialSignin.classList.add("remove");
+		});
+
+		forgetPass.addEventListener("click", (e) => {
+			e.preventDefault();
+			passwordLoginWrapper.classList.add("remove");
+			forgetPassWrapper.classList.remove("remove");
+		});
+
+		document.getElementById("forgot-back").addEventListener("click", (e) => {
+			passwordLoginWrapper.classList.remove("remove");
+			forgetPassWrapper.classList.add("remove");
+		});
+
+		document.getElementById("password-back").addEventListener("click", (e) => {
+			passwordLoginWrapper.classList.add("remove");
+			magicLoginWrapper.classList.remove("remove");
+			socialSignin.classList.remove("remove");
+		});
+
+		const tabAs = document.querySelectorAll(".tab-a");
+		tabAs.forEach((tabA) => {
+			tabA.addEventListener("click", function() {
+				const tabId = this.getAttribute("data-id");
+				const tabs = document.querySelectorAll(".authTab");
+
+				tabAs.forEach((tabA) => tabA.classList.remove("active-a"));
+				this.classList.add("active-a");
+
+				tabs.forEach((tab) => {
+					if (tab.dataset.id === tabId) {
+						tab.classList.add("tab-active");
+					} else {
+						tab.classList.remove("tab-active");
+					}
+				});
+			});
+		});
+
+		$("#loginForm").on("submit", function() {
+			if (adding_favorite) {
+				document.querySelector('input[name="adding_favorite"]').value = adding_favorite;
+			}
+
+			return true;
+		});
+
+		const forms = document.querySelectorAll(".authForm");
+
+		forms.forEach((form) => {
+			form.addEventListener("submit", function(event) {
+				const emailInput = this.querySelector('input[name="email"]');
+				if (emailInput) {
+					emailInput.value = emailInput.value.trim(); // Trim leading and trailing spaces
+				}
+			});
+		});
+	});
+</script>
+
+
+<style>
+
+	#equally-ai___init-button, 
+	equally-widget-ui {
+		display: none !important;
+	}
+
+	button.button-disabled {
+		opacity: 0.5;
+		pointer-events: none;
+	}
+
+	.top-buttons-container>a.cart_footer_phone_link {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.settings {
+		position: fixed;
+		right: 16px;
+		height: 40px;
+		width: 40px;
+		border-radius: 20px;
+		box-shadow: rgb(0 0 0 / 40%) 0px 4px 12px;
+		z-index: 100;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.settings i {
+		position: absolute;
+		z-index: 102;
+	}
+
+	.accessible.settings {
+		bottom: 60px;
+		background-color: #fff;
+		border: 2px solid #0A3D7A;
+		color: #0A3D7A;
+	}
+
+	.accessible.settings i {
+		top: -2px;
+		left: -2px;
+		font-size: 40px;
+		width: 40px;
+		height: 40px;
+	}
+
+	.chat.settings {
+		bottom: 10px;
+		background-color: #b13533;
+		border: 2px solid transparent;
+		color: #fff;
+	}
+
+	.chat.settings i {
+		top: 7px;
+		left: 8px;
+		font-size: 22px;
+		width: 22px;
+		height: 22px;
+		font-weight: bold:
+	}
+
+	.acsb-widget.acsb-widget-position-right {
+		right: 16px !important;
+		height: 100% !important;
+		max-height: 100% !important:
+	}
+
+	#header .accessibility {
+		position: absolute;
+		right: 10px;
+		margin-left: 16px;
+	}
+
+	#new-footer {
+		padding: 85px 0 40px 0;
+		background-color: #19437a;
+		font-family: 'Open Sans', sans-serif;
+	}
+
+	.hp-footer-container {
+		max-width: 1175px;
+		margin: 0 auto;
+		width: 100%;
+	}
+
+	.hp-footer-logo-container {
+		margin-bottom: 35px;
+	}
+
+	.small-footer-btn {
+		flex: 1;
+		height: 53px;
+		cursor: pointer;
+	}
+
+	.large-footer-btn {
+		width: 302px;
+		height: 54px;
+		cursor: pointer;
+	}
+
+	.bordered-transparent-btn {
+		border-radius: 12px !important;
+		font-size: 14px;
+		font-weight: 700;
+	}
+
+	.transparent-btn {
+		border: 1px solid #ffffff !important;
+		background-color: #19437a !important;
+		color: #ffffff;
+	}
+
+	.transparent-btn:hover {
+		border: none !important;
+		background-color: #ffffff !important;
+		color: #19437a;
+		box-shadow: 0 0 8px rgb(255 255 255 / 80%) !important;
+	}
+
+	.white-btn {
+		border: none;
+		outline: none;
+		background-color: #ffffff !important;
+		color: #19437a !important;
+	}
+
+	.white-btn:hover {
+		border: 1px solid #ffffff !important;
+		background-color: #19437a !important;
+		color: #ffffff !important;
+	}
+
+	.light-btn {
+		border-radius: 11px;
+		font-size: 14px;
+		font-weight: 700;
+	}
+
+	.hp-footer-collapsible {
+		margin-right: 85px;
+	}
+
+	.hp-footer-collapsible-header,
+	.hp-footer-social-title {
+		color: #ffffff;
+		font-size: 15px;
+		font-weight: 700;
+	}
+
+	.footer-menu-chevron-icon {
+		display: none;
+	}
+
+	.hp-footer-collapsible-content ul {
+		list-style: none;
+		margin-top: 20px;
+		margin-left: 0 !important;
+	}
+
+	.hp-footer-collapsible-content ul li {
+		margin-bottom: 10px;
+	}
+
+	.hp-footer-collapsible-content ul li a {
+		text-decoration: none;
+		color: #aeb9cd;
+		font-size: 14px;
+		font-weight: 300;
+	}
+
+	.hp-footer-collapsible-content ul li a:hover,
+	.hp-footer-copyright-container span a:hover {
+		text-decoration: underline !important;
+		color: #fff !important;
+	}
+
+	.hp-footer-social-icons {
+		margin-top: 25px;
+	}
+
+	.social-items {
+		margin-top: 15px;
+	}
+
+	.social-icon {
+		margin-right: 25px;
+		cursor: pointer;
+	}
+
+	.hp-footer-contact-section {
+		width: 317px;
+		max-width: 317px;
+	}
+
+	.hp-footer-contact-section h6 {
+		color: #ffffff;
+		font-size: 16px;
+		font-weight: 700;
+		text-align: center;
+	}
+
+	.footer-email-input {
+		margin: 25px 0 15px 0;
+		width: 302px;
+		border-radius: 11px;
+		outline: none;
+		padding: 17px 30px;
+		border: 1px solid #ffffff;
+		font-size: 13px;
+		font-weight: 400;
+		background-color: transparent;
+		color: #ffffff;
+	}
+
+	.footer-email-input::placeholder {
+		color: #ffffff;
+	}
+
+	.hp-footer-phone-container {
+		margin-top: 60px;
+	}
+
+	.hp-footer-phone-number {
+		color: #ffffff;
+		font-size: 17px;
+		font-weight: 700;
+		margin-left: 10px;
+		white-space: nowrap;
+	}
+
+	.hp-footer-separator {
+		margin: 80px 0 45px 0;
+		background-color: #ffffff;
+		opacity: 0.1;
+	}
+
+	.hp-footer-copyright-container span {
+		color: #aeb9cd;
+		font-size: 14px;
+		font-weight: 400;
+		text-align: center;
+	}
+
+	.hp-footer-copyright-container span a {
+		text-decoration: none;
+		color: #aeb9cd;
+	}
+
+	.hp-footer-copyright-container span a:hover {
+		text-decoration: underline;
+		color: #fff;
+	}
+
+	.footer-phone-container-label {
+		display: none;
+	}
+
+	.footer-blank-space {
+		display: none;
+	}
+
+	/* Display Klaviyo form block only if it's loaded */
+	.klaviyo-form-YudwBh {
+		display: none;
+	}
+	.klaviyo-form-YudwBh.klaviyo-form {
+		display: block;
+	}
+	
+	.hp-footer-contact-section .klaviyo-form {
+		background-color: transparent !important;
+		border: none !important;
+		flex-direction: column !important;
+	}
+
+	[data-testid="klaviyo-form-YudwBh"] {
+		padding: 0 !important;
+	}
+
+	[data-testid="form-row"] {
+		flex-direction: column !important;
+		padding: 0 !important;
+		margin-top: 90px !important;
+	}
+
+	[data-testid="form-component"] {
+		padding: 0 !important;
+	}
+
+	#email_57634663,
+	#new-footer input[id^="email_"] {
+		border-radius: 12px !important;
+		margin-bottom: 20px !important;
+		border: 1px solid #ffffff !important;
+		height: 55px !important;
+		color: white !important;
+	}
+
+	.go4372111.go4372111.go4372111::placeholder {
+		font-size: 13px !important;
+		font-weight: 400 !important;
+		color: #ffffff !important;
+		font-family: 'Open Sans', sans-serif;
+	}
+
+	.go893004649 {
+		background-color: #ffffff !important;
+		color: #19437a !important;
+		width: 100% !important;
+		border: none !important;
+		border-radius: 11px !important;
+		font-size: 14px !important;
+		font-weight: 700 !important;
+		text-transform: uppercase !important;
+		height: 54px !important;
+		padding: 0 !important;
+		font-family: 'Open Sans', sans-serif !important;
+		letter-spacing: normal !important;
+	}
+
+	.go893004649:hover {
+		background-color: #19437a !important;
+		color: #ffffff !important;
+		border: 1px solid white !important;
+	}
+
+	.go3176171171 {
+		margin-top: -50px;
+	}
+
+	.go3176171171 p,
+	.go3176171171 p span {
+		color: #ffffff !important;
+	}
+
+	.top-buttons-container {
+		display: flex;
+		width: 317px;
+		column-gap: 10px;
+		justify-content: flex-end;
+	}
+
+	.top-buttons-container > * {
+		flex-grow: 1;
+		display: flex;
+		justify-content: flex-end;
+	}
+
+	.iconsm {
+		font-size: 30px;
+		color: #718EAF;
+		margin: 7px;
+	}
+
+	.iconsm:hover {
+		color: #ffff;
+	}
+
+	.icontik {
+		height: 26px;
+		margin-right: 7px;
+		margin-left: 7px;
+		color: #718EAF;
+	}
+
+	.icontik :hover {
+		color: #ffff;
+	}
+
+
+	/* MEDIA QUERIES */
+
+	@media (max-width: 1260px) {
+
+		.hp-footer-container {
+			padding: 0 20px;
+			width: unset;
+		}
+
+		.hp-footer-collapsible {
+			margin-right: 50px;
+		}
+		
+	}
+
+	@media (max-width: 1230px) {
+
+		#header .accessibility {
+			position: static;
+		}
+
+	}
+
+	@media (max-width: 1060px) {
+
+		#header .accessibility-label {
+			display: none;
+		}
+
+	}
+
+	@media (max-width: 1024px) {
+
+		li.new-search {
+			margin-left: 0 !important;
+		}
+
+		.new-search a {
+			display: inline-block;
+			text-align: center;
+			margin: 0 auto;
+			width: 177px;
+			max-width: 177px;
+			border-radius: 3px;
+		}
+
+		.hp-header__secondarynav {
+			top: 287px !important;
+		}
+
+		#header .accessibility {
+			padding-top: 8px;
+			padding-bottom: 8px;
+		}
+
+		#header .accessibility-label {
+			display: inline;
+		}
+
+		.hp-footer-options-container {
+			flex-direction: column;
+		}
+
+		.hp-footer-options-container div {
+			justify-content: center;
+		}
+
+		.klaviyo-form-YudwBh div {
+			display: flex;
+		}
+
+		[data-testid="form-row"] {
+			flex-direction: row !important;
+			padding: 0 !important;
+			align-items: end !important;
+			margin-top: 90px !important;
+		}
+
+		[data-testid="form-row"] [data-testid="form-component"] {
+			background-color: transparent !important;
+		}
+
+		#email_21726859 {
+			margin: 0 20px 0 0 !important;
+		}
+
+		.go893004649 {
+			margin-left: 10px;
+			width: 112px !important;
+		}
+
+		[data-testid="klaviyo-form-YudwBh"] {
+			height: 85px !important;
+		}
+
+		.go3176171171 {
+			display: block !important;
+		}
+
+		.hp-footer-contact-section {
+			margin-top: 40px;
+			width: 100%;
+			max-width: unset;
+			text-align: center;
+		}
+
+		#hp-footer-contact-form button {
+			width: 20%;
+		}
+
+		.hp-footer-phone-container #footer-phone-icon {
+			display: none;
+		}
+
+		.hp-footer-phone-container {
+			flex-direction: column;
+			margin-top: 20px;
+		}
+
+		.footer-phone-container-label {
+			font-size: 14px;
+			color: #ffffff;
+		}
+
+		.hp-footer-phone-container .hp-footer-phone-number {
+			font-size: 28px;
+			font-weight: 500;
+			margin-top: 10px;
+		}
+
+		.hp-footer-separator {
+			margin: 25px 0;
+		}
+
+		.footer-phone-container-label {
+			display: block;
+		}
+
+	}
+
+	@media (min-width:770px) and (max-width: 1024px) {
+
+		.go893004649 {
+			margin-bottom: 17%;
+		}
+
+	}
+
+	@media screen and (max-width: 992px) {
+		[data-testid="klaviyo-form-YudwBh"] {
+			display: flex !important;
+			align-items: center !important;
+		}
+	}
+
+	@media screen and (max-width: 768px) {
+		#new-footer {
+			padding: 35px 0;
+		}
+
+		.hp-footer-logo {
+			max-width: 250px;
+			object-fit: contain;
+			margin: 0 auto;
+		}
+
+		.top-buttons-container {
+			justify-content: center;
+			margin-top: 40px;
+			width: 100%;
+			flex-wrap: nowrap !important;
+		}
+
+		.top-buttons-container a {
+			width: 50%;
+		}
+
+		.top-buttons-container button {
+			width: 100%;
+		}
+
+		.hp-footer-logo-container {
+			margin-bottom: 40px;
+		}
+
+		.footer-collapsibles-container,
+		.social-container-collapsibles {
+			flex-direction: column;
+		}
+
+		.hp-footer-collapsible {
+			margin-bottom: 20px;
+			margin-right: 0;
+		}
+
+		.hp-footer-collapsible-content {
+			max-height: 0;
+			overflow: hidden;
+			transition: max-height 0.2s ease-out;
+		}
+
+		.hp-footer-collapsible-header {
+			display: flex;
+			flex-direction: row;
+			justify-content: space-between;
+		}
+
+		.footer-menu-chevron-icon {
+			display: inline-block;
+		}
+
+		.hp-footer-collapsible-content ul {
+			margin-top: 10px;
+		}
+
+		.hp-footer-social-icons {
+			text-align: center;
+			margin-top: 20px;
+		}
+
+		.social-items {
+			display: flex;
+			justify-content: space-between !important;
+			align-items: center;
+		}
+
+		.social-icon {
+			margin: 0;
+		}
+
+		.footer-blank-space {
+			display: block;
+			width: 100%;
+			height: 40px;
+		}
+
+		.go893004649,
+		#email_57634663 {
+			display: block;
+			width: 100%;
+			margin-bottom: 20px;
+		}
+
+		.go893004649 {
+			height: 54px;
+		}
+
+		#email_57634663 {
+			height: 55px;
+		}
+	}
+
+	@media (max-width: 576px) {
+
+		#hp-footer-contact-form button,
+		#hp-footer-contact-form input {
+			width: -webkit-fill-available;
+		}
+
+		.hp-footer-copyright-container {
+			flex-direction: column;
+		}
+
+	}
+
+</style>
+
+<script src="/static/js/jquery.3.6.0.min.js"></script>
+
+<script type="text/javascript" src="/static/js/app.js?ver=prod-2025-04-04-1"></script>
+
+<script type="text/javascript" src="/static/js/slick.1.7.1.min.js"></script>
+
+<script defer type="text/javascript" src="/static/js/featherlight.1.7.13.min.js"></script>
+
+<!-- Google API / OAuth Integration -->
+<script defer src="https://apis.google.com/js/client:platform.js?onload=start"></script>
+<script>
+	function start() {
+		gapi.load('auth2', function() {
+			auth2 = gapi.auth2.init({
+				client_id: '963471920957-rlm379atgg47ecgsivq1bqsp5qpk9ngb.apps.googleusercontent.com'
+			});
+		});
+	}
+</script>
+
+<!-- Facebook OAuth Integration -->
+<script defer>
+	function facebookHousePlansSignIn(id,name,email){if(id&&name&&email){var formData=new FormData();formData.append('action','facebook');formData.append('id',id);formData.append('name',name);formData.append('email',email);formData.append('receive_mailings',$('input[name="receive_mailings"]').is(":checked")?'y':'n');formData.append('industry_insider',$('input[name="industry_insider"]').is(":checked")?'y':'n');$.ajax({type:'POST',url:'/ajax.php',headers:{'X-Requested-With':'XMLHttpRequest'},data:formData,cache:false,contentType:false,processData:false,error:function(response){console.log('An error was encountered:');console.log(response);},success:function(response){if(response.status==='success'){if(response.isNewUser){ga('send','event',{eventCategory:'Create Account',eventAction:'Click',eventLabel:'Button'});ga('test.send','event',{eventCategory:'Create Account',eventAction:'Click',eventLabel:'Button'});}
+	location.reload(true);}else{alert(response.message);}}});}else{alert('Sorry, there was a problem connecting to Facebook.');}}
+	function facebookLoginInit(){FB.init({appId:'465084322106708',cookie:true,xfbml:true,version:'v2.8'});FB.login(function(response){if(response.authResponse){FB.api('/me?fields=id,name,email',function(response){facebookHousePlansSignIn(response.id,response.name,response.email);});}},{scope:'public_profile,email'});}
+	(function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(d.getElementById(id))return;js=d.createElement(s);js.id=id;js.src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v21.0";fjs.parentNode.insertBefore(js,fjs);}(document,'script','facebook-jssdk'));
+</script>
+
+    <script type="text/javascript" src="https://static.klaviyo.com/onsite/js/klaviyo.js?company_id=Wjbmmw" defer></script>
+    <script defer>
+
+        !function(){if(!window.klaviyo){window._klOnsite=window._klOnsite||[];try{window.klaviyo=new Proxy({},{get:function(n,i){return"push"===i?function(){var n;(n=window._klOnsite).push.apply(n,arguments)}:function(){for(var n=arguments.length,o=new Array(n),w=0;w<n;w++)o[w]=arguments[w];var t="function"==typeof o[o.length-1]?o.pop():void 0,e=new Promise((function(n){window._klOnsite.push([i].concat(o,[function(i){t&&t(i),n(i)}]))}));return e}}})}catch(n){window.klaviyo=window.klaviyo||[],window.klaviyo.push=function(){var n;(n=window._klOnsite).push.apply(n,arguments)}}}}();
+
+        // Identify the user
+        
+        // Function to track when a user adds a favorite item
+        function trackAddFavorite(element, event) {
+            event.preventDefault();
+
+            var planName = element.getAttribute('data-plan-name');
+            var trackingData = {};
+
+            if (planName) {
+                trackingData = { 'Product ID': planName };
+            }
+
+            klaviyo.push(['track', 'Added Favorite', trackingData]);
+
+            setTimeout(function() {
+                window.location.href = element.href;
+            }, 300);
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Helper function to get form data as an object
+            function getFormData(form) {
+                var data = {};
+                var formData = new FormData(form);
+                formData.forEach((value, key) => {
+                    data[key] = value;
+                });
+                return data;
+            }
+
+            // Page View
+            klaviyo.push(['track', 'Page View', {
+                'URL': '/news/wp-content/uploads/2020/01/Cottage_1_floorplan.jpg'
+            }]);
+
+            
+            
+            
+            
+            
+            
+            
+                    });
+    </script>
+
+<!-- Microsoft Advertising UET Javascript tag. -->
+<noscript>
+	<img src="//bat.bing.com/action/0?ti=5681260&Ver=2" height="0" width="0" style="display:none; visibility: hidden;" />
+</noscript>
+
+
+
+<script defer type="text/javascript">
+
+	window.addEventListener('DOMContentLoaded', function () {
+
+		setTimeout(function() {
+
+			console.log("LiveChat Loaded");
+			window.__lc = window.__lc || {};
+			window.__lc.license = 9741340;
+			window.__lc.params = [{ name: '1. Logged In As', value: 'Not Logged In' }];
+			(function() {
+				var lc = document.createElement('script');
+				lc.type = 'text/javascript';
+				lc.async = true;
+				lc.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'cdn.livechatinc.com/tracking.js';
+				var s = document.getElementsByTagName('script')[0];
+				s.parentNode.insertBefore(lc, s);
+			})();
+
+			console.log("Bing Tracking Loaded");
+			(function(w, d, t, r, u) {
+				var f, n, i;
+				w[u] = w[u] || [], f = function() {
+					var o = {
+					ti: "5681260"
+				};
+				o.q = w[u], w[u] = new UET(o), w[u].push("pageLoad")
+			}, n = d.createElement(t), n.src = r, n.async = 1, n.onload = n.onreadystatechange = function() {
+				var s = this.readyState;
+				s && s !== "loaded" && s !== "complete" || (f(), n.onload = n.onreadystatechange = null)
+				}, i = d.getElementsByTagName(t)[0], i.parentNode.insertBefore(n, i)
+			})(window, document, "script", "//bat.bing.com/bat.js", "uetq");
+
+			
+		}, 1000);
+
+	});
+
+</script>
+
+
+</div>
+
+</div> <!-- wrapper -->
+<div id="hp-mobile-navigator" class="flex-row justify-around d-flex">
+	<a href="/floorplans/" class="d-flex flex-column justify-center align-center">
+		<img loading="lazy" src="/static/img/shop-icons.png" class="mobile-navigator-icon" alt="">
+		<span class="mobile-navigator-label">Shop</span>
+	</a>
+
+	<a href="" id="" class="d-flex flex-column justify-center align-center">
+		<img loading="lazy" src="/static/img/users-filled.png" class="mobile-navigator-icon" alt="Account">
+		<span class="mobile-navigator-label">Account</span>
+	</a>
+
+	<a href="/account/favorites/" id="" class="d-flex flex-column justify-center align-center">
+		<div class="favorite-icon-container">
+			<img loading="lazy" src="/static/img/fav-icon.png?ver=prod-2025-04-04-1" class="mobile-navigator-icon" alt="Favorites">
+					</div>
+		<span class="mobile-navigator-label">Favorites</span>
+	</a>
+
+	<a href="/cart/" class="d-flex flex-column justify-center align-center">
+		<div class="cart-icon-container">
+			<img loading="lazy" src="/static/img/cart-icons.png" class="mobile-navigator-icon" alt="Cart">
+					</div>
+		<span class="mobile-navigator-label">Cart</span>
+	</a>
+
+	<a href="javascript://" class="d-flex flex-column justify-center align-center" onclick="LC_API.open_chat_window({source:'button'});return false;">
+		<img loading="lazy" src="/static/img/chat-icons.png" class="mobile-navigator-icon" alt="">
+		<span class="mobile-navigator-label">Chat</span>
+	</a>
+</div>
+</body>
+
+</html>

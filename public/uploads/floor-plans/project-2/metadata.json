@@ -1,0 +1,16 @@
+{
+  "projectId": "project-2",
+  "name": "Farmhouse Floor Plan",
+  "style": "farmhouse",
+  "imageUrl": "/uploads/floor-plans/project-2/farmhouse-floor-plan.svg",
+  "description": "Floor plan for a farmhouse style house with 4 bedrooms and 3 bathrooms",
+  "dimensions": {
+    "width": 40,
+    "length": 60,
+    "unit": "ft"
+  },
+  "area": 2800,
+  "bedrooms": 4,
+  "bathrooms": 3,
+  "createdAt": "2025-04-15T13:58:53.843Z"
+}
