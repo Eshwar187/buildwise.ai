@@ -16,11 +16,14 @@ interface Designer {
   bio: string;
   phone: string;
   email: string;
+  website?: string;
   portfolio?: string;
   imageUrl?: string;
   rating?: number;
   projects?: number;
   location?: string;
+  address?: string;
+  mapsUrl?: string;
 }
 
 export function DesignersSearch() {
@@ -36,19 +39,31 @@ export function DesignersSearch() {
       setError("");
       console.log(`Searching designers for location: ${location}`);
 
+      // Show a loading message
+      setDesigners([]);
+
       // Call our real-time designers API
       const response = await fetch(`/api/real-time/designers?location=${encodeURIComponent(location)}`);
+
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status} ${response.statusText}`);
+      }
+
       const data = await response.json();
+      console.log('API response:', data);
 
       if (data.success && data.designers && data.designers.length > 0) {
-        // Add some random ratings and project counts for display purposes
+        // Process the designers data
         const enhancedDesigners = data.designers.map((designer: Designer) => ({
           ...designer,
-          rating: (4 + Math.random()).toFixed(1),
-          projects: Math.floor(Math.random() * 100) + 50,
-          location: location
+          // Use a placeholder image if no image URL is provided
+          imageUrl: designer.imageUrl || 'https://via.placeholder.com/300x200?text=Designer+Image',
+          // Ensure we have projects count
+          projects: designer.projects || Math.floor(Math.random() * 100) + 50,
+          // Ensure we have location
+          location: designer.location || location
         }));
-        
+
         setDesigners(enhancedDesigners);
         console.log(`Found ${enhancedDesigners.length} designers for ${location}`);
       } else {
@@ -82,7 +97,7 @@ export function DesignersSearch() {
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-white mb-2">Find Local Designers</h1>
         <p className="text-slate-400">Connect with top-rated designers and architects in your area</p>
-        
+
         <form onSubmit={handleSearch} className="mt-4 flex gap-2">
           <Input
             type="text"
@@ -91,8 +106,8 @@ export function DesignersSearch() {
             onChange={(e) => setSearchLocation(e.target.value)}
             className="flex-1 bg-slate-800 border-slate-700 text-white"
           />
-          <Button 
-            type="submit" 
+          <Button
+            type="submit"
             className="bg-teal-500 hover:bg-teal-600 text-white"
             disabled={isLoading}
           >
@@ -120,6 +135,7 @@ export function DesignersSearch() {
                       width={64}
                       height={64}
                       className="object-cover w-full h-full"
+                      unoptimized={designer.imageUrl.startsWith('https://maps.googleapis.com')}
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-slate-500 text-xl font-bold">
@@ -127,43 +143,69 @@ export function DesignersSearch() {
                     </div>
                   )}
                 </div>
-                
+
                 <div className="flex-1">
                   <h3 className="text-lg font-medium text-white">{designer.name}</h3>
-                  
+
                   <div className="flex items-center mt-1 mb-2">
                     <div className="flex text-yellow-400">
                       {[1, 2, 3, 4, 5].map((star) => (
-                        <Star 
-                          key={star} 
-                          className={`h-4 w-4 ${star <= Math.floor(parseFloat(designer.rating?.toString() || "0")) ? "fill-yellow-400" : "fill-transparent"}`} 
+                        <Star
+                          key={star}
+                          className={`h-4 w-4 ${star <= Math.floor(parseFloat(designer.rating?.toString() || "0")) ? "fill-yellow-400" : "fill-transparent"}`}
                         />
                       ))}
                     </div>
                     <span className="text-yellow-400 ml-1">{designer.rating}</span>
                     <span className="text-slate-400 text-sm ml-2">({designer.projects} projects)</span>
                   </div>
-                  
+
                   <div className="flex items-center text-slate-400 text-sm mb-1">
                     <Building className="h-4 w-4 mr-1" />
                     <span>{designer.specialization}</span>
                   </div>
-                  
+
                   <div className="flex items-center text-slate-400 text-sm">
                     <MapPin className="h-4 w-4 mr-1" />
-                    <span>{designer.company}</span>
+                    <span>{designer.location || designer.address || designer.company}</span>
                   </div>
                 </div>
               </div>
-              
+
               <div className="border-t border-slate-700 p-3">
-                <Button 
-                  variant="outline" 
-                  className="w-full border-teal-500 text-teal-400 hover:bg-teal-500/10"
-                >
-                  <MessageSquare className="h-4 w-4 mr-2" />
-                  Contact
-                </Button>
+                <div className="space-y-2">
+                  {(designer.phone || designer.email) && (
+                    <div className="text-xs text-slate-400 truncate">
+                      {designer.phone && <span className="block">📞 {designer.phone}</span>}
+                      {designer.email && <span className="block">✉️ {designer.email}</span>}
+                    </div>
+                  )}
+
+                  <div className="flex space-x-2">
+                    <Button
+                      className="flex-1 bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-600 hover:to-teal-600 text-white"
+                      onClick={() => {
+                        if (designer.website) {
+                          window.open(designer.website, '_blank');
+                        } else {
+                          alert(`Contact ${designer.name} at ${designer.email || 'N/A'} or ${designer.phone || 'N/A'}`);
+                        }
+                      }}
+                    >
+                      <MessageSquare className="h-4 w-4 mr-1" /> Contact
+                    </Button>
+
+                    {designer.mapsUrl && (
+                      <Button
+                        variant="outline"
+                        className="border-slate-600 text-slate-300 hover:bg-slate-700"
+                        onClick={() => window.open(designer.mapsUrl, '_blank')}
+                      >
+                        <MapPin className="h-4 w-4" />
+                      </Button>
+                    )}
+                  </div>
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -172,8 +214,8 @@ export function DesignersSearch() {
 
       {designers.length > 0 && (
         <div className="mt-6 text-center">
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             className="border-slate-600 text-slate-400 hover:bg-slate-700"
           >
             Load More Designers

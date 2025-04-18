@@ -8,7 +8,7 @@ export async function POST(
   { params }: { params: { id: string } }
 ) {
   try {
-    const { userId } = auth()
+    const { userId } = await auth()
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
@@ -62,7 +62,7 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    const { userId } = auth()
+    const { userId } =await auth()
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
@@ -96,8 +96,8 @@ export async function DELETE(
 
     // Remove the designer from the project's recommendations
     const designerRecommendations = project.designerRecommendations || []
-    const updatedRecommendations = designerRecommendations.filter(
-      id => id !== designerId
+    const updatedRecommendations: string[] = designerRecommendations.filter(
+      (id: string) => id !== designerId
     )
 
     // Update the project

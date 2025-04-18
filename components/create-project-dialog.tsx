@@ -164,11 +164,12 @@ export function CreateProjectDialog({
     }
   }, [open, step, activeTab]);
 
-  // Fetch designers when location changes
+  // Fetch designers when location changes or when we reach step 5 and the designers tab is active
   useEffect(() => {
-    if (projectData.location.city || projectData.location.state) {
-      // Only fetch if we're on step 5 and the designers tab is active
-      if (step === 5 && activeTab === "designers") {
+    if (step === 5 && activeTab === "designers") {
+      // Only fetch if we have some location data
+      if (projectData.location.city || projectData.location.state || projectData.location.country) {
+        console.log('Fetching designers for location:', projectData.location);
         fetchDesigners();
       }
     }
@@ -623,7 +624,7 @@ export function CreateProjectDialog({
       const totalArea = (length * width).toString();
 
       // Check if we have a generated floor plan
-      const hasGeneratedFloorPlan = !!projectData.floorPlan;
+      // This is useful for debugging and future enhancements
 
       const finalProjectData = {
         ...projectData,
@@ -632,7 +633,7 @@ export function CreateProjectDialog({
           totalArea,
         },
         budget: projectData.budget,
-        userId: "anonymous", // Use anonymous user ID for now
+        // Don't set userId here - let the API handle it with the authenticated user
       };
 
       console.log('Creating project with data:', finalProjectData);
@@ -712,7 +713,7 @@ export function CreateProjectDialog({
     }
   }, [projectData, onSubmit, onOpenChange]);
 
-  const [generatedFloorPlan, setGeneratedFloorPlan] = useState<any>(null);
+  // State to track the generated floor plan for display in the preview tab
 
   const handleGenerateAI = useCallback(async () => {
     try {
@@ -750,8 +751,7 @@ export function CreateProjectDialog({
         console.log('Floor plan generated successfully:', data.floorPlan);
         toast.success('Floor plan generated successfully!');
 
-        // Store the generated floor plan
-        setGeneratedFloorPlan(data.floorPlan);
+        // Store the generated floor plan in the project data
 
         // Update the project data with the floor plan
         setProjectData(prev => ({

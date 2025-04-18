@@ -135,6 +135,21 @@ async function generateFloorPlanImage(description: string, style: string) {
         <!-- Outer walls -->
         <rect x="50" y="50" width="700" height="500" fill="none" stroke="#333333" stroke-width="8" />
 
+        <!-- Main Gate/Entrance -->
+        <rect x="350" y="46" width="100" height="8" fill="#555555" />
+        <text x="400" y="40" font-family="Arial" font-size="12" text-anchor="middle">Main Entrance</text>
+
+        <!-- Dimensions -->
+        <line x1="50" y1="570" x2="750" y2="570" stroke="#000000" stroke-width="1" />
+        <line x1="50" y1="565" x2="50" y2="575" stroke="#000000" stroke-width="1" />
+        <line x1="750" y1="565" x2="750" y2="575" stroke="#000000" stroke-width="1" />
+        <text x="400" y="585" font-family="Arial" font-size="12" text-anchor="middle">${parseFloat(projectData.landDimensions.width) || 30} ${projectData.landUnit || 'ft'}</text>
+
+        <line x1="30" y1="50" x2="30" y2="550" stroke="#000000" stroke-width="1" />
+        <line x1="25" y1="50" x2="35" y2="50" stroke="#000000" stroke-width="1" />
+        <line x1="25" y1="550" x2="35" y2="550" stroke="#000000" stroke-width="1" />
+        <text x="15" y="300" font-family="Arial" font-size="12" text-anchor="middle" transform="rotate(270, 15, 300)">${parseFloat(projectData.landDimensions.length) || 40} ${projectData.landUnit || 'ft'}</text>
+
         <!-- Living area -->
         <rect x="100" y="100" width="300" height="200" fill="${roomColors.living}" />
         <text x="250" y="200" font-family="Arial" font-size="16" text-anchor="middle">Living Room</text>
@@ -194,9 +209,21 @@ async function generateFloorPlanImage(description: string, style: string) {
         <!-- Outer walls -->
         <rect x="50" y="50" width="700" height="500" fill="none" stroke="#333333" stroke-width="8" />
 
-        <!-- Entrance -->
+        <!-- Entrance with Gate -->
         <rect x="350" y="50" width="100" height="50" fill="${roomColors.entrance}" />
+        <rect x="350" y="46" width="100" height="8" fill="#555555" />
         <text x="400" y="80" font-family="Arial" font-size="14" text-anchor="middle">Entrance</text>
+
+        <!-- Dimensions -->
+        <line x1="50" y1="570" x2="750" y2="570" stroke="#000000" stroke-width="1" />
+        <line x1="50" y1="565" x2="50" y2="575" stroke="#000000" stroke-width="1" />
+        <line x1="750" y1="565" x2="750" y2="575" stroke="#000000" stroke-width="1" />
+        <text x="400" y="585" font-family="Arial" font-size="12" text-anchor="middle">${parseFloat(projectData.landDimensions.width) || 30} ${projectData.landUnit || 'ft'}</text>
+
+        <line x1="30" y1="50" x2="30" y2="550" stroke="#000000" stroke-width="1" />
+        <line x1="25" y1="50" x2="35" y2="50" stroke="#000000" stroke-width="1" />
+        <line x1="25" y1="550" x2="35" y2="550" stroke="#000000" stroke-width="1" />
+        <text x="15" y="300" font-family="Arial" font-size="12" text-anchor="middle" transform="rotate(270, 15, 300)">${parseFloat(projectData.landDimensions.length) || 40} ${projectData.landUnit || 'ft'}</text>
 
         <!-- Living Room -->
         <rect x="100" y="100" width="250" height="200" fill="${roomColors.living}" />
@@ -260,6 +287,21 @@ async function generateFloorPlanImage(description: string, style: string) {
 
         <!-- Outer walls -->
         <rect x="50" y="50" width="700" height="500" fill="none" stroke="#333333" stroke-width="8" />
+
+        <!-- Main Gate/Entrance -->
+        <rect x="350" y="46" width="100" height="8" fill="#555555" />
+        <text x="400" y="40" font-family="Arial" font-size="12" text-anchor="middle">Main Entrance</text>
+
+        <!-- Dimensions -->
+        <line x1="50" y1="570" x2="750" y2="570" stroke="#000000" stroke-width="1" />
+        <line x1="50" y1="565" x2="50" y2="575" stroke="#000000" stroke-width="1" />
+        <line x1="750" y1="565" x2="750" y2="575" stroke="#000000" stroke-width="1" />
+        <text x="400" y="585" font-family="Arial" font-size="12" text-anchor="middle">${parseFloat(projectData.landDimensions.width) || 30} ${projectData.landUnit || 'ft'}</text>
+
+        <line x1="30" y1="50" x2="30" y2="550" stroke="#000000" stroke-width="1" />
+        <line x1="25" y1="50" x2="35" y2="50" stroke="#000000" stroke-width="1" />
+        <line x1="25" y1="550" x2="35" y2="550" stroke="#000000" stroke-width="1" />
+        <text x="15" y="300" font-family="Arial" font-size="12" text-anchor="middle" transform="rotate(270, 15, 300)">${parseFloat(projectData.landDimensions.length) || 40} ${projectData.landUnit || 'ft'}</text>
 
         <!-- Living Room -->
         <rect x="100" y="100" width="300" height="200" fill="${roomColors.living}" />
@@ -344,6 +386,14 @@ async function generateFloorPlanImage(description: string, style: string) {
 // POST endpoint to generate a real-time floor plan
 export async function POST(req: NextRequest) {
   try {
+    // Get the authenticated user ID
+    const { auth } = await import("@clerk/nextjs/server")
+    const { userId } = await auth()
+
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized. Please sign in to generate a floor plan." }, { status: 401 })
+    }
+
     const projectData = await req.json()
 
     if (!projectData) {
@@ -370,7 +420,7 @@ export async function POST(req: NextRequest) {
     // Create a floor plan object
     const floorPlan = {
       projectId: projectData.id || "temp-project",
-      userId: projectData.userId || "anonymous",
+      userId: userId, // Use the authenticated user ID
       imageUrl: imageUrl,
       aiPrompt: JSON.stringify(projectData),
       description,
@@ -399,7 +449,7 @@ export async function POST(req: NextRequest) {
     // Return a fallback floor plan if API fails
     const fallbackFloorPlan = {
       projectId: "temp-project",
-      userId: "anonymous",
+      userId: userId || "anonymous", // Use the authenticated user ID if available
       imageUrl: "/uploads/floor-plans/project-1/modern-floor-plan.svg",
       description: "This is a fallback floor plan generated when the API request failed. It represents a modern home design with open living spaces, multiple bedrooms, and energy-efficient features.",
       generatedBy: "fallback",

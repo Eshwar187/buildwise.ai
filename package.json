@@ -11,6 +11,8 @@
     "install-python-deps": "node scripts/install_python_deps.js",
     "check-routes": "node scripts/check_routes.js",
     "init-mongodb": "node scripts/init-mongodb.js",
+    "test-mongodb": "node scripts/test-mongodb-connection.js",
+    "init-mongodb-collections": "node scripts/init-mongodb-collections.js",
     "postinstall": "npm run check-python && npm run init-mongodb"
   },
   "dependencies": {

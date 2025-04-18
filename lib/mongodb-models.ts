@@ -240,23 +240,87 @@ export async function updateUserLastActive(clerkId: string) {
 
 // Project model functions
 export async function createProject(projectData: Omit<Project, "_id" | "createdAt" | "updatedAt">) {
-  const { db } = await connectToDatabase()
+  const { db, isLocal } = await connectToDatabase()
+
+  // Make sure userId is a string
+  if (projectData.userId) {
+    projectData.userId = String(projectData.userId)
+  }
+
+  console.log('Creating project with userId:', projectData.userId)
+  console.log('Using local database:', isLocal)
+
+  // Ensure numeric values are properly converted
+  const landDimensions = {
+    length: parseFloat(String(projectData.landDimensions?.length || 0)),
+    width: parseFloat(String(projectData.landDimensions?.width || 0)),
+    totalArea: parseFloat(String(projectData.landDimensions?.totalArea || 0))
+  }
+
+  const budget = parseFloat(String(projectData.budget || 0))
 
   const now = new Date()
   const project = {
     ...projectData,
+    landDimensions,
+    budget,
     createdAt: now,
     updatedAt: now,
   }
 
-  const result = await db.collection("projects").insertOne(project)
-  return { ...project, _id: result.insertedId }
+  console.log('Inserting project into MongoDB:', {
+    name: project.name,
+    userId: project.userId,
+    dimensions: project.landDimensions,
+    budget: project.budget
+  })
+
+  try {
+    const result = await db.collection("projects").insertOne(project)
+    console.log('Project created successfully with ID:', result.insertedId)
+    return { ...project, _id: result.insertedId }
+  } catch (error) {
+    console.error('Error creating project in MongoDB:', error)
+    throw error
+  }
 }
 
 export async function getProjectsByUserId(userId: string) {
   try {
-    const { db } = await connectToDatabase()
-    return db.collection("projects").find({ userId }).sort({ createdAt: -1 }).toArray()
+    const { db, isLocal } = await connectToDatabase()
+    console.log(`Fetching projects for user ID: ${userId}`)
+    console.log('Using local database:', isLocal)
+
+    // Make sure we're using the correct user ID format
+    userId = String(userId)
+
+    console.log(`Querying MongoDB with userId: ${userId}`)
+    const projects = await db.collection("projects").find({ userId: userId }).sort({ createdAt: -1 }).toArray()
+
+    console.log(`Found ${projects.length} projects for user ID: ${userId}`)
+
+    // Log the first project if available for debugging
+    if (projects.length > 0) {
+      console.log('First project in MongoDB:', {
+        id: projects[0]._id,
+        name: projects[0].name,
+        userId: projects[0].userId,
+        createdAt: projects[0].createdAt
+      })
+    } else {
+      // If no projects found, log all projects in the collection for debugging
+      const allProjects = await db.collection("projects").find({}).limit(5).toArray()
+      console.log(`Found ${allProjects.length} total projects in the collection`)
+      if (allProjects.length > 0) {
+        console.log('Sample projects in MongoDB:', allProjects.map(p => ({
+          id: p._id,
+          name: p.name,
+          userId: p.userId
+        })))
+      }
+    }
+
+    return projects
   } catch (error) {
     console.error("Error getting projects by userId:", error)
     return []
@@ -290,28 +354,52 @@ export async function deleteProject(projectId: string) {
 
 // Floor Plan model functions
 export async function createFloorPlan(floorPlanData: Omit<FloorPlan, "_id" | "createdAt">) {
-  const { db } = await connectToDatabase()
+  const { db, isLocal } = await connectToDatabase()
+  console.log('Creating floor plan for project:', floorPlanData.projectId)
+  console.log('Using local database:', isLocal)
+
+  // Make sure userId is a string
+  if (floorPlanData.userId) {
+    floorPlanData.userId = String(floorPlanData.userId)
+  }
 
   const floorPlan = {
     ...floorPlanData,
     createdAt: new Date(),
   }
 
-  const result = await db.collection("floorPlans").insertOne(floorPlan)
-
-  // Update the project with the new floor plan
   try {
-    await db
-      .collection("projects")
-      .updateOne(
-        { _id: new ObjectId(floorPlanData.projectId) },
-        { $push: { floorPlans: { ...floorPlan, _id: result.insertedId } } },
-      )
-  } catch (error) {
-    console.error("Error updating project with floor plan:", error)
-  }
+    console.log('Inserting floor plan into MongoDB')
+    const result = await db.collection("floorPlans").insertOne(floorPlan)
+    console.log('Floor plan created with ID:', result.insertedId)
 
-  return { ...floorPlan, _id: result.insertedId }
+    // Update the project with the new floor plan
+    try {
+      console.log('Updating project with floor plan')
+      let projectId;
+      try {
+        projectId = new ObjectId(floorPlanData.projectId);
+      } catch (e) {
+        // If projectId is not a valid ObjectId, use it as is
+        projectId = floorPlanData.projectId;
+      }
+
+      await db
+        .collection("projects")
+        .updateOne(
+          { _id: projectId },
+          { $push: { floorPlans: { ...floorPlan, _id: result.insertedId } } },
+        )
+      console.log('Project updated with floor plan')
+    } catch (error) {
+      console.error("Error updating project with floor plan:", error)
+    }
+
+    return { ...floorPlan, _id: result.insertedId }
+  } catch (error) {
+    console.error('Error creating floor plan in MongoDB:', error)
+    throw error
+  }
 }
 
 // Verification Code model functions
@@ -439,7 +527,9 @@ export async function getAnalytics() {
 
 // Designer model functions
 export async function createDesigner(designerData: Omit<Designer, "_id" | "createdAt" | "updatedAt">) {
-  const { db } = await connectToDatabase()
+  const { db, isLocal } = await connectToDatabase()
+  console.log('Creating designer:', designerData.name)
+  console.log('Using local database:', isLocal)
 
   const now = new Date()
   const designer = {
@@ -448,8 +538,15 @@ export async function createDesigner(designerData: Omit<Designer, "_id" | "creat
     updatedAt: now,
   }
 
-  const result = await db.collection("designers").insertOne(designer)
-  return { ...designer, _id: result.insertedId }
+  try {
+    console.log('Inserting designer into MongoDB')
+    const result = await db.collection("designers").insertOne(designer)
+    console.log('Designer created with ID:', result.insertedId)
+    return { ...designer, _id: result.insertedId }
+  } catch (error) {
+    console.error('Error creating designer in MongoDB:', error)
+    throw error
+  }
 }
 
 export async function getDesignerById(designerId: string) {
@@ -502,7 +599,9 @@ export async function deleteDesigner(designerId: string) {
 
 // Material model functions
 export async function createMaterial(materialData: Omit<Material, "_id" | "createdAt" | "updatedAt">) {
-  const { db } = await connectToDatabase()
+  const { db, isLocal } = await connectToDatabase()
+  console.log('Creating material:', materialData.name)
+  console.log('Using local database:', isLocal)
 
   const now = new Date()
   const material = {
@@ -511,8 +610,15 @@ export async function createMaterial(materialData: Omit<Material, "_id" | "creat
     updatedAt: now,
   }
 
-  const result = await db.collection("materials").insertOne(material)
-  return { ...material, _id: result.insertedId }
+  try {
+    console.log('Inserting material into MongoDB')
+    const result = await db.collection("materials").insertOne(material)
+    console.log('Material created with ID:', result.insertedId)
+    return { ...material, _id: result.insertedId }
+  } catch (error) {
+    console.error('Error creating material in MongoDB:', error)
+    throw error
+  }
 }
 
 export async function getMaterialById(materialId: string) {

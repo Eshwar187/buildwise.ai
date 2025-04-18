@@ -39,22 +39,18 @@ export async function connectToDatabase() {
   }
 
   try {
-    // Try to connect to MongoDB with options that work around SSL issues
+    console.log('Attempting to connect to MongoDB Atlas with URI:', MONGODB_URI.substring(0, 20) + '...')
+
+    // Try to connect to MongoDB with simplified options
     const client = new MongoClient(MONGODB_URI, {
       serverApi: {
         version: ServerApiVersion.v1,
         strict: true,
         deprecationErrors: true,
       },
-      // Add timeouts for better error handling
-      connectTimeoutMS: 5000, // Shorter timeout to fail faster
-      socketTimeoutMS: 5000,
-      // SSL options that work around common issues
-      ssl: true,
-      tls: true,
-      tlsAllowInvalidCertificates: process.env.NODE_ENV !== 'production',
-      tlsAllowInvalidHostnames: process.env.NODE_ENV !== 'production',
-      directConnection: false
+      // Add longer timeouts for better reliability
+      connectTimeoutMS: 30000,
+      socketTimeoutMS: 30000
     })
 
     // Connect to MongoDB
@@ -112,9 +108,19 @@ export async function connectToDatabase() {
     }
   } catch (error) {
     console.error("MongoDB connection error:", error)
+    console.error("MongoDB connection details:", {
+      uri: MONGODB_URI.substring(0, 20) + '...',
+      dbName: MONGODB_URI.split("/").pop()?.split("?")[0] || "buildwise"
+    })
+
+    // Don't use local database fallback in production
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error('Failed to connect to MongoDB in production environment')
+    }
+
     console.warn("Using local database as fallback")
 
-    // Use local database as fallback
+    // Use local database as fallback in development
     isUsingLocalDb = true
     return getLocalDb()
   }

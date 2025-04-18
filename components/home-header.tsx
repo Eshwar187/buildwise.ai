@@ -9,7 +9,7 @@ export function HomeHeader() {
     <header className="bg-slate-900 border-b border-slate-800 py-4">
       <div className="container mx-auto px-4 flex justify-between items-center">
         <Link href="/" className="flex items-center">
-          <Image src="/logo-unique.svg" alt="BuildWise.ai Logo" width={200} height={50} priority className="hover:opacity-90 transition-opacity" />
+          <Image src="/logo-elegant.svg" alt="BuildWise.ai Logo" width={240} height={60} priority className="hover:opacity-90 transition-opacity" />
         </Link>
         <nav className="flex gap-4">
           <Button variant="ghost" className="text-white hover:bg-slate-800">

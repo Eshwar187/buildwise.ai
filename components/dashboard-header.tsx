@@ -40,7 +40,7 @@ export function DashboardHeader() {
     <header className="bg-slate-800 border-b border-slate-700 sticky top-0 z-10">
       <div className="container mx-auto px-4 py-3 flex justify-between items-center">
         <Link href="/dashboard" className="flex items-center">
-          <Image src="/logo-unique.svg" alt="BuildWise.ai Logo" width={170} height={42} priority className="hover:opacity-90 transition-opacity" />
+          <Image src="/logo-elegant.svg" alt="BuildWise.ai Logo" width={200} height={50} priority className="hover:opacity-90 transition-opacity" />
         </Link>
 
         <div className="hidden md:flex items-center space-x-4">

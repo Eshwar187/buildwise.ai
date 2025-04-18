@@ -25,7 +25,18 @@ export async function GET(request: Request) {
     }
 
     // Get projects for this user
+    console.log(`Getting projects for Clerk user ID: ${userId}`)
     const projects = await getProjectsByUserId(userId)
+    console.log(`Retrieved ${projects.length} projects from database for user ${userId}`)
+
+    // Log the first project if available for debugging
+    if (projects.length > 0) {
+      console.log('First project:', {
+        id: projects[0]._id,
+        name: projects[0].name,
+        userId: projects[0].userId
+      })
+    }
 
     return NextResponse.json({ projects }, { headers: cacheHeaders })
   } catch (error) {

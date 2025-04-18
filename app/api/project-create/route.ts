@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
+import { auth } from "@clerk/nextjs/server"
 import { createProject } from "@/lib/mongodb-models"
 import { v4 as uuidv4 } from "uuid"
 import fs from "fs"
@@ -51,17 +52,28 @@ function copyFloorPlanTemplate(templateId: string, projectId: string) {
 // POST endpoint to create a project
 export async function POST(req: NextRequest) {
   try {
+    // Get the authenticated user ID
+    const { userId } = await auth()
+
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized. Please sign in to create a project." }, { status: 401 })
+    }
+
     const body = await req.json()
     console.log('Received project data:', body)
 
-    // Create a new project
+    // Create a new project with the authenticated user's ID
     const project = await createProject({
-      userId: body.userId || "anonymous",
+      userId: userId, // Use the authenticated user's ID
       name: body.name,
       description: body.description,
-      landDimensions: body.landDimensions,
+      landDimensions: {
+        length: parseFloat(body.landDimensions.length) || 0,
+        width: parseFloat(body.landDimensions.width) || 0,
+        totalArea: parseFloat(body.landDimensions.totalArea) || 0
+      },
       landUnit: body.landUnit,
-      budget: body.budget,
+      budget: parseFloat(body.budget) || 0,
       currency: body.currency,
       location: body.location,
       preferences: body.preferences,
@@ -69,6 +81,8 @@ export async function POST(req: NextRequest) {
       // Initialize floorPlans array if we have a generated floor plan
       floorPlans: body.floorPlan ? [body.floorPlan] : []
     })
+
+    console.log("Project created with ID:", project._id, "for user:", userId)
 
     // Check if a floor plan template was selected
     if (body.floorPlanTemplateId) {
@@ -84,7 +98,7 @@ export async function POST(req: NextRequest) {
         if (project._id) {
           const floorPlan = {
             projectId: project._id.toString(),
-            userId: body.userId || "anonymous",
+            userId: userId, // Use the authenticated user's ID
             imageUrl,
             aiPrompt: "Template floor plan",
             description: `Floor plan based on template ${body.floorPlanTemplateId}`,
