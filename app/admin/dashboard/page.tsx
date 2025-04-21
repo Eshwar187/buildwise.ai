@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useUser } from "@clerk/nextjs"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
@@ -76,12 +76,25 @@ const mockProjects = [
 ]
 
 export default function AdminDashboardPage() {
-  const { user } = useUser()
+  const { user, isLoaded } = useUser()
   const router = useRouter()
   const [users, setUsers] = useState(mockUsers)
   const [projects, setProjects] = useState(mockProjects)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [itemToDelete, setItemToDelete] = useState<{ id: string; type: "user" | "project" } | null>(null)
+
+  // Check if the user is the admin when the component loads
+  useEffect(() => {
+    if (isLoaded && user) {
+      // Check if the user is the admin (eshwar09052005@gmail.com)
+      const userEmail = user.primaryEmailAddress?.emailAddress
+      if (userEmail !== "eshwar09052005@gmail.com") {
+        toast.error("You don't have admin privileges")
+        // Redirect to home page
+        window.location.href = "/"
+      }
+    }
+  }, [isLoaded, user])
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-US", {
@@ -264,10 +277,20 @@ export default function AdminDashboardPage() {
                 <Button
                   variant="destructive"
                   className="bg-red-600 hover:bg-red-700"
-                  onClick={() => {
-                    // In a real app, we would sign out the admin
-                    toast.success("Logged out successfully")
-                    router.push("/")
+                  onClick={async () => {
+                    try {
+                      // Sign out the user using Clerk
+                      await fetch("/api/auth/sign-out", {
+                        method: "POST",
+                      })
+
+                      toast.success("Logged out successfully")
+                      // Use window.location for a hard redirect
+                      window.location.href = "/"
+                    } catch (error) {
+                      console.error("Error signing out:", error)
+                      toast.error("Failed to sign out")
+                    }
                   }}
                 >
                   <LogOut className="mr-2 h-4 w-4" /> Sign Out

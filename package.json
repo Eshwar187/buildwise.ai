@@ -13,7 +13,9 @@
     "init-mongodb": "node scripts/init-mongodb.js",
     "test-mongodb": "node scripts/test-mongodb-connection.js",
     "init-mongodb-collections": "node scripts/init-mongodb-collections.js",
-    "postinstall": "npm run check-python && npm run init-mongodb"
+    "init-sample-materials": "node scripts/init-sample-materials.js",
+    "create-test-project": "node scripts/create-test-project.js",
+    "postinstall": "npm run check-python && npm run init-mongodb && npm run init-sample-materials"
   },
   "dependencies": {
     "@clerk/nextjs": "^6.13.0",
@@ -50,7 +52,7 @@
     "date-fns": "^3.6.0",
     "dotenv": "^16.5.0",
     "embla-carousel-react": "^8.5.2",
-    "framer-motion": "^12.6.3",
+    "framer-motion": "^10.16.4",
     "input-otp": "^1.4.2",
     "lucide-react": "^0.487.0",
     "mongodb": "^6.15.0",

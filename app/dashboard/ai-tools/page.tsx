@@ -14,6 +14,7 @@ import { DesignerCard } from "@/components/designer-card"
 import { Slider } from "@/components/ui/slider"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { toast } from "sonner"
 
 export default function AIToolsPage() {
   const [activeTab, setActiveTab] = useState("chatbot")
@@ -82,55 +83,90 @@ export default function AIToolsPage() {
     if (!materialPrompt) return
 
     setIsGenerating(true)
+    setMaterialResult("") // Clear previous results
 
     try {
-      const response = await fetch("/api/ai/generate-materials", {
+      toast.info("Generating material recommendations...")
+
+      // Create a mock project object with the prompt data
+      const projectData = {
+        preferences: {
+          style: buildingType || 'Modern',
+        },
+        budget: budget,
+        currency: currency,
+        landDimensions: {
+          length: 40,
+          width: 30,
+        },
+        landUnit: 'sq ft',
+        location: {
+          country: 'United States',
+          state: 'California',
+          city: 'Los Angeles',
+        },
+        description: materialPrompt,
+      }
+
+      console.log("Sending request to generate materials with data:", {
+        style: projectData.preferences.style,
+        budget: projectData.budget,
+        description: projectData.description.substring(0, 50) + "..."
+      })
+
+      // Call the real-time materials API
+      const response = await fetch("/api/real-time/materials", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          prompt: materialPrompt,
-          budget: budget,
-          currency: currency,
-        }),
+        body: JSON.stringify(projectData),
       })
 
       if (!response.ok) {
-        throw new Error("Failed to generate materials")
+        const errorData = await response.json()
+        console.error("API error:", errorData)
+        throw new Error(errorData.error || "Failed to generate materials")
       }
 
       const data = await response.json()
-      setMaterialResult(data.result)
+      console.log("Received material recommendations:", {
+        success: data.success,
+        count: data.materials?.length || 0
+      })
+
+      if (data.materials && data.materials.length > 0) {
+        // Format the materials into a readable text format
+        let result = `Based on your project description and budget of ${new Intl.NumberFormat('en-US', { style: 'currency', currency: currency }).format(budget)}, here are the recommended materials:\n\n`
+
+        // Group materials by category
+        const categorizedMaterials = {}
+        data.materials.forEach(material => {
+          if (!categorizedMaterials[material.category]) {
+            categorizedMaterials[material.category] = []
+          }
+          categorizedMaterials[material.category].push(material)
+        })
+
+        // Add each category and its materials
+        for (const [category, materials] of Object.entries(categorizedMaterials)) {
+          result += `${category}:\n`
+          materials.forEach(material => {
+            result += `- ${material.name} (${new Intl.NumberFormat('en-US', { style: 'currency', currency: material.currency }).format(material.costPerUnit)} per ${material.unit})\n`
+            result += `  Sustainability: ${material.sustainability}/10, Durability: ${material.durability}/10, Energy Efficiency: ${material.energyEfficiency}/10\n`
+          })
+          result += '\n'
+        }
+
+        setMaterialResult(result)
+        toast.success("Successfully generated material recommendations!")
+      } else {
+        throw new Error("No materials returned from API")
+      }
     } catch (error) {
       console.error("Error generating materials:", error)
-
-      // Fallback response if API fails
-      setMaterialResult(`
-        Based on your project description and budget, here are the recommended materials:
-        
-        Foundation:
-        - Reinforced concrete (4000 PSI)
-        - Waterproofing membrane
-        - Drainage system
-        
-        Structural:
-        - Steel I-beams (ASTM A992)
-        - Engineered wood joists
-        - Concrete masonry units
-        
-        Exterior:
-        - Fiber cement siding
-        - Energy-efficient windows (double-glazed)
-        - Metal roofing (standing seam)
-        
-        Interior:
-        - Drywall (5/8" fire-rated)
-        - Engineered hardwood flooring
-        - Ceramic tile (bathrooms)
-        
-        Estimated total cost: Unable to calculate due to API error
-      `)
+      toast.error(`Failed to generate material recommendations: ${error.message || 'Unknown error'}. Please try again.`)
+      setMaterialResult("")
     } finally {
       setIsGenerating(false)
     }

@@ -292,7 +292,7 @@ export const cities: { [stateCode: string]: string[] } = {
   "HE": ["Frankfurt", "Wiesbaden", "Kassel", "Darmstadt", "Offenbach", "Hanau", "Gießen", "Marburg", "Fulda", "Bad Homburg"],
 
   // Default cities for any state not explicitly listed
-  "DEFAULT": ["City 1", "City 2", "City 3", "City 4", "City 5"]
+  "DEFAULT": ["Capital City", "Major City", "Central City", "Riverside", "Lakeside", "Mountainview", "Coastal Town", "Valley City", "Harbor City", "Metro City"]
 };
 
 // Function to get states by country code

@@ -146,24 +146,52 @@ export default function ProjectDetailPage() {
     }
   }, [project])
 
-  // Fetch materials
+  // Fetch materials using real-time API
   useEffect(() => {
     const fetchMaterials = async () => {
+      if (!project) return;
+
       try {
-        const response = await fetch("/api/materials")
+        console.log('Fetching real-time materials for project...')
+        setIsLoading(true)
+
+        // Call the real-time materials API with project data
+        const response = await fetch("/api/real-time/materials", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(project)
+        })
+
         if (!response.ok) {
-          throw new Error("Failed to fetch materials")
+          throw new Error("Failed to fetch real-time materials")
         }
 
         const data = await response.json()
-        setMaterials(data.materials || [])
+        console.log(`Generated ${data.materials?.length || 0} real-time material recommendations`)
+
+        if (data.materials && data.materials.length > 0) {
+          setMaterials(data.materials)
+          toast.success("Generated material recommendations based on your project")
+        } else {
+          throw new Error("No materials returned from API")
+        }
       } catch (error) {
-        console.error("Error fetching materials:", error)
+        console.error("Error fetching real-time materials:", error)
+        toast.error("Couldn't generate material recommendations. Please try again later.")
+
+        // No fallback - just set empty array
+        setMaterials([])
+      } finally {
+        setIsLoading(false)
       }
     }
 
-    fetchMaterials()
-  }, [])
+    if (project) {
+      fetchMaterials()
+    }
+  }, [project])
 
   // Fetch energy recommendations
   useEffect(() => {
@@ -696,6 +724,7 @@ export default function ProjectDetailPage() {
               currency={project.currency}
               onSaveMaterial={handleSaveMaterial}
               savedMaterials={savedMaterials}
+              isLoading={isLoading}
             />
           </TabsContent>
 

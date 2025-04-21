@@ -94,7 +94,7 @@ This ${style.toLowerCase()} style home features ${bedrooms} bedrooms, ${bathroom
 }
 
 // Function to generate floor plan image URL (using dynamic SVG generation)
-async function generateFloorPlanImage(description: string, style: string) {
+async function generateFloorPlanImage(description: string, style: string, projectData?: any) {
   try {
     console.log('Generating floor plan image for style:', style);
 
@@ -129,69 +129,105 @@ async function generateFloorPlanImage(description: string, style: string) {
       // Modern open floor plan
       svgContent = `
       <svg width="800" height="600" xmlns="http://www.w3.org/2000/svg">
-        <!-- Background -->
-        <rect width="800" height="600" fill="#FFFFFF" />
+        <!-- Filters for shadows and effects -->
+        <defs>
+          <filter id="shadow" x="-2" y="-2" width="104%" height="104%">
+            <feDropShadow dx="2" dy="2" stdDeviation="2" flood-opacity="0.3" />
+          </filter>
+          <linearGradient id="modernGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#f8f9fa" />
+            <stop offset="100%" stop-color="#e9ecef" />
+          </linearGradient>
+        </defs>
 
-        <!-- Outer walls -->
-        <rect x="50" y="50" width="700" height="500" fill="none" stroke="#333333" stroke-width="8" />
+        <!-- Background with subtle grid -->
+        <rect width="800" height="600" fill="#F8F9FA" />
+        <pattern id="smallGrid" width="10" height="10" patternUnits="userSpaceOnUse">
+          <path d="M 10 0 L 0 0 0 10" fill="none" stroke="#E9ECEF" stroke-width="0.5" />
+        </pattern>
+        <rect width="800" height="600" fill="url(#smallGrid)" />
 
-        <!-- Main Gate/Entrance -->
-        <rect x="350" y="46" width="100" height="8" fill="#555555" />
-        <text x="400" y="40" font-family="Arial" font-size="12" text-anchor="middle">Main Entrance</text>
+        <!-- Outer walls with shadow effect -->
+        <rect x="55" y="55" width="690" height="490" fill="#E9ECEF" rx="2" ry="2" />
+        <rect x="50" y="50" width="690" height="490" fill="none" stroke="#212529" stroke-width="4" rx="2" ry="2" />
+
+        <!-- Main Gate/Entrance with better styling -->
+        <rect x="350" y="46" width="100" height="8" fill="#495057" rx="2" ry="2" />
+        <text x="400" y="38" font-family="Arial" font-size="12" font-weight="bold" text-anchor="middle" fill="#212529">Main Entrance</text>
+
+        <!-- Dimensions -->
+        <line x1="50" y1="570" x2="740" y2="570" stroke="#495057" stroke-width="1" />
+        <line x1="50" y1="565" x2="50" y2="575" stroke="#495057" stroke-width="1" />
+        <line x1="740" y1="565" x2="740" y2="575" stroke="#495057" stroke-width="1" />
+        <text x="395" y="585" font-family="Arial" font-size="12" text-anchor="middle" fill="#212529">${parseFloat(description.match(/width.*?(\d+)/i)?.[1] || '30')} ft</text>
+
+        <line x1="30" y1="50" x2="30" y2="540" stroke="#495057" stroke-width="1" />
+        <line x1="25" y1="50" x2="35" y2="50" stroke="#495057" stroke-width="1" />
+        <line x1="25" y1="540" x2="35" y2="540" stroke="#495057" stroke-width="1" />
+        <text x="15" y="295" font-family="Arial" font-size="12" text-anchor="middle" transform="rotate(270, 15, 295)" fill="#212529">${parseFloat(description.match(/length.*?(\d+)/i)?.[1] || '40')} ft</text>
 
         <!-- Dimensions -->
         <line x1="50" y1="570" x2="750" y2="570" stroke="#000000" stroke-width="1" />
         <line x1="50" y1="565" x2="50" y2="575" stroke="#000000" stroke-width="1" />
         <line x1="750" y1="565" x2="750" y2="575" stroke="#000000" stroke-width="1" />
-        <text x="400" y="585" font-family="Arial" font-size="12" text-anchor="middle">${parseFloat(projectData.landDimensions.width) || 30} ${projectData.landUnit || 'ft'}</text>
+        <text x="400" y="585" font-family="Arial" font-size="12" text-anchor="middle">${projectData?.landDimensions?.width ? parseFloat(projectData.landDimensions.width) : parseFloat(description.match(/width.*?(\d+)/i)?.[1] || '30')} ${projectData?.landUnit || 'ft'}</text>
 
         <line x1="30" y1="50" x2="30" y2="550" stroke="#000000" stroke-width="1" />
         <line x1="25" y1="50" x2="35" y2="50" stroke="#000000" stroke-width="1" />
         <line x1="25" y1="550" x2="35" y2="550" stroke="#000000" stroke-width="1" />
-        <text x="15" y="300" font-family="Arial" font-size="12" text-anchor="middle" transform="rotate(270, 15, 300)">${parseFloat(projectData.landDimensions.length) || 40} ${projectData.landUnit || 'ft'}</text>
+        <text x="15" y="300" font-family="Arial" font-size="12" text-anchor="middle" transform="rotate(270, 15, 300)">${projectData?.landDimensions?.length ? parseFloat(projectData.landDimensions.length) : parseFloat(description.match(/length.*?(\d+)/i)?.[1] || '40')} ${projectData?.landUnit || 'ft'}</text>
 
-        <!-- Living area -->
-        <rect x="100" y="100" width="300" height="200" fill="${roomColors.living}" />
-        <text x="250" y="200" font-family="Arial" font-size="16" text-anchor="middle">Living Room</text>
+        <!-- Living area with gradient and rounded corners -->
+        <rect x="100" y="100" width="300" height="200" rx="5" ry="5" fill="${roomColors.living}" filter="url(#shadow)" />
+        <text x="250" y="200" font-family="Arial" font-size="16" font-weight="bold" text-anchor="middle" fill="#212529">Living Room</text>
+        <text x="250" y="220" font-family="Arial" font-size="10" text-anchor="middle" fill="#495057">${Math.round(300 * 0.3048)} × ${Math.round(200 * 0.3048)} ft</text>
 
-        <!-- Kitchen -->
-        <rect x="400" y="100" width="200" height="150" fill="${roomColors.kitchen}" />
-        <text x="500" y="175" font-family="Arial" font-size="16" text-anchor="middle">Kitchen</text>
+        <!-- Kitchen with gradient and rounded corners -->
+        <rect x="400" y="100" width="200" height="150" rx="5" ry="5" fill="${roomColors.kitchen}" filter="url(#shadow)" />
+        <text x="500" y="175" font-family="Arial" font-size="16" font-weight="bold" text-anchor="middle" fill="#212529">Kitchen</text>
+        <text x="500" y="195" font-family="Arial" font-size="10" text-anchor="middle" fill="#495057">${Math.round(200 * 0.3048)} × ${Math.round(150 * 0.3048)} ft</text>
 
-        <!-- Dining -->
-        <rect x="400" y="250" width="200" height="150" fill="${roomColors.dining}" />
-        <text x="500" y="325" font-family="Arial" font-size="16" text-anchor="middle">Dining</text>
+        <!-- Dining with gradient and rounded corners -->
+        <rect x="400" y="250" width="200" height="150" rx="5" ry="5" fill="${roomColors.dining}" filter="url(#shadow)" />
+        <text x="500" y="325" font-family="Arial" font-size="16" font-weight="bold" text-anchor="middle" fill="#212529">Dining</text>
+        <text x="500" y="345" font-family="Arial" font-size="10" text-anchor="middle" fill="#495057">${Math.round(200 * 0.3048)} × ${Math.round(150 * 0.3048)} ft</text>
 
-        <!-- Master Bedroom -->
-        <rect x="100" y="300" width="200" height="200" fill="${roomColors.bedroom}" />
-        <text x="200" y="400" font-family="Arial" font-size="16" text-anchor="middle">Master Bedroom</text>
+        <!-- Master Bedroom with gradient and rounded corners -->
+        <rect x="100" y="300" width="200" height="200" rx="5" ry="5" fill="${roomColors.bedroom}" filter="url(#shadow)" />
+        <text x="200" y="400" font-family="Arial" font-size="16" font-weight="bold" text-anchor="middle" fill="#212529">Master Bedroom</text>
+        <text x="200" y="420" font-family="Arial" font-size="10" text-anchor="middle" fill="#495057">${Math.round(200 * 0.3048)} × ${Math.round(200 * 0.3048)} ft</text>
 
-        <!-- Bathroom -->
-        <rect x="300" y="300" width="100" height="100" fill="${roomColors.bathroom}" />
-        <text x="350" y="350" font-family="Arial" font-size="14" text-anchor="middle">Bath</text>
+        <!-- Bathroom with gradient and rounded corners -->
+        <rect x="300" y="300" width="100" height="100" rx="5" ry="5" fill="${roomColors.bathroom}" filter="url(#shadow)" />
+        <text x="350" y="350" font-family="Arial" font-size="14" font-weight="bold" text-anchor="middle" fill="#212529">Bath</text>
+        <text x="350" y="365" font-family="Arial" font-size="10" text-anchor="middle" fill="#495057">${Math.round(100 * 0.3048)} × ${Math.round(100 * 0.3048)} ft</text>
 
         ${hasStudy ? `
-        <!-- Study -->
-        <rect x="600" y="100" width="100" height="100" fill="${roomColors.study}" />
-        <text x="650" y="150" font-family="Arial" font-size="14" text-anchor="middle">Study</text>
+        <!-- Study with gradient and rounded corners -->
+        <rect x="600" y="100" width="100" height="100" rx="5" ry="5" fill="${roomColors.study}" filter="url(#shadow)" />
+        <text x="650" y="150" font-family="Arial" font-size="14" font-weight="bold" text-anchor="middle" fill="#212529">Study</text>
+        <text x="650" y="165" font-family="Arial" font-size="10" text-anchor="middle" fill="#495057">${Math.round(100 * 0.3048)} × ${Math.round(100 * 0.3048)} ft</text>
         ` : ''}
 
         ${numBedrooms > 1 ? `
-        <!-- Bedroom 2 -->
-        <rect x="600" y="200" width="100" height="150" fill="${roomColors.bedroom}" />
-        <text x="650" y="275" font-family="Arial" font-size="14" text-anchor="middle">Bedroom</text>
+        <!-- Bedroom 2 with gradient and rounded corners -->
+        <rect x="600" y="200" width="100" height="150" rx="5" ry="5" fill="${roomColors.bedroom}" filter="url(#shadow)" />
+        <text x="650" y="275" font-family="Arial" font-size="14" font-weight="bold" text-anchor="middle" fill="#212529">Bedroom</text>
+        <text x="650" y="290" font-family="Arial" font-size="10" text-anchor="middle" fill="#495057">${Math.round(100 * 0.3048)} × ${Math.round(150 * 0.3048)} ft</text>
         ` : ''}
 
         ${numBathrooms > 1 ? `
-        <!-- Bathroom 2 -->
-        <rect x="600" y="350" width="100" height="100" fill="${roomColors.bathroom}" />
-        <text x="650" y="400" font-family="Arial" font-size="14" text-anchor="middle">Bath</text>
+        <!-- Bathroom 2 with gradient and rounded corners -->
+        <rect x="600" y="350" width="100" height="100" rx="5" ry="5" fill="${roomColors.bathroom}" filter="url(#shadow)" />
+        <text x="650" y="400" font-family="Arial" font-size="14" font-weight="bold" text-anchor="middle" fill="#212529">Bath</text>
+        <text x="650" y="415" font-family="Arial" font-size="10" text-anchor="middle" fill="#495057">${Math.round(100 * 0.3048)} × ${Math.round(100 * 0.3048)} ft</text>
         ` : ''}
 
         ${hasGarage ? `
-        <!-- Garage -->
-        <rect x="300" y="400" width="200" height="150" fill="${roomColors.garage}" />
-        <text x="400" y="475" font-family="Arial" font-size="16" text-anchor="middle">Garage</text>
+        <!-- Garage with gradient and rounded corners -->
+        <rect x="300" y="400" width="200" height="150" rx="5" ry="5" fill="${roomColors.garage}" filter="url(#shadow)" />
+        <text x="400" y="475" font-family="Arial" font-size="16" font-weight="bold" text-anchor="middle" fill="#212529">Garage</text>
+        <text x="400" y="495" font-family="Arial" font-size="10" text-anchor="middle" fill="#495057">${Math.round(200 * 0.3048)} × ${Math.round(150 * 0.3048)} ft</text>
         ` : ''}
 
         <!-- Title and Info -->
@@ -218,12 +254,12 @@ async function generateFloorPlanImage(description: string, style: string) {
         <line x1="50" y1="570" x2="750" y2="570" stroke="#000000" stroke-width="1" />
         <line x1="50" y1="565" x2="50" y2="575" stroke="#000000" stroke-width="1" />
         <line x1="750" y1="565" x2="750" y2="575" stroke="#000000" stroke-width="1" />
-        <text x="400" y="585" font-family="Arial" font-size="12" text-anchor="middle">${parseFloat(projectData.landDimensions.width) || 30} ${projectData.landUnit || 'ft'}</text>
+        <text x="400" y="585" font-family="Arial" font-size="12" text-anchor="middle">${projectData?.landDimensions?.width ? parseFloat(projectData.landDimensions.width) : parseFloat(description.match(/width.*?(\d+)/i)?.[1] || '30')} ${projectData?.landUnit || 'ft'}</text>
 
         <line x1="30" y1="50" x2="30" y2="550" stroke="#000000" stroke-width="1" />
         <line x1="25" y1="50" x2="35" y2="50" stroke="#000000" stroke-width="1" />
         <line x1="25" y1="550" x2="35" y2="550" stroke="#000000" stroke-width="1" />
-        <text x="15" y="300" font-family="Arial" font-size="12" text-anchor="middle" transform="rotate(270, 15, 300)">${parseFloat(projectData.landDimensions.length) || 40} ${projectData.landUnit || 'ft'}</text>
+        <text x="15" y="300" font-family="Arial" font-size="12" text-anchor="middle" transform="rotate(270, 15, 300)">${projectData?.landDimensions?.length ? parseFloat(projectData.landDimensions.length) : parseFloat(description.match(/length.*?(\d+)/i)?.[1] || '40')} ${projectData?.landUnit || 'ft'}</text>
 
         <!-- Living Room -->
         <rect x="100" y="100" width="250" height="200" fill="${roomColors.living}" />
@@ -296,12 +332,12 @@ async function generateFloorPlanImage(description: string, style: string) {
         <line x1="50" y1="570" x2="750" y2="570" stroke="#000000" stroke-width="1" />
         <line x1="50" y1="565" x2="50" y2="575" stroke="#000000" stroke-width="1" />
         <line x1="750" y1="565" x2="750" y2="575" stroke="#000000" stroke-width="1" />
-        <text x="400" y="585" font-family="Arial" font-size="12" text-anchor="middle">${parseFloat(projectData.landDimensions.width) || 30} ${projectData.landUnit || 'ft'}</text>
+        <text x="400" y="585" font-family="Arial" font-size="12" text-anchor="middle">${projectData?.landDimensions?.width ? parseFloat(projectData.landDimensions.width) : parseFloat(description.match(/width.*?(\d+)/i)?.[1] || '30')} ${projectData?.landUnit || 'ft'}</text>
 
         <line x1="30" y1="50" x2="30" y2="550" stroke="#000000" stroke-width="1" />
         <line x1="25" y1="50" x2="35" y2="50" stroke="#000000" stroke-width="1" />
         <line x1="25" y1="550" x2="35" y2="550" stroke="#000000" stroke-width="1" />
-        <text x="15" y="300" font-family="Arial" font-size="12" text-anchor="middle" transform="rotate(270, 15, 300)">${parseFloat(projectData.landDimensions.length) || 40} ${projectData.landUnit || 'ft'}</text>
+        <text x="15" y="300" font-family="Arial" font-size="12" text-anchor="middle" transform="rotate(270, 15, 300)">${projectData?.landDimensions?.length ? parseFloat(projectData.landDimensions.length) : parseFloat(description.match(/length.*?(\d+)/i)?.[1] || '40')} ${projectData?.landUnit || 'ft'}</text>
 
         <!-- Living Room -->
         <rect x="100" y="100" width="300" height="200" fill="${roomColors.living}" />
@@ -351,11 +387,25 @@ async function generateFloorPlanImage(description: string, style: string) {
     // Save the SVG to a file
     const publicDir = path.join(process.cwd(), 'public');
     const uploadsDir = path.join(publicDir, 'uploads', 'floor-plans', 'generated');
+    const projectDir = path.join(publicDir, 'uploads', 'floor-plans', 'project-1');
 
     // Create directories if they don't exist
     if (!fs.existsSync(uploadsDir)) {
       fs.mkdirSync(uploadsDir, { recursive: true });
     }
+
+    // Create project directories for fallback paths
+    const projectDirs = [
+      path.join(publicDir, 'uploads', 'floor-plans', 'project-1'),
+      path.join(publicDir, 'uploads', 'floor-plans', 'project-2'),
+      path.join(publicDir, 'uploads', 'floor-plans', 'project-3')
+    ];
+
+    projectDirs.forEach(dir => {
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+      }
+    });
 
     // Save the SVG file
     const fileName = `floor-plan-${style.toLowerCase()}-${floorPlanId}.svg`;
@@ -414,7 +464,7 @@ export async function POST(req: NextRequest) {
 
     // Generate floor plan image URL
     console.log("Generating floor plan image...")
-    const imageUrl = await generateFloorPlanImage(description, projectData.preferences.style)
+    const imageUrl = await generateFloorPlanImage(description, projectData.preferences.style, projectData)
     console.log("Image URL generated successfully:", imageUrl)
 
     // Create a floor plan object

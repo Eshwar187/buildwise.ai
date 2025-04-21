@@ -656,7 +656,37 @@ export function CreateProjectDialog({
           toast.success('Project created successfully!');
 
           // Redirect to the projects page to see the new project
-          window.location.href = '/dashboard/projects';
+          console.log('Redirecting to projects page...');
+
+          // First, try to verify the project was created by calling the debug API
+          try {
+            const verifyResponse = await fetch('/api/debug/projects');
+            if (verifyResponse.ok) {
+              const verifyData = await verifyResponse.json();
+              console.log('Verify projects response:', verifyData);
+
+              if (verifyData.projects && verifyData.projects.length > 0) {
+                console.log(`Verified ${verifyData.projects.length} projects exist in database`);
+              } else {
+                console.warn('No projects found in database after creation');
+
+                // Try to fix projects
+                const fixResponse = await fetch('/api/debug/fix-projects');
+                if (fixResponse.ok) {
+                  const fixData = await fixResponse.json();
+                  console.log('Fix projects response:', fixData);
+                }
+              }
+            }
+          } catch (verifyError) {
+            console.error('Error verifying project creation:', verifyError);
+          }
+
+          // Add a small delay to ensure the project is saved before redirecting
+          setTimeout(() => {
+            // Force a hard refresh to ensure the projects list is updated
+            window.location.href = '/dashboard/projects?refresh=' + new Date().getTime();
+          }, 2000);
         } else {
           console.error('Error creating project via direct API:', data.error);
           // Fall back to the original method

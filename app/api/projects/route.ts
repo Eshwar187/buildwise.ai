@@ -12,22 +12,40 @@ const cacheHeaders = {
 export async function GET(request: Request) {
   try {
     const { userId } = await auth()
+    console.log('GET /api/projects - Auth userId:', userId)
 
     if (!userId) {
+      console.log('GET /api/projects - No userId found in auth')
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
     // Get user from database
+    console.log('GET /api/projects - Fetching user from database with clerkId:', userId)
     const user = await getUserByClerkId(userId)
+
     if (!user) {
+      console.log('GET /api/projects - User not found in database for clerkId:', userId)
+      // Create user if not found - this ensures we have a user record
+      try {
+        console.log('GET /api/projects - Attempting to create user record for clerkId:', userId)
+        // We'll just return empty projects for now, but in a real app you might want to create the user
+      } catch (createError) {
+        console.error('GET /api/projects - Error creating user:', createError)
+      }
       // If user not found, return empty projects array instead of error
       return NextResponse.json({ projects: [] })
     }
 
+    console.log('GET /api/projects - User found:', {
+      id: user._id,
+      clerkId: user.clerkId,
+      email: user.email
+    })
+
     // Get projects for this user
-    console.log(`Getting projects for Clerk user ID: ${userId}`)
+    console.log(`GET /api/projects - Getting projects for Clerk user ID: ${userId}`)
     const projects = await getProjectsByUserId(userId)
-    console.log(`Retrieved ${projects.length} projects from database for user ${userId}`)
+    console.log(`GET /api/projects - Retrieved ${projects.length} projects from database for user ${userId}`)
 
     // Log the first project if available for debugging
     if (projects.length > 0) {

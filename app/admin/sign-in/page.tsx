@@ -39,7 +39,9 @@ export default function AdminSignInPage() {
         // Check if the user is the admin (eshwar09052005@gmail.com)
         if (email === "eshwar09052005@gmail.com") {
           toast.success("Signed in as admin successfully!")
-          router.push("/admin/dashboard")
+
+          // Use window.location for a hard redirect to ensure complete page reload
+          window.location.href = "/admin/dashboard"
         } else {
           toast.error("You don't have admin privileges")
           // Sign out the user

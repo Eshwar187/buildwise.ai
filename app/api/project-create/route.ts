@@ -54,23 +54,38 @@ export async function POST(req: NextRequest) {
   try {
     // Get the authenticated user ID
     const { userId } = await auth()
+    console.log('POST /api/project-create - Auth userId:', userId)
 
     if (!userId) {
+      console.log('POST /api/project-create - No userId found in auth')
       return NextResponse.json({ error: "Unauthorized. Please sign in to create a project." }, { status: 401 })
     }
+
+    console.log('POST /api/project-create - Authenticated userId:', userId)
 
     const body = await req.json()
     console.log('Received project data:', body)
 
     // Create a new project with the authenticated user's ID
-    const project = await createProject({
-      userId: userId, // Use the authenticated user's ID
+    console.log('POST /api/project-create - Creating project for userId:', userId)
+
+    // Ensure we have a valid userId as a string
+    const userIdStr = String(userId)
+    console.log('POST /api/project-create - Converted userId to string:', userIdStr)
+
+    // Calculate total area if not provided
+    const length = parseFloat(body.landDimensions.length) || 0
+    const width = parseFloat(body.landDimensions.width) || 0
+    const totalArea = parseFloat(body.landDimensions.totalArea) || (length * width)
+
+    const projectData = {
+      userId: userIdStr, // Use the authenticated user's ID as a string
       name: body.name,
       description: body.description,
       landDimensions: {
-        length: parseFloat(body.landDimensions.length) || 0,
-        width: parseFloat(body.landDimensions.width) || 0,
-        totalArea: parseFloat(body.landDimensions.totalArea) || 0
+        length: length,
+        width: width,
+        totalArea: totalArea
       },
       landUnit: body.landUnit,
       budget: parseFloat(body.budget) || 0,
@@ -80,7 +95,15 @@ export async function POST(req: NextRequest) {
       status: "Planning",
       // Initialize floorPlans array if we have a generated floor plan
       floorPlans: body.floorPlan ? [body.floorPlan] : []
+    }
+
+    console.log('POST /api/project-create - Project data prepared:', {
+      userId: projectData.userId,
+      name: projectData.name,
+      dimensions: projectData.landDimensions,
     })
+
+    const project = await createProject(projectData)
 
     console.log("Project created with ID:", project._id, "for user:", userId)
 
@@ -118,7 +141,12 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    return NextResponse.json({ success: true, project })
+    console.log('POST /api/project-create - Returning successful response with project ID:', project._id)
+    return NextResponse.json({
+      success: true,
+      project,
+      message: 'Project created successfully. You will be redirected to the projects page.'
+    })
   } catch (error: any) {
     console.error("Error creating project:", error)
     return NextResponse.json({

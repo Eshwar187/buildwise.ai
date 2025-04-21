@@ -22,10 +22,20 @@ export function AdminHeader() {
   const router = useRouter()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
-  const handleSignOut = () => {
-    // In a real app, we would sign out the user
-    toast.success("Logged out successfully")
-    router.push("/")
+  const handleSignOut = async () => {
+    try {
+      // Sign out the user using Clerk
+      await fetch("/api/auth/sign-out", {
+        method: "POST",
+      })
+
+      toast.success("Logged out successfully")
+      // Use window.location for a hard redirect
+      window.location.href = "/"
+    } catch (error) {
+      console.error("Error signing out:", error)
+      toast.error("Failed to sign out")
+    }
   }
 
   const getInitials = (name: string) => {

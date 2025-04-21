@@ -3,24 +3,26 @@
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
-import { 
-  Plus, 
-  Search, 
-  Filter, 
-  Building2, 
-  MapPin, 
-  DollarSign, 
-  Clock, 
-  Loader2 
+import {
+  Plus,
+  Search,
+  Filter,
+  Building2,
+  MapPin,
+  DollarSign,
+  Clock,
+  Loader2,
+  RefreshCw,
+  Wrench
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
 } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
@@ -61,32 +63,50 @@ export default function ProjectsPage() {
   const [searchQuery, setSearchQuery] = useState("")
   const [statusFilter, setStatusFilter] = useState<string>("all")
 
-  // Fetch projects
-  useEffect(() => {
-    const fetchProjects = async () => {
-      try {
-        const response = await fetch("/api/projects")
-        if (!response.ok) {
-          throw new Error("Failed to fetch projects")
-        }
-        const data = await response.json()
-        setProjects(data.projects || [])
-        setFilteredProjects(data.projects || [])
-      } catch (error) {
-        console.error("Error fetching projects:", error)
-        toast.error("Failed to load projects")
-      } finally {
-        setIsLoading(false)
+  // Function to fetch projects
+  const fetchProjects = async () => {
+    setIsLoading(true)
+    try {
+      console.log('Fetching projects...')
+      // Add a cache-busting parameter to avoid caching issues
+      const response = await fetch(`/api/projects?t=${new Date().getTime()}`)
+      if (!response.ok) {
+        throw new Error("Failed to fetch projects")
       }
-    }
+      const data = await response.json()
+      console.log(`Fetched ${data.projects?.length || 0} projects`)
+      setProjects(data.projects || [])
+      setFilteredProjects(data.projects || [])
 
+      if (data.projects?.length === 0) {
+        console.log('No projects found, showing empty state')
+      }
+    } catch (error) {
+      console.error("Error fetching projects:", error)
+      toast.error("Failed to load projects")
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  // Fetch projects on initial load
+  useEffect(() => {
     fetchProjects()
+
+    // Also check for refresh parameter in URL (used after project creation)
+    const urlParams = new URLSearchParams(window.location.search)
+    if (urlParams.has('refresh')) {
+      console.log('Refresh parameter detected, fetching projects again...')
+      // Remove the refresh parameter from the URL without reloading the page
+      const newUrl = window.location.pathname
+      window.history.replaceState({}, document.title, newUrl)
+    }
   }, [])
 
   // Filter projects when search query or status filter changes
   useEffect(() => {
     let filtered = [...projects]
-    
+
     // Apply search filter
     if (searchQuery) {
       const query = searchQuery.toLowerCase()
@@ -99,12 +119,12 @@ export default function ProjectsPage() {
           project.location.city.toLowerCase().includes(query)
       )
     }
-    
+
     // Apply status filter
     if (statusFilter !== "all") {
       filtered = filtered.filter(project => project.status === statusFilter)
     }
-    
+
     setFilteredProjects(filtered)
   }, [searchQuery, statusFilter, projects])
 
@@ -136,7 +156,7 @@ export default function ProjectsPage() {
   // Format currency
   const formatCurrency = (amount: number | string, currency: string) => {
     const numAmount = typeof amount === "string" ? parseFloat(amount) : amount
-    
+
     return new Intl.NumberFormat("en-US", {
       style: "currency",
       currency: currency,
@@ -174,12 +194,61 @@ export default function ProjectsPage() {
         heading="Projects"
         text="Create and manage your floor plan projects."
       >
-        <Button
-          onClick={() => setIsCreateDialogOpen(true)}
-          className="bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-600 hover:to-teal-600 text-white"
-        >
-          <Plus className="mr-2 h-4 w-4" /> New Project
-        </Button>
+        <div className="flex items-center space-x-2">
+          <Button
+            onClick={fetchProjects}
+            variant="outline"
+            className="border-slate-700 text-slate-300 hover:bg-slate-700"
+            disabled={isLoading}
+          >
+            <RefreshCw className={`mr-2 h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} /> Refresh
+          </Button>
+          <Button
+            onClick={async () => {
+              toast.info("Checking for projects in database...")
+              try {
+                const response = await fetch('/api/debug/projects')
+                if (response.ok) {
+                  const data = await response.json()
+                  console.log('Debug projects response:', data)
+                  if (data.projects && data.projects.length > 0) {
+                    toast.success(`Found ${data.projects.length} projects in database!`)
+                    // Refresh the projects list
+                    fetchProjects()
+                  } else {
+                    toast.warning("No projects found in database. Trying to fix...")
+                    // Try to fix projects
+                    const fixResponse = await fetch('/api/debug/fix-projects')
+                    if (fixResponse.ok) {
+                      const fixData = await fixResponse.json()
+                      console.log('Fix projects response:', fixData)
+                      if (fixData.fixed > 0) {
+                        toast.success(`Fixed ${fixData.fixed} projects!`)
+                        // Refresh the projects list
+                        fetchProjects()
+                      } else {
+                        toast.error("Could not fix any projects.")
+                      }
+                    }
+                  }
+                }
+              } catch (error) {
+                console.error('Error debugging projects:', error)
+                toast.error("Error checking projects")
+              }
+            }}
+            variant="outline"
+            className="border-slate-700 text-slate-300 hover:bg-slate-700"
+          >
+            <Wrench className="mr-2 h-4 w-4" /> Debug
+          </Button>
+          <Button
+            onClick={() => setIsCreateDialogOpen(true)}
+            className="bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-600 hover:to-teal-600 text-white"
+          >
+            <Plus className="mr-2 h-4 w-4" /> New Project
+          </Button>
+        </div>
       </DashboardHeader>
 
       <div className="space-y-4">
@@ -221,7 +290,7 @@ export default function ProjectsPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, delay: index * 0.05 }}
               >
-                <Card 
+                <Card
                   className="bg-slate-800 border-slate-700 h-full flex flex-col cursor-pointer hover:border-teal-500/50 transition-colors"
                   onClick={() => router.push(`/dashboard/projects/${project._id}`)}
                 >
@@ -242,20 +311,20 @@ export default function ProjectsPage() {
                           {project.landDimensions.length} × {project.landDimensions.width} {project.landUnit}
                         </p>
                         <p className="text-xs text-slate-500">
-                          Total Area: {project.landDimensions.totalArea || 
-                            (parseFloat(project.landDimensions.length as string) * 
+                          Total Area: {project.landDimensions.totalArea ||
+                            (parseFloat(project.landDimensions.length as string) *
                              parseFloat(project.landDimensions.width as string))} {project.landUnit}
                         </p>
                       </div>
                     </div>
-                    
+
                     <div className="flex items-start space-x-2">
                       <MapPin className="h-4 w-4 text-slate-500 mt-0.5" />
                       <p className="text-sm text-slate-300">
                         {project.location.city}, {project.location.state}, {project.location.country}
                       </p>
                     </div>
-                    
+
                     <div className="flex items-start space-x-2">
                       <DollarSign className="h-4 w-4 text-slate-500 mt-0.5" />
                       <p className="text-sm text-slate-300">

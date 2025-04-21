@@ -3,15 +3,15 @@
 import { useState, useEffect } from "react"
 import Image from "next/image"
 import { motion } from "framer-motion"
-import { 
-  DollarSign, 
-  Leaf, 
-  Shield, 
-  ExternalLink, 
-  ThumbsUp, 
-  ThumbsDown, 
-  Bookmark, 
-  BookmarkCheck 
+import {
+  DollarSign,
+  Leaf,
+  Shield,
+  ExternalLink,
+  ThumbsUp,
+  ThumbsDown,
+  Bookmark,
+  BookmarkCheck
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
@@ -26,14 +26,16 @@ interface MaterialRecommendationsProps {
   currency: string
   onSaveMaterial: (materialId: string) => void
   savedMaterials?: string[]
+  isLoading?: boolean
 }
 
-export function MaterialRecommendations({ 
-  materials, 
-  budget, 
-  currency, 
+export function MaterialRecommendations({
+  materials,
+  budget,
+  currency,
   onSaveMaterial,
-  savedMaterials = []
+  savedMaterials = [],
+  isLoading = false
 }: MaterialRecommendationsProps) {
   const [activeTab, setActiveTab] = useState("all")
   const [filteredMaterials, setFilteredMaterials] = useState<Material[]>(materials)
@@ -42,12 +44,12 @@ export function MaterialRecommendations({
   // Filter and sort materials when dependencies change
   useEffect(() => {
     let filtered = [...materials]
-    
+
     // Apply category filter
     if (activeTab !== "all") {
       filtered = filtered.filter(material => material.category.toLowerCase() === activeTab.toLowerCase())
     }
-    
+
     // Apply sorting
     filtered.sort((a, b) => {
       if (sortBy === "cost") {
@@ -58,7 +60,7 @@ export function MaterialRecommendations({
         return b.durability - a.durability
       }
     })
-    
+
     setFilteredMaterials(filtered)
   }, [materials, activeTab, sortBy])
 
@@ -71,12 +73,17 @@ export function MaterialRecommendations({
   }
 
   // Format currency
-  const formatCurrency = (amount: number, currencyCode: string) => {
-    return new Intl.NumberFormat('en-US', { 
-      style: 'currency', 
-      currency: currencyCode,
-      maximumFractionDigits: 0
-    }).format(amount)
+  const formatCurrency = (amount: number, currencyCode: string = currency) => {
+    try {
+      return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: currencyCode || 'USD',
+        maximumFractionDigits: 0
+      }).format(amount)
+    } catch (error) {
+      console.error('Error formatting currency:', error);
+      return `$${amount}`; // Fallback to simple format
+    }
   }
 
   // Check if a material is saved
@@ -93,28 +100,34 @@ export function MaterialRecommendations({
             Based on your budget of {formatCurrency(budget, currency)}
           </p>
         </div>
-        
+
         <div className="flex items-center space-x-2">
+          {isLoading && (
+            <div className="flex items-center mr-2">
+              <div className="h-4 w-4 rounded-full border-2 border-t-transparent border-teal-500 animate-spin mr-1" />
+              <span className="text-sm text-slate-400">Loading...</span>
+            </div>
+          )}
           <span className="text-sm text-slate-400">Sort by:</span>
           <div className="flex rounded-md overflow-hidden">
-            <Button 
-              size="sm" 
+            <Button
+              size="sm"
               variant={sortBy === "cost" ? "default" : "outline"}
               className={sortBy === "cost" ? "bg-teal-600 hover:bg-teal-700" : "border-slate-600 text-slate-300"}
               onClick={() => setSortBy("cost")}
             >
               <DollarSign className="h-4 w-4 mr-1" /> Cost
             </Button>
-            <Button 
-              size="sm" 
+            <Button
+              size="sm"
               variant={sortBy === "sustainability" ? "default" : "outline"}
               className={sortBy === "sustainability" ? "bg-green-600 hover:bg-green-700" : "border-slate-600 text-slate-300"}
               onClick={() => setSortBy("sustainability")}
             >
               <Leaf className="h-4 w-4 mr-1" /> Eco
             </Button>
-            <Button 
-              size="sm" 
+            <Button
+              size="sm"
               variant={sortBy === "durability" ? "default" : "outline"}
               className={sortBy === "durability" ? "bg-blue-600 hover:bg-blue-700" : "border-slate-600 text-slate-300"}
               onClick={() => setSortBy("durability")}
@@ -124,23 +137,23 @@ export function MaterialRecommendations({
           </div>
         </div>
       </div>
-      
+
       <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="bg-slate-800 border border-slate-700 mb-4 overflow-x-auto flex w-full">
           <TabsTrigger value="all" className="data-[state=active]:bg-slate-700">
             All Materials
           </TabsTrigger>
           {categories.map(category => (
-            <TabsTrigger 
-              key={category} 
-              value={category.toLowerCase()} 
+            <TabsTrigger
+              key={category}
+              value={category.toLowerCase()}
               className="data-[state=active]:bg-slate-700"
             >
               {category}
             </TabsTrigger>
           ))}
         </TabsList>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredMaterials.length > 0 ? (
             filteredMaterials.map((material, index) => (
@@ -164,7 +177,7 @@ export function MaterialRecommendations({
                       </Badge>
                     </div>
                   )}
-                  
+
                   <CardHeader className={material.imageUrl ? "pt-4" : "pt-6"}>
                     <div className="flex justify-between items-start">
                       <CardTitle className="text-white text-lg">{material.name}</CardTitle>
@@ -182,12 +195,12 @@ export function MaterialRecommendations({
                       </Button>
                     </div>
                     <CardDescription className="text-slate-400">
-                      {material.description.length > 100 
-                        ? `${material.description.substring(0, 100)}...` 
+                      {material.description.length > 100
+                        ? `${material.description.substring(0, 100)}...`
                         : material.description}
                     </CardDescription>
                   </CardHeader>
-                  
+
                   <CardContent className="space-y-4 flex-grow">
                     <div className="flex justify-between items-center">
                       <span className="text-sm text-slate-400">Cost</span>
@@ -195,7 +208,7 @@ export function MaterialRecommendations({
                         {formatCurrency(material.costPerUnit, material.currency)} per {material.unit}
                       </span>
                     </div>
-                    
+
                     <div className="space-y-2">
                       <div className="flex justify-between items-center">
                         <span className="text-xs text-slate-400">Sustainability</span>
@@ -205,7 +218,7 @@ export function MaterialRecommendations({
                         <div className="h-full bg-gradient-to-r from-green-500 to-green-400 rounded-full" />
                       </Progress>
                     </div>
-                    
+
                     <div className="space-y-2">
                       <div className="flex justify-between items-center">
                         <span className="text-xs text-slate-400">Durability</span>
@@ -215,7 +228,7 @@ export function MaterialRecommendations({
                         <div className="h-full bg-gradient-to-r from-blue-500 to-blue-400 rounded-full" />
                       </Progress>
                     </div>
-                    
+
                     <div className="space-y-2">
                       <div className="flex justify-between items-center">
                         <span className="text-xs text-slate-400">Energy Efficiency</span>
@@ -225,14 +238,14 @@ export function MaterialRecommendations({
                         <div className="h-full bg-gradient-to-r from-teal-500 to-teal-400 rounded-full" />
                       </Progress>
                     </div>
-                    
+
                     {material.locallyAvailable && (
                       <Badge variant="outline" className="bg-slate-700 text-green-400 border-green-500">
                         Locally Available
                       </Badge>
                     )}
                   </CardContent>
-                  
+
                   <CardFooter className="flex justify-between pt-2 pb-4">
                     <div className="flex space-x-2">
                       <Button variant="ghost" size="sm" className="text-slate-400 hover:text-white">
@@ -242,7 +255,7 @@ export function MaterialRecommendations({
                         <ThumbsDown className="h-4 w-4 mr-1" />
                       </Button>
                     </div>
-                    
+
                     {material.supplier?.website && (
                       <Button variant="outline" size="sm" className="border-slate-600 text-slate-300">
                         Supplier <ExternalLink className="h-3 w-3 ml-1" />

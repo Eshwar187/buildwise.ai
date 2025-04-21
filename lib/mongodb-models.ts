@@ -242,13 +242,27 @@ export async function updateUserLastActive(clerkId: string) {
 export async function createProject(projectData: Omit<Project, "_id" | "createdAt" | "updatedAt">) {
   const { db, isLocal } = await connectToDatabase()
 
-  // Make sure userId is a string
+  // Make sure userId is a string and properly formatted
   if (projectData.userId) {
+    const originalUserId = projectData.userId
     projectData.userId = String(projectData.userId)
+    console.log('createProject - Original userId:', originalUserId)
+    console.log('createProject - Converted userId to string:', projectData.userId)
   }
 
-  console.log('Creating project with userId:', projectData.userId)
-  console.log('Using local database:', isLocal)
+  console.log('createProject - Creating project with userId:', projectData.userId)
+  console.log('createProject - Using local database:', isLocal)
+
+  // First check if the collection exists
+  const collections = await db.listCollections().toArray()
+  const collectionNames = collections.map(c => c.name)
+  console.log(`createProject - Available collections:`, collectionNames)
+
+  if (!collectionNames.includes('projects')) {
+    console.log('createProject - Projects collection does not exist, creating it')
+    await db.createCollection('projects')
+    await db.collection('projects').createIndex({ userId: 1 })
+  }
 
   // Ensure numeric values are properly converted
   const landDimensions = {
@@ -268,7 +282,7 @@ export async function createProject(projectData: Omit<Project, "_id" | "createdA
     updatedAt: now,
   }
 
-  console.log('Inserting project into MongoDB:', {
+  console.log('createProject - Inserting project into MongoDB:', {
     name: project.name,
     userId: project.userId,
     dimensions: project.landDimensions,
@@ -277,10 +291,19 @@ export async function createProject(projectData: Omit<Project, "_id" | "createdA
 
   try {
     const result = await db.collection("projects").insertOne(project)
-    console.log('Project created successfully with ID:', result.insertedId)
+    console.log('createProject - Project created successfully with ID:', result.insertedId)
+
+    // Verify the project was actually inserted
+    const insertedProject = await db.collection("projects").findOne({ _id: result.insertedId })
+    if (insertedProject) {
+      console.log('createProject - Verified project was inserted with ID:', result.insertedId)
+    } else {
+      console.error('createProject - Project was not found after insertion!')
+    }
+
     return { ...project, _id: result.insertedId }
   } catch (error) {
-    console.error('Error creating project in MongoDB:', error)
+    console.error('createProject - Error creating project in MongoDB:', error)
     throw error
   }
 }
@@ -288,41 +311,95 @@ export async function createProject(projectData: Omit<Project, "_id" | "createdA
 export async function getProjectsByUserId(userId: string) {
   try {
     const { db, isLocal } = await connectToDatabase()
-    console.log(`Fetching projects for user ID: ${userId}`)
-    console.log('Using local database:', isLocal)
+    console.log(`getProjectsByUserId - Fetching projects for user ID: ${userId}`)
+    console.log('getProjectsByUserId - Using local database:', isLocal)
 
     // Make sure we're using the correct user ID format
-    userId = String(userId)
+    const userIdStr = String(userId)
+    console.log(`getProjectsByUserId - Converted userId to string: ${userIdStr}`)
 
-    console.log(`Querying MongoDB with userId: ${userId}`)
-    const projects = await db.collection("projects").find({ userId: userId }).sort({ createdAt: -1 }).toArray()
+    console.log(`getProjectsByUserId - Querying MongoDB with userId: ${userIdStr}`)
 
-    console.log(`Found ${projects.length} projects for user ID: ${userId}`)
+    // First check if the collection exists
+    const collections = await db.listCollections().toArray()
+    const collectionNames = collections.map(c => c.name)
+    console.log(`getProjectsByUserId - Available collections:`, collectionNames)
+
+    if (!collectionNames.includes('projects')) {
+      console.log('getProjectsByUserId - Projects collection does not exist, creating it')
+      await db.createCollection('projects')
+      await db.collection('projects').createIndex({ userId: 1 })
+    }
+
+    // Count total projects in the collection
+    const totalCount = await db.collection("projects").countDocuments({})
+    console.log(`getProjectsByUserId - Total projects in collection: ${totalCount}`)
+
+    // Get all projects for debugging
+    const allProjects = await db.collection("projects").find({}).limit(5).toArray()
+    console.log(`getProjectsByUserId - Sample of all projects:`, allProjects.map(p => ({
+      id: p._id,
+      name: p.name,
+      userId: p.userId
+    })))
+
+    // Query for this specific user's projects using multiple approaches
+    // First try with the original userId
+    const projectsOriginal = await db.collection("projects").find({ userId: userId }).sort({ createdAt: -1 }).toArray()
+    console.log(`getProjectsByUserId - Found ${projectsOriginal.length} projects with original userId`)
+
+    // Then try with the string version
+    const projectsString = await db.collection("projects").find({ userId: userIdStr }).sort({ createdAt: -1 }).toArray()
+    console.log(`getProjectsByUserId - Found ${projectsString.length} projects with string userId`)
+
+    // Combine results (removing duplicates)
+    const projects = [...projectsOriginal]
+    for (const project of projectsString) {
+      if (!projects.some(p => p._id.toString() === project._id.toString())) {
+        projects.push(project)
+      }
+    }
+
+    console.log(`getProjectsByUserId - Found ${projects.length} projects for user ID: ${userId}`)
 
     // Log the first project if available for debugging
     if (projects.length > 0) {
-      console.log('First project in MongoDB:', {
+      console.log('getProjectsByUserId - First project in MongoDB:', {
         id: projects[0]._id,
         name: projects[0].name,
         userId: projects[0].userId,
         createdAt: projects[0].createdAt
       })
-    } else {
-      // If no projects found, log all projects in the collection for debugging
-      const allProjects = await db.collection("projects").find({}).limit(5).toArray()
-      console.log(`Found ${allProjects.length} total projects in the collection`)
-      if (allProjects.length > 0) {
-        console.log('Sample projects in MongoDB:', allProjects.map(p => ({
-          id: p._id,
-          name: p.name,
-          userId: p.userId
-        })))
+    }
+
+    // If still no projects found, try a more aggressive approach
+    if (projects.length === 0 && totalCount > 0) {
+      console.log('getProjectsByUserId - No projects found for user, trying a more aggressive approach')
+
+      // Try to find projects by partial userId match (in case of formatting differences)
+      const userIdPartial = userId.substring(0, 10) // Use first part of the userId
+      console.log(`getProjectsByUserId - Trying partial userId match with: ${userIdPartial}`)
+
+      // Use a regex to find partial matches
+      const projectsPartial = await db.collection("projects").find({
+        userId: { $regex: userIdPartial, $options: 'i' }
+      }).sort({ createdAt: -1 }).toArray()
+
+      console.log(`getProjectsByUserId - Found ${projectsPartial.length} projects with partial userId match`)
+
+      // Add these to our results if they're not already included
+      for (const project of projectsPartial) {
+        if (!projects.some(p => p._id.toString() === project._id.toString())) {
+          projects.push(project)
+        }
       }
+
+      console.log(`getProjectsByUserId - Total projects after partial matching: ${projects.length}`)
     }
 
     return projects
   } catch (error) {
-    console.error("Error getting projects by userId:", error)
+    console.error("getProjectsByUserId - Error getting projects by userId:", error)
     return []
   }
 }
