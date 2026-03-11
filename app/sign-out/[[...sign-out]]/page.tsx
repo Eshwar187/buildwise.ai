@@ -1,30 +1,35 @@
 "use client"
 
-import { SignOutButton } from "@clerk/nextjs"
-import { useRouter } from "next/navigation"
 import { useEffect } from "react"
+import { Loader2 } from "lucide-react"
+import { createClient } from "@/lib/supabase/client"
+import { useRouter } from "next/navigation"
 
 export default function SignOutPage() {
   const router = useRouter()
-  
-  // Redirect to home page after sign out
-  const handleSignOutComplete = () => {
-    router.push("/")
-  }
-  
+  const supabase = createClient()
+
+  useEffect(() => {
+    const doSignOut = async () => {
+      try {
+        await supabase.auth.signOut()
+      } catch (error) {
+        console.error("Sign out error:", error)
+      }
+      // Always redirect home
+      router.push("/")
+      router.refresh()
+    }
+
+    doSignOut()
+  }, [router, supabase])
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-900">
-      <div className="w-full max-w-md p-8 bg-slate-800 border border-slate-700 rounded-lg shadow-xl">
-        <h1 className="text-2xl font-bold text-white mb-6 text-center">Signing Out...</h1>
-        <p className="text-slate-400 mb-8 text-center">You are being signed out of BuildWise.ai</p>
-        
-        <div className="flex justify-center">
-          <SignOutButton signOutCallback={handleSignOutComplete}>
-            <button className="bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-600 hover:to-teal-600 text-white px-6 py-3 rounded-md font-medium">
-              Click here if you're not redirected
-            </button>
-          </SignOutButton>
-        </div>
+    <div className="flex min-h-screen items-center justify-center bg-slate-950">
+      <div className="text-center animate-in fade-in zoom-in duration-300">
+        <Loader2 className="h-8 w-8 animate-spin text-cyan-500 mx-auto mb-4" />
+        <h1 className="text-xl font-semibold text-white mb-2">Signing out...</h1>
+        <p className="text-slate-500 text-sm">See you next time!</p>
       </div>
     </div>
   )

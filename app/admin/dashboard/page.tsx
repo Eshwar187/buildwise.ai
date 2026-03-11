@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useUser } from "@clerk/nextjs"
+import { useAuth } from "@/contexts/auth-context"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -76,7 +76,7 @@ const mockProjects = [
 ]
 
 export default function AdminDashboardPage() {
-  const { user, isLoaded } = useUser()
+  const { user, loading } = useAuth()
   const router = useRouter()
   const [users, setUsers] = useState(mockUsers)
   const [projects, setProjects] = useState(mockProjects)
@@ -85,16 +85,16 @@ export default function AdminDashboardPage() {
 
   // Check if the user is the admin when the component loads
   useEffect(() => {
-    if (isLoaded && user) {
+    if (!loading && user) {
       // Check if the user is the admin (eshwar09052005@gmail.com)
-      const userEmail = user.primaryEmailAddress?.emailAddress
+      const userEmail = user.email
       if (userEmail !== "eshwar09052005@gmail.com") {
         toast.error("You don't have admin privileges")
         // Redirect to home page
         window.location.href = "/"
       }
     }
-  }, [isLoaded, user])
+  }, [loading, user])
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-US", {
@@ -279,7 +279,7 @@ export default function AdminDashboardPage() {
                   className="bg-red-600 hover:bg-red-700"
                   onClick={async () => {
                     try {
-                      // Sign out the user using Clerk
+                      // Sign out the user
                       await fetch("/api/auth/sign-out", {
                         method: "POST",
                       })

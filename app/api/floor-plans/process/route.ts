@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import { auth } from "@clerk/nextjs/server"
+import { getAuthFromCookies } from "@/lib/auth"
 import path from "path"
 import fs from "fs"
 import os from "os"
@@ -10,7 +10,7 @@ import { saveImageToPublic } from "@/lib/image-storage"
 // POST endpoint to process a floor plan
 export async function POST(req: NextRequest) {
   try {
-    const { userId } = auth()
+    const userId = await getAuthFromCookies()
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }

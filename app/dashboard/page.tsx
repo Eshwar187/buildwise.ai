@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useUser } from "@clerk/nextjs"
+import { useAuth } from "@/contexts/auth-context"
 import { motion } from "framer-motion"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
@@ -15,7 +15,9 @@ import { CreateProjectDialog } from "@/components/create-project-dialog"
 import type { Project } from "@/lib/models/project"
 
 export default function DashboardPage() {
-  const { user, isLoaded, isSignedIn } = useUser()
+  const { user, loading } = useAuth()
+  const isLoaded = !loading
+  const isSignedIn = !!user
   const router = useRouter()
   const [isCreateProjectOpen, setIsCreateProjectOpen] = useState(false)
   const [projects, setProjects] = useState<Project[]>([])

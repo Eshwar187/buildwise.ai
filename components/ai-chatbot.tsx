@@ -84,90 +84,47 @@ export function AIChatbot({ budget = 100000, buildingType = "residential" }: AIC
     setInput("")
     setIsLoading(true)
 
-    // In a production environment, we would call an API here
-    // try {
-    //   const response = await fetch('/api/ai/chat', {
-    //     method: 'POST',
-    //     headers: {
-    //       'Content-Type': 'application/json',
-    //     },
-    //     body: JSON.stringify({
-    //       message: input,
-    //       budget,
-    //       buildingType,
-    //       currency
-    //     }),
-    //   });
-    //
-    //   if (!response.ok) {
-    //     throw new Error('Failed to get AI response');
-    //   }
-    //
-    //   const data = await response.json();
-    //
-    //   const aiMessage: Message = {
-    //     id: Date.now().toString(),
-    //     role: "assistant",
-    //     content: data.response,
-    //     timestamp: new Date(),
-    //   };
-    //
-    //   setMessages((prev) => [...prev, aiMessage]);
-    // } catch (error) {
-    //   console.error('Error getting AI response:', error);
-    //   // Fallback response
-    //   // ...
-    // } finally {
-    //   setIsLoading(false);
-    // }
+    try {
+      const response = await fetch('/api/ai/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: input,
+          budget,
+          buildingType,
+          currency
+        }),
+      });
 
-    // Simulate AI response based on user input and budget
-    setTimeout(() => {
-      let response = ""
-      const userInput = input.toLowerCase()
-      const formattedBudget = formatCurrency(budget)
-
-      if (userInput.includes("material") || userInput.includes("recommend")) {
-        if (budget < 100000) {
-          response = `For a ${buildingType} project with your budget of ${formattedBudget}, I recommend focusing on durable but cost-effective materials. Consider vinyl siding, laminate flooring, and stock cabinetry to maximize your budget.`
-        } else if (budget < 300000) {
-          response = `With your budget of ${formattedBudget}, you can use mid-range materials for your ${buildingType} project. Consider fiber cement siding, engineered hardwood, and semi-custom cabinetry for a good balance of quality and cost.`
-        } else {
-          response = `Your generous budget of ${formattedBudget} allows for premium materials in your ${buildingType} project. Consider natural stone, solid hardwood flooring, and custom cabinetry for a high-end finish.`
-        }
-      } else if (userInput.includes("cost") || userInput.includes("price") || userInput.includes("expensive")) {
-        response = `For a typical ${buildingType} project with your budget of ${formattedBudget}, you can expect to spend about 40% on structural elements, 30% on systems (electrical, plumbing, HVAC), and 30% on finishes. Would you like a more detailed breakdown for a specific area?`
-      } else if (userInput.includes("time") || userInput.includes("schedule") || userInput.includes("long")) {
-        response = `A ${buildingType} project with your scope and budget of ${formattedBudget} typically takes 6-12 months from design to completion. The design phase usually takes 2-3 months, permitting 1-2 months, and construction 3-7 months depending on complexity and size.`
-      } else if (userInput.includes("energy") || userInput.includes("efficient") || userInput.includes("sustainable")) {
-        if (budget < 200000) {
-          response = `With your budget of ${formattedBudget}, focus on basic energy efficiency measures like good insulation, Energy Star appliances, and LED lighting. These have the best ROI for energy savings.`
-        } else {
-          response = `Your budget of ${formattedBudget} allows for significant energy efficiency investments. Consider high-efficiency HVAC, enhanced insulation, triple-pane windows, and possibly solar panels depending on your location.`
-        }
-      } else if (userInput.includes("inr") || userInput.includes("rupees") || userInput.includes("indian")) {
-        const inrBudget = formatCurrency(budget)
-        response = `I've updated the currency to Indian Rupees. Your budget of ${inrBudget} would be sufficient for a ${buildingType} project of approximately ${Math.floor(budget / 1500)} square meters in most Indian cities. Construction costs vary significantly between metro and non-metro areas in India.`
-      } else {
-        const responses = [
-          `Based on your ${buildingType} project and budget of ${formattedBudget}, I'd recommend starting with a detailed design phase to maximize value.`,
-          `For a ${buildingType} project with your budget of ${formattedBudget}, it's important to prioritize structural integrity and systems before cosmetic finishes.`,
-          `With a budget of ${formattedBudget} for your ${buildingType} project, you should allocate about 10-15% for unexpected costs and changes during construction.`,
-          `Your ${buildingType} project budget of ${formattedBudget} is in line with typical costs for this type of construction. Would you like specific recommendations for materials or design approaches?`,
-        ]
-        response = responses[Math.floor(Math.random() * responses.length)]
+      if (!response.ok) {
+        throw new Error('Failed to get AI response');
       }
+
+      const data = await response.json();
 
       const aiMessage: Message = {
         id: Date.now().toString(),
         role: "assistant",
-        content: response,
+        content: data.response,
         timestamp: new Date(),
-      }
+      };
 
-      setMessages((prev) => [...prev, aiMessage])
-      setIsLoading(false)
-    }, 1500)
+      setMessages((prev) => [...prev, aiMessage]);
+    } catch (error) {
+      console.error('Error getting AI response:', error);
+      
+      const fallbackMessage: Message = {
+        id: Date.now().toString(),
+        role: "assistant",
+        content: "Sorry, I'm having trouble connecting to my service. Please try again later.",
+        timestamp: new Date(),
+      };
+      setMessages((prev) => [...prev, fallbackMessage]);
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   const handleKeyDown = (e: React.KeyboardEvent) => {

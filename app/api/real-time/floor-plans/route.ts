@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
+import { getAuthFromRequest } from "@/lib/auth"
 import { saveImageToPublic } from "@/lib/image-storage"
 import fs from "fs"
 import path from "path"
@@ -437,8 +438,7 @@ async function generateFloorPlanImage(description: string, style: string, projec
 export async function POST(req: NextRequest) {
   try {
     // Get the authenticated user ID
-    const { auth } = await import("@clerk/nextjs/server")
-    const { userId } = await auth()
+    const userId = await getAuthFromRequest(req)
 
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized. Please sign in to generate a floor plan." }, { status: 401 })
@@ -499,7 +499,7 @@ export async function POST(req: NextRequest) {
     // Return a fallback floor plan if API fails
     const fallbackFloorPlan = {
       projectId: "temp-project",
-      userId: userId || "anonymous", // Use the authenticated user ID if available
+      userId: "anonymous",
       imageUrl: "/uploads/floor-plans/project-1/modern-floor-plan.svg",
       description: "This is a fallback floor plan generated when the API request failed. It represents a modern home design with open living spaces, multiple bedrooms, and energy-efficient features.",
       generatedBy: "fallback",

@@ -3,9 +3,9 @@
 import { useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { useUser, SignOutButton } from "@clerk/nextjs"
+import { useAuth } from "@/components/auth-provider"
 import { Button } from "@/components/ui/button"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,13 +19,13 @@ import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 
 export function DashboardHeader() {
-  const { user } = useUser()
+  const { user, signOut } = useAuth()
   const router = useRouter()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
-  const handleSignOut = () => {
-    // This is now handled by the Clerk SignOutButton
+  const handleSignOut = async () => {
     toast.success("Logging out...")
+    await signOut()
   }
 
   const getInitials = (name: string) => {
@@ -63,11 +63,10 @@ export function DashboardHeader() {
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="relative h-8 w-8 rounded-full">
                 <Avatar className="h-8 w-8">
-                  <AvatarImage src={user?.imageUrl} alt={user?.username || ""} />
                   <AvatarFallback className="bg-slate-700 text-white">
-                    {user?.firstName
-                      ? getInitials(user.firstName + " " + (user.lastName || ""))
-                      : user?.username?.[0].toUpperCase() || "U"}
+                    {user?.user_metadata?.first_name
+                      ? getInitials(user.user_metadata.first_name + " " + (user.user_metadata.last_name || ""))
+                      : user?.email?.[0]?.toUpperCase() || "U"}
                   </AvatarFallback>
                 </Avatar>
               </Button>
@@ -76,9 +75,9 @@ export function DashboardHeader() {
               <DropdownMenuLabel className="font-normal">
                 <div className="flex flex-col space-y-1">
                   <p className="text-sm font-medium leading-none">
-                    {user?.firstName} {user?.lastName}
+                    {user?.user_metadata?.first_name} {user?.user_metadata?.last_name}
                   </p>
-                  <p className="text-xs leading-none text-slate-400">{user?.emailAddresses[0].emailAddress}</p>
+                  <p className="text-xs leading-none text-slate-400">{user?.email}</p>
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator className="bg-slate-700" />
@@ -94,15 +93,13 @@ export function DashboardHeader() {
                 <span>Settings</span>
               </DropdownMenuItem>
               <DropdownMenuSeparator className="bg-slate-700" />
-              <SignOutButton signOutCallback={() => router.push("/")}>
-                <DropdownMenuItem
-                  className="hover:bg-slate-700 cursor-pointer text-red-400 hover:text-red-300"
-                  onClick={handleSignOut}
-                >
-                  <LogOut className="mr-2 h-4 w-4" />
-                  <span>Log out</span>
-                </DropdownMenuItem>
-              </SignOutButton>
+              <DropdownMenuItem
+                className="hover:bg-slate-700 cursor-pointer text-red-400 hover:text-red-300"
+                onClick={handleSignOut}
+              >
+                <LogOut className="mr-2 h-4 w-4" />
+                <span>Log out</span>
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -149,16 +146,14 @@ export function DashboardHeader() {
               AI Tools
             </Link>
             <div className="border-t border-slate-700 pt-2 mt-2">
-              <SignOutButton signOutCallback={() => router.push("/")}>
-                <Button
-                  variant="ghost"
-                  className="w-full justify-start text-red-400 hover:text-red-300 hover:bg-slate-700 px-0"
-                  onClick={handleSignOut}
-                >
-                  <LogOut className="mr-2 h-4 w-4" />
-                  <span>Log out</span>
-                </Button>
-              </SignOutButton>
+              <Button
+                variant="ghost"
+                className="w-full justify-start text-red-400 hover:text-red-300 hover:bg-slate-700 px-0"
+                onClick={handleSignOut}
+              >
+                <LogOut className="mr-2 h-4 w-4" />
+                <span>Log out</span>
+              </Button>
             </div>
           </nav>
         </div>
@@ -166,4 +161,3 @@ export function DashboardHeader() {
     </header>
   )
 }
-

@@ -2,9 +2,9 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { useUser } from "@clerk/nextjs"
+import { useAuth } from "@/components/auth-provider"
 import { Button } from "@/components/ui/button"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,24 +18,13 @@ import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 
 export function AdminHeader() {
-  const { user } = useUser()
+  const { user, signOut } = useAuth()
   const router = useRouter()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
   const handleSignOut = async () => {
-    try {
-      // Sign out the user using Clerk
-      await fetch("/api/auth/sign-out", {
-        method: "POST",
-      })
-
-      toast.success("Logged out successfully")
-      // Use window.location for a hard redirect
-      window.location.href = "/"
-    } catch (error) {
-      console.error("Error signing out:", error)
-      toast.error("Failed to sign out")
-    }
+    toast.success("Logging out...")
+    await signOut()
   }
 
   const getInitials = (name: string) => {
@@ -72,11 +61,11 @@ export function AdminHeader() {
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="relative h-8 w-8 rounded-full">
                 <Avatar className="h-8 w-8">
-                  <AvatarImage src={user?.imageUrl} alt={user?.username || ""} />
+
                   <AvatarFallback className="bg-slate-700 text-white">
-                    {user?.firstName
-                      ? getInitials(user.firstName + " " + (user.lastName || ""))
-                      : user?.username?.[0].toUpperCase() || "A"}
+                    {user?.user_metadata?.first_name
+                      ? getInitials(user.user_metadata.first_name + " " + (user.user_metadata.last_name || ""))
+                      : user?.email?.[0]?.toUpperCase() || "A"}
                   </AvatarFallback>
                 </Avatar>
               </Button>
@@ -85,9 +74,9 @@ export function AdminHeader() {
               <DropdownMenuLabel className="font-normal">
                 <div className="flex flex-col space-y-1">
                   <p className="text-sm font-medium leading-none">
-                    {user?.firstName} {user?.lastName}
+                    {user?.user_metadata?.first_name} {user?.user_metadata?.last_name}
                   </p>
-                  <p className="text-xs leading-none text-slate-400">{user?.emailAddresses[0].emailAddress}</p>
+                  <p className="text-xs leading-none text-slate-400">{user?.email}</p>
                   <p className="text-xs leading-none text-emerald-400 flex items-center mt-1">
                     <Shield className="h-3 w-3 mr-1" /> Admin
                   </p>

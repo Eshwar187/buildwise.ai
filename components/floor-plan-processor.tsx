@@ -11,7 +11,7 @@ import {
   Check,
   AlertCircle,
   Palette,
-  Cube,
+  Box,
   FileJson,
   Download
 } from "lucide-react"
@@ -142,7 +142,7 @@ export const FloorPlanProcessor = memo(function FloorPlanProcessor({
     } finally {
       setIsProcessing(false)
     }
-  }
+  }, [selectedFile, colorScheme, generate3D, exportData, projectId, onProcessComplete])
 
   // Download processed floor plan - memoized with useCallback
   const downloadImage = useCallback((dataUrl: string, filename: string) => {
@@ -152,7 +152,7 @@ export const FloorPlanProcessor = memo(function FloorPlanProcessor({
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
-  }
+  }, [])
 
   // Download floor plan data - memoized with useCallback
   const downloadData = useCallback((data: any, filename: string) => {
@@ -166,7 +166,7 @@ export const FloorPlanProcessor = memo(function FloorPlanProcessor({
     link.click()
     document.body.removeChild(link)
     URL.revokeObjectURL(url)
-  }
+  }, [])
 
   return (
     // Use React.Fragment to avoid unnecessary DOM elements
@@ -313,7 +313,7 @@ export const FloorPlanProcessor = memo(function FloorPlanProcessor({
 
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
-                  <Cube className="h-4 w-4 text-slate-400" />
+                  <Box className="h-4 w-4 text-slate-400" />
                   <Label htmlFor="generate3D" className="text-slate-300">
                     Generate 3D Visualization
                   </Label>

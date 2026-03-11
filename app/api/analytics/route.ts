@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server"
-import { auth } from "@clerk/nextjs/server"
+import { getAuthFromCookies } from "@/lib/auth"
 import { getAnalytics, getUserByClerkId } from "@/lib/mongodb-models"
 
 export async function GET(request: Request) {
   try {
-    const { userId } = await auth()
+    const userId = await getAuthFromCookies()
 
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })

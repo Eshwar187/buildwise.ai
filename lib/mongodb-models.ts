@@ -9,6 +9,7 @@ export interface User {
   email: string
   firstName?: string
   lastName?: string
+  passwordHash?: string
   isAdmin: boolean
   isAdminApproved: boolean
   savedDesigners?: string[] // Array of designer IDs

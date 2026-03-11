@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
-import { auth } from "@clerk/nextjs/server"
-import { getProjectById, updateProject } from "@/lib/mongodb-models"
+import { getAuthFromCookies } from "@/lib/auth"
+import { createClient } from "@/lib/supabase/server"
 
 // POST endpoint to add a material to a project's recommendations
 export async function POST(
@@ -8,7 +8,7 @@ export async function POST(
   { params }: { params: { id: string } }
 ) {
   try {
-    const { userId } = auth()
+    const userId = await getAuthFromCookies()
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
@@ -18,13 +18,20 @@ export async function POST(
       return NextResponse.json({ error: "Project ID is required" }, { status: 400 })
     }
 
+    const supabase = await createClient()
+
     // Get the project to verify ownership
-    const project = await getProjectById(projectId)
-    if (!project) {
+    const { data: project, error: projectError } = await supabase
+      .from('projects')
+      .select('user_id, material_recommendations')
+      .eq('id', projectId)
+      .single()
+
+    if (projectError || !project) {
       return NextResponse.json({ error: "Project not found" }, { status: 404 })
     }
 
-    if (project.userId !== userId) {
+    if (project.user_id !== userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 403 })
     }
 
@@ -35,13 +42,20 @@ export async function POST(
     }
 
     // Add the material to the project's recommendations if not already added
-    const materialRecommendations = project.materialRecommendations || []
+    const materialRecommendations = project.material_recommendations || []
     if (!materialRecommendations.includes(materialId)) {
       materialRecommendations.push(materialId)
     }
 
     // Update the project
-    await updateProject(projectId, { materialRecommendations })
+    const { error: updateError } = await supabase
+      .from('projects')
+      .update({ material_recommendations: materialRecommendations })
+      .eq('id', projectId)
+
+    if (updateError) {
+      throw updateError
+    }
 
     return NextResponse.json({
       success: true,
@@ -62,7 +76,7 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    const { userId } = auth()
+    const userId = await getAuthFromCookies()
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
@@ -72,36 +86,56 @@ export async function DELETE(
       return NextResponse.json({ error: "Project ID is required" }, { status: 400 })
     }
 
+    const supabase = await createClient()
+
     // Get the project to verify ownership
-    const project = await getProjectById(projectId)
-    if (!project) {
+    const { data: project, error: projectError } = await supabase
+      .from('projects')
+      .select('user_id, material_recommendations')
+      .eq('id', projectId)
+      .single()
+
+    if (projectError || !project) {
       return NextResponse.json({ error: "Project not found" }, { status: 404 })
     }
 
-    if (project.userId !== userId) {
+    if (project.user_id !== userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 403 })
     }
 
     // Get material ID from request
     const url = new URL(req.url)
-    const materialId = url.searchParams.get("materialId")
+    let materialId = url.searchParams.get("materialId")
 
     if (!materialId) {
       // Try to get from request body
-      const body = await req.json()
-      if (!body.materialId) {
-        return NextResponse.json({ error: "Material ID is required" }, { status: 400 })
+      try {
+        const body = await req.json()
+        materialId = body.materialId
+      } catch (e) {
+        // Body might be empty
       }
     }
 
+    if (!materialId) {
+      return NextResponse.json({ error: "Material ID is required" }, { status: 400 })
+    }
+
     // Remove the material from the project's recommendations
-    const materialRecommendations = project.materialRecommendations || []
+    const materialRecommendations = project.material_recommendations || []
     const updatedRecommendations = materialRecommendations.filter(
-      id => id !== materialId
+      (id: string) => id !== materialId
     )
 
     // Update the project
-    await updateProject(projectId, { materialRecommendations: updatedRecommendations })
+    const { error: updateError } = await supabase
+      .from('projects')
+      .update({ material_recommendations: updatedRecommendations })
+      .eq('id', projectId)
+
+    if (updateError) {
+      throw updateError
+    }
 
     return NextResponse.json({
       success: true,
@@ -115,3 +149,4 @@ export async function DELETE(
     )
   }
 }
+

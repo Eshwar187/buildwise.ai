@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import { auth } from "@clerk/nextjs/server"
+import { getAuthFromCookies } from "@/lib/auth"
 import { createProject } from "@/lib/mongodb-models"
 import { v4 as uuidv4 } from "uuid"
 import fs from "fs"
@@ -53,7 +53,7 @@ function copyFloorPlanTemplate(templateId: string, projectId: string) {
 export async function POST(req: NextRequest) {
   try {
     // Get the authenticated user ID
-    const { userId } = await auth()
+    const userId = await getAuthFromCookies()
     console.log('POST /api/project-create - Auth userId:', userId)
 
     if (!userId) {

@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server"
-import { auth } from "@clerk/nextjs/server"
+import { getAuthFromCookies } from "@/lib/auth"
 import { connectToDatabase } from "@/lib/mongodb"
 
 // This is a debug endpoint to directly access projects from the database
 export async function GET(request: Request) {
   try {
     // Get the authenticated user ID
-    const { userId } = await auth()
+    const userId = await getAuthFromCookies()
     console.log('DEBUG GET /api/debug-projects - Auth userId:', userId)
 
     if (!userId) {

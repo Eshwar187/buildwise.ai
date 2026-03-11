@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import { auth } from "@clerk/nextjs/server"
+import { getAuthFromCookies } from "@/lib/auth"
 import path from "path"
 import fs from "fs"
 
@@ -200,7 +200,7 @@ IMPORTANT: Your response must be a valid JSON array only, with no additional tex
 export async function POST(req: NextRequest) {
   try {
     // Get the authenticated user ID
-    const { userId } = auth()
+    const userId = await getAuthFromCookies()
 
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized. Please sign in to generate materials." }, { status: 401 })

@@ -1,21 +1,25 @@
 import { NextResponse } from "next/server"
-import { auth, clerkClient } from "@clerk/nextjs/server"
+import { AUTH_COOKIE_NAME } from "@/lib/auth"
 
 export async function POST() {
   try {
-    const { userId } = await auth()
-    
-    if (!userId) {
-      return NextResponse.json({ error: "Not authenticated" }, { status: 401 })
-    }
+    const response = NextResponse.json({ success: true })
 
-    // Sign out the user's active session
-    // Note: In a production app, you would use Clerk's API to sign out the user
-    // This is a simplified version for demonstration purposes
-    
-    return NextResponse.json({ success: true })
+    // Clear the auth cookie
+    response.cookies.set(AUTH_COOKIE_NAME, "", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 0,
+      path: "/",
+    })
+
+    return response
   } catch (error) {
-    console.error("Error signing out:", error)
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
+    console.error("Sign out error:", error)
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    )
   }
 }

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import { auth } from "@clerk/nextjs"
+import { getAuthFromCookies } from "@/lib/auth"
 import { 
   getEnergyRecommendationById, 
   getEnergyRecommendationsByRegion, 
@@ -10,7 +10,7 @@ import {
 // GET endpoint to retrieve energy recommendations
 export async function GET(req: NextRequest) {
   try {
-    const { userId } = auth()
+    const userId = await getAuthFromCookies()
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
@@ -49,7 +49,7 @@ export async function GET(req: NextRequest) {
 // POST endpoint to create a new energy recommendation
 export async function POST(req: NextRequest) {
   try {
-    const { userId } = auth()
+    const userId = await getAuthFromCookies()
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }

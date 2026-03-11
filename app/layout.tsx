@@ -4,7 +4,7 @@ import { Inter } from "next/font/google"
 import "./globals.css"
 import { ThemeProvider } from "./theme-provider"
 import { ToasterProvider } from "@/components/ui/toaster-provider"
-import { ClerkProviderWrapper } from "@/components/clerk-provider-wrapper"
+import { AuthProvider } from "@/components/auth-provider"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -26,14 +26,13 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className} suppressHydrationWarning>
-        <ClerkProviderWrapper>
+        <AuthProvider>
           <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false} storageKey="buildwise-theme">
             {children}
             <ToasterProvider />
           </ThemeProvider>
-        </ClerkProviderWrapper>
+        </AuthProvider>
       </body>
     </html>
   )
 }
-

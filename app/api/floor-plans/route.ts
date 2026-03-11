@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import { auth } from "@clerk/nextjs/server"
+import { getAuthFromCookies } from "@/lib/auth"
 import { createFloorPlan, getProjectById } from "@/lib/mongodb-models"
 import { saveImageToPublic } from "@/lib/image-storage"
 import { ObjectId } from "mongodb"
@@ -98,7 +98,7 @@ async function generateFloorPlanImage(description: string) {
 // POST endpoint to generate a floor plan
 export async function POST(req: NextRequest) {
   try {
-    const { userId } = auth()
+    const userId = await getAuthFromCookies()
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
@@ -152,7 +152,7 @@ export async function POST(req: NextRequest) {
 // GET endpoint to retrieve floor plans for a project
 export async function GET(req: NextRequest) {
   try {
-    const { userId } = auth()
+    const userId = await getAuthFromCookies()
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }

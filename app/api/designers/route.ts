@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import { auth } from "@clerk/nextjs"
+import { getAuthFromCookies } from "@/lib/auth"
 import { 
   getDesignerById, 
   getDesignersByLocation, 
@@ -12,7 +12,7 @@ import {
 // GET endpoint to retrieve designers
 export async function GET(req: NextRequest) {
   try {
-    const { userId } = auth()
+    const userId = await getAuthFromCookies()
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
@@ -53,7 +53,7 @@ export async function GET(req: NextRequest) {
 // POST endpoint to create a new designer
 export async function POST(req: NextRequest) {
   try {
-    const { userId } = auth()
+    const userId = await getAuthFromCookies()
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
@@ -94,7 +94,7 @@ export async function POST(req: NextRequest) {
 // PUT endpoint to update a designer
 export async function PUT(req: NextRequest) {
   try {
-    const { userId } = auth()
+    const userId = await getAuthFromCookies()
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
@@ -132,7 +132,7 @@ export async function PUT(req: NextRequest) {
 // DELETE endpoint to delete a designer
 export async function DELETE(req: NextRequest) {
   try {
-    const { userId } = auth()
+    const userId = await getAuthFromCookies()
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }

@@ -7,11 +7,13 @@ import { Button } from "@/components/ui/button"
 import { Volume2, VolumeX, ChevronDown } from "lucide-react"
 import Link from "next/link"
 import { HomeHeader } from "@/components/home-header"
-import { useUser } from "@clerk/nextjs"
+import { useAuth } from "@/contexts/auth-context"
 
 export default function Home() {
   const router = useRouter()
-  const { isSignedIn, isLoaded } = useUser()
+  const { user, loading } = useAuth()
+  const isSignedIn = !!user
+  const isLoaded = !loading
   const [isMuted, setIsMuted] = useState(true)
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const [currentSection, setCurrentSection] = useState(0)

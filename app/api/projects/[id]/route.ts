@@ -1,29 +1,51 @@
 import { NextResponse } from "next/server"
-import { auth } from "@clerk/nextjs/server"
-import { getProjectById, deleteProject } from "@/lib/mongodb-models"
+import { getAuthFromCookies } from "@/lib/auth"
+import { createClient } from "@/lib/supabase/server"
+
+// Helpers to map Supabase snake_case to frontend camelCase expectations
+function mapProjectToFrontend(p: any) {
+  if (!p) return null
+  return {
+    ...p,
+    _id: p.id,
+    userId: p.user_id,
+    landDimensions: p.land_dimensions,
+    landUnit: p.land_unit,
+    createdAt: p.created_at,
+    updatedAt: p.updated_at,
+    designerRecommendations: p.designer_recommendations,
+    materialRecommendations: p.material_recommendations,
+    energyRecommendations: p.energy_recommendations
+  }
+}
 
 export async function GET(request: Request, { params }: { params: { id: string } }) {
   try {
-    const { userId } = await auth()
+    const userId = await getAuthFromCookies()
 
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
     const projectId = params.id
-    const project = await getProjectById(projectId)
+    const supabase = await createClient()
 
-    if (!project) {
+    const { data: project, error: projectError } = await supabase
+      .from('projects')
+      .select('*')
+      .eq('id', projectId)
+      .single()
+
+    if (projectError || !project) {
       return NextResponse.json({ error: "Project not found" }, { status: 404 })
     }
 
-    // Check if the user owns this project or is an admin
-    // In a real app, you would check if the user is an admin
-    if (project.userId !== userId) {
+    // Check if the user owns this project
+    if (project.user_id !== userId) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 })
     }
 
-    return NextResponse.json(project)
+    return NextResponse.json(mapProjectToFrontend(project))
   } catch (error) {
     console.error("Error fetching project:", error)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
@@ -32,26 +54,38 @@ export async function GET(request: Request, { params }: { params: { id: string }
 
 export async function DELETE(request: Request, { params }: { params: { id: string } }) {
   try {
-    const { userId } = await auth()
+    const userId = await getAuthFromCookies()
 
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
     const projectId = params.id
-    const project = await getProjectById(projectId)
+    const supabase = await createClient()
 
-    if (!project) {
+    const { data: project, error: projectError } = await supabase
+      .from('projects')
+      .select('id, user_id')
+      .eq('id', projectId)
+      .single()
+
+    if (projectError || !project) {
       return NextResponse.json({ error: "Project not found" }, { status: 404 })
     }
 
-    // Check if the user owns this project or is an admin
-    // In a real app, you would check if the user is an admin
-    if (project.userId !== userId) {
+    if (project.user_id !== userId) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 })
     }
 
-    await deleteProject(projectId)
+    const { error: deleteError } = await supabase
+      .from('projects')
+      .delete()
+      .eq('id', projectId)
+
+    if (deleteError) {
+      console.error("Error deleting project:", deleteError)
+      return NextResponse.json({ error: "Failed to delete project" }, { status: 500 })
+    }
 
     return NextResponse.json({ success: true })
   } catch (error) {
@@ -59,4 +93,3 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }
-

@@ -1,0 +1,46 @@
+
+> aibot@0.1.0 build
+> next build
+
+   ▲ Next.js 15.2.4
+
+   Creating an optimized production build ...
+Failed to compile.
+
+./app/api/projects/[id]/floor-plans/route.ts
+Module not found: Can't resolve 'mongodb'
+
+https://nextjs.org/docs/messages/module-not-found
+
+./app/api/users/[id]/route.ts
+Module not found: Can't resolve 'mongodb'
+
+https://nextjs.org/docs/messages/module-not-found
+
+./lib/auth-edge.ts
+Module not found: Can't resolve 'jose'
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./lib/auth.ts
+./app/api/analytics/route.ts
+
+./lib/auth.ts
+Module not found: Can't resolve 'bcryptjs'
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./app/api/analytics/route.ts
+
+./lib/image-storage.ts
+Module not found: Can't resolve 'node-fetch'
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./app/api/floor-plans/route.ts
+
+
+> Build failed because of webpack errors

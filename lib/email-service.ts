@@ -1,14 +1,23 @@
 import { Resend } from "resend"
 import Mailjet from "node-mailjet"
 
-// Initialize Resend client for admin emails
-const resend = new Resend(process.env.RESEND_API_KEY || "")
+// Lazy-initialized clients to avoid throwing during build when env vars are absent
+let _resend: Resend | null = null
+function getResend() {
+  if (!_resend) _resend = new Resend(process.env.RESEND_API_KEY || "")
+  return _resend
+}
 
-// Initialize Mailjet client for user emails
-const mailjet = new Mailjet({
-  apiKey: process.env.MAILJET_API_KEY || "",
-  apiSecret: process.env.MAILJET_SECRET_KEY || "",
-})
+let _mailjet: ReturnType<typeof Mailjet.apiConnect> | null = null
+function getMailjet() {
+  if (!_mailjet) {
+    _mailjet = Mailjet.apiConnect(
+      process.env.MAILJET_API_KEY || "placeholder",
+      process.env.MAILJET_SECRET_KEY || "placeholder",
+    )
+  }
+  return _mailjet
+}
 
 // Resend email service for admin-related emails
 export async function sendAdminEmail({
@@ -28,7 +37,7 @@ export async function sendAdminEmail({
     // Use a verified domain or Resend's default domain
     const fromEmail = "onboarding@resend.dev" // Using Resend's default domain which is already verified
 
-    const { data, error } = await resend.emails.send({
+    const { data, error } = await getResend().emails.send({
       from: from || `ConstructHub.ai <${fromEmail}>`,
       to: typeof to === "string" ? [to] : to,
       subject,
@@ -64,7 +73,7 @@ export async function sendUserEmail({
   textContent?: string
 }) {
   try {
-    const result = await mailjet.post("send", { version: "v3.1" }).request({
+    const result = await getMailjet().post("send", { version: "v3.1" }).request({
       Messages: [
         {
           From: {
