@@ -1,20 +1,23 @@
 "use client"
 
-import { useState } from "react"
+import { useState, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
-import { motion } from "framer-motion"
+import { motion, AnimatePresence } from "framer-motion"
 import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Home, ArrowRight, Loader2 } from "lucide-react"
+import { Loader2, ArrowRight, Mail, Lock, CheckCircle2 } from "lucide-react"
+import { AuthSplitLayout } from "@/components/auth/split-layout"
 
-export default function SignInPage() {
+function SignInContent() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
+  const [isSuccess, setIsSuccess] = useState(false)
+  
   const router = useRouter()
   const searchParams = useSearchParams()
   const redirectParams = searchParams?.get("redirectUrl")
@@ -32,113 +35,169 @@ export default function SignInPage() {
         password,
       })
 
-      if (error) {
-        throw error
-      }
+      if (error) throw error
 
-      router.push(redirectUrl)
-      router.refresh()
-    } catch (error: any) {
-      setError(error.message || "An error occurred during sign in.")
-    } finally {
+      setIsSuccess(true)
+      
+      setTimeout(() => {
+        router.push(redirectUrl)
+        router.refresh()
+      }, 1500)
+    } catch (error) {
+      const err = error as any
+      setError(err.message || "Invalid email or password.")
       setIsLoading(false)
     }
   }
 
   return (
-    <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center p-4 relative overflow-hidden">
-      {/* Background gradients */}
-      <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-blue-900/20 blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] rounded-full bg-emerald-900/20 blur-[120px] pointer-events-none" />
-
-      <Link href="/" className="absolute top-8 left-8 flex items-center gap-2 text-zinc-400 hover:text-white transition-colors">
-        <Home className="w-4 h-4" />
-        <span className="text-sm font-medium">Back to Home</span>
-      </Link>
-
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        <div className="w-full max-w-md">
-          <div className="bg-zinc-950 border border-zinc-800 rounded-2xl p-8 shadow-2xl relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-emerald-500" />
-          
-          <div className="mb-8 items-center flex flex-col">
-          <div className="h-10 w-10 bg-indigo-600 rounded-xl flex items-center justify-center mb-6 shadow-lg shadow-indigo-500/20">
-              <svg className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-              </svg>
-            </div>
-            <h1 className="text-3xl font-bold mb-2">Welcome back</h1>
-            <p className="text-zinc-400 text-sm">Sign in to your BuildWise account</p>
-          </div>
-
-          <form onSubmit={handleSignIn} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="you@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="bg-zinc-900 border-zinc-800 focus-visible:ring-blue-500"
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="password">Password</Label>
-                <Link href="#" className="text-xs text-blue-400 hover:text-blue-300">
-                  Forgot password?
-                </Link>
+    <div className="w-full">
+      <AnimatePresence mode="wait">
+        {isSuccess ? (
+          <motion.div
+            key="success"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="text-center py-12"
+          >
+            <div className="mb-6 flex justify-center">
+              <div className="w-20 h-20 bg-emerald-500/20 rounded-full flex items-center justify-center border border-emerald-500/30">
+                <CheckCircle2 className="w-10 h-10 text-emerald-500" />
               </div>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className="bg-zinc-900 border-zinc-800 focus-visible:ring-blue-500"
-              />
+            </div>
+            <h2 className="text-3xl font-bold text-white mb-2">Welcome Back!</h2>
+            <p className="text-zinc-400">Signing you into your workspace...</p>
+          </motion.div>
+        ) : (
+          <motion.div
+            key="form"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+          >
+            <div className="mb-8">
+              <motion.h1 
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 }}
+                className="text-4xl font-bold mb-3 tracking-tight text-white"
+              >
+                Welcome back
+              </motion.h1>
+              <motion.p 
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="text-zinc-400 text-lg"
+              >
+                Sign in to continue your construction journey
+              </motion.p>
             </div>
 
-            {error && (
-              <div className="p-3 rounded-lg bg-red-900/30 border border-red-500/50 text-red-300 text-sm">
-                {error}
+            <form onSubmit={handleSignIn} className="space-y-5">
+              <div className="space-y-2">
+                <Label htmlFor="email" className="text-sm font-medium text-zinc-300 ml-1">
+                  Email Address
+                </Label>
+                <div className="relative group">
+                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 group-focus-within:text-indigo-500 transition-colors">
+                    <Mail className="w-5 h-5" />
+                  </div>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="name@company.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    className="bg-zinc-900/50 border-zinc-800 text-white h-13 pl-12 rounded-2xl focus-visible:ring-indigo-500/50 focus-visible:border-indigo-500 transition-all text-base hover:border-zinc-700"
+                  />
+                </div>
               </div>
-            )}
+              
+              <div className="space-y-2">
+                <div className="flex items-center justify-between ml-1">
+                  <Label htmlFor="password" className="text-sm font-medium text-zinc-300">
+                    Password
+                  </Label>
+                  <Link href="#" className="text-xs font-semibold text-indigo-400 hover:text-indigo-300 transition-colors uppercase tracking-wider">
+                    Forgot password?
+                  </Link>
+                </div>
+                <div className="relative group">
+                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 group-focus-within:text-indigo-500 transition-colors">
+                    <Lock className="w-5 h-5" />
+                  </div>
+                  <Input
+                    id="password"
+                    type="password"
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    className="bg-zinc-900/50 border-zinc-800 text-white h-13 pl-12 rounded-2xl focus-visible:ring-indigo-500/50 focus-visible:border-indigo-500 transition-all text-base hover:border-zinc-700"
+                  />
+                </div>
+              </div>
 
-            <Button
-              type="submit"
-              className="w-full bg-white text-black hover:bg-zinc-200 mt-2"
-              disabled={isLoading}
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Signing in...
-                </>
-              ) : (
-                <>
-                  Sign In <ArrowRight className="ml-2 w-4 h-4" />
-                </>
+              {error && (
+                <motion.div 
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 text-sm font-medium"
+                >
+                  {error}
+                </motion.div>
               )}
-            </Button>
-          </form>
 
-          <div className="mt-6 text-center text-sm text-zinc-400">
-            Don&apos;t have an account?{" "}
-            <Link href="/sign-up" className="text-white hover:underline font-medium">
-              Sign up
-            </Link>
-          </div>
-        </div>
-        </div>
-      </motion.div>
+              <Button
+                type="submit"
+                className="w-full h-13 bg-indigo-600 hover:bg-indigo-500 text-white mt-4 rounded-2xl text-base font-bold shadow-lg shadow-indigo-600/20 transition-all active:scale-[0.98] disabled:opacity-70 disabled:active:scale-100"
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <div className="flex items-center gap-2">
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                    <span>Signing in...</span>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <span>Sign In</span>
+                    <ArrowRight className="w-5 h-5" />
+                  </div>
+                )}
+              </Button>
+            </form>
+
+            <div className="mt-8 pt-8 border-t border-zinc-800/50 text-center">
+              <p className="text-zinc-500 font-medium">
+                New to BuildWise?{" "}
+                <Link href="/sign-up" className="text-white hover:text-indigo-400 font-bold transition-colors underline decoration-indigo-500/30 underline-offset-4 hover:decoration-indigo-500">
+                  Create an account
+                </Link>
+              </p>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
+  )
+}
+
+export default function SignInPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-zinc-950 text-white flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="w-10 h-10 animate-spin text-indigo-500" />
+          <p className="text-zinc-500 font-medium animate-pulse">Loading experience...</p>
+        </div>
+      </div>
+    }>
+      <AuthSplitLayout>
+        <SignInContent />
+      </AuthSplitLayout>
+    </Suspense>
   )
 }

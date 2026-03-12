@@ -49,7 +49,7 @@ export async function updateSession(request: NextRequest) {
       : new URL('/sign-in', request.url)
     
     // add redirect param so we can send them back after login
-    redirectUrl.searchParams.set('redirect_url', request.nextUrl.pathname)
+    redirectUrl.searchParams.set('redirectUrl', request.nextUrl.pathname)
     return NextResponse.redirect(redirectUrl)
   }
 

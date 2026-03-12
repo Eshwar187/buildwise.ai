@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import { getAuthFromRequest } from "@/lib/auth"
+import { createClient } from "@/lib/supabase/server"
 import { saveImageToPublic } from "@/lib/image-storage"
 import fs from "fs"
 import path from "path"
@@ -438,7 +438,9 @@ async function generateFloorPlanImage(description: string, style: string, projec
 export async function POST(req: NextRequest) {
   try {
     // Get the authenticated user ID
-    const userId = await getAuthFromRequest(req)
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    const userId = user?.id
 
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized. Please sign in to generate a floor plan." }, { status: 401 })

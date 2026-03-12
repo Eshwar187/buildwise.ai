@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useAuth } from "@/contexts/auth-context"
+import { useAuth } from "@/components/auth-provider"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -76,7 +76,7 @@ const mockProjects = [
 ]
 
 export default function AdminDashboardPage() {
-  const { user, loading } = useAuth()
+  const { user, isLoaded } = useAuth()
   const router = useRouter()
   const [users, setUsers] = useState(mockUsers)
   const [projects, setProjects] = useState(mockProjects)
@@ -85,7 +85,7 @@ export default function AdminDashboardPage() {
 
   // Check if the user is the admin when the component loads
   useEffect(() => {
-    if (!loading && user) {
+    if (isLoaded && user) {
       // Check if the user is the admin (eshwar09052005@gmail.com)
       const userEmail = user.email
       if (userEmail !== "eshwar09052005@gmail.com") {
@@ -94,7 +94,7 @@ export default function AdminDashboardPage() {
         window.location.href = "/"
       }
     }
-  }, [loading, user])
+  }, [isLoaded, user])
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-US", {

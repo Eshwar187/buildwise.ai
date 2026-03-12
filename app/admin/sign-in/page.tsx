@@ -9,8 +9,23 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { ShieldAlert, ArrowRight, Loader2, Home } from "lucide-react"
+import { AuthSplitLayout } from "@/components/auth/split-layout"
+
+import { Suspense } from "react"
 
 export default function AdminSignInPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center p-4">
+        <Loader2 className="w-8 h-8 animate-spin text-zinc-500" />
+      </div>
+    }>
+      <AdminSignInContent />
+    </Suspense>
+  )
+}
+
+function AdminSignInContent() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState<string | null>(null)
@@ -36,49 +51,46 @@ export default function AdminSignInPage() {
         throw error
       }
 
-      // Optional: we can check if the user is an admin here before redirecting
-      // For now, we'll just redirect to the admin dashboard and let the layout/middleware handle authorization
-
       router.push(redirectUrl)
       router.refresh()
-    } catch (error: any) {
-      setError(error.message || "An error occurred during admin sign in.")
+    } catch (error) {
+      const err = error as any
+      setError(err.message || "An error occurred during admin sign in.")
     } finally {
       setIsLoading(false)
     }
   }
 
   return (
-    <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center p-4 relative overflow-hidden">
-      {/* Background gradients - red hue for admin */}
-      <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-red-900/10 blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] rounded-full bg-orange-900/10 blur-[120px] pointer-events-none" />
+    <AuthSplitLayout
+      title="Admin Portal"
+      subtitle="Sign in to access the restricted BuildWise admin area"
+      tag="Security"
+      sideTitle="Control & Oversight"
+      sideDescription="Manage projects, users, and system configurations with advanced administrative tools."
+      sideIcon={<ShieldAlert className="w-12 h-12 text-red-500" />}
+      accentColor="red"
+    >
+      <div className="space-y-6">
+        <div className="flex flex-col items-center text-center space-y-2">
+          <motion.div
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="w-12 h-12 bg-red-500/10 rounded-2xl flex items-center justify-center border border-red-500/20 mb-2"
+          >
+            <ShieldAlert className="w-6 h-6 text-red-500" />
+          </motion.div>
+          <h1 className="text-3xl font-bold tracking-tight text-white">Welcome, Admin</h1>
+          <p className="text-zinc-400">Authenticating for restricted system access</p>
+        </div>
 
-      <Link href="/" className="absolute top-8 left-8 flex items-center gap-2 text-zinc-400 hover:text-white transition-colors">
-        <Home className="w-4 h-4" />
-        <span className="text-sm font-medium">Back to Home</span>
-      </Link>
-
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        <div className="w-full max-w-md">
-          <div className="bg-zinc-950 border border-zinc-800 rounded-2xl p-8 shadow-2xl relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-red-500 to-orange-500" />
-          
-          <div className="mb-8 items-center flex flex-col">
-            <div className="h-10 w-10 bg-red-950/50 border border-red-900/50 rounded-xl flex items-center justify-center mb-6 shadow-lg">
-              <ShieldAlert className="h-5 w-5 text-red-500" />
-            </div>
-            <h1 className="text-3xl font-bold mb-2">Admin Portal</h1>
-            <p className="text-zinc-400 text-sm">Sign in to access the BuildWise admin dashboard</p>
-          </div>
-
-          <form onSubmit={handleSignIn} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">Admin Email</Label>
+        <form onSubmit={handleSignIn} className="space-y-4 pt-4">
+          <div className="space-y-2">
+            <Label htmlFor="email" className="text-zinc-300 ml-1">Admin Email</Label>
+            <div className="relative group">
+              <div className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 group-focus-within:text-red-500 transition-colors">
+                <ShieldAlert className="w-4 h-4" />
+              </div>
               <Input
                 id="email"
                 type="email"
@@ -86,57 +98,66 @@ export default function AdminSignInPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="bg-zinc-900 border-zinc-800 focus-visible:ring-red-500"
+                className="bg-zinc-900/50 border-zinc-800 focus:border-red-500/50 focus:ring-red-500/20 pl-10 h-12 rounded-xl transition-all"
               />
             </div>
-            
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="password">Password</Label>
+          </div>
+          
+          <div className="space-y-2">
+            <div className="flex items-center justify-between ml-1">
+              <Label htmlFor="password" text-zinc-300>Security Key</Label>
+            </div>
+            <div className="relative group">
+              <div className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 group-focus-within:text-red-500 transition-colors">
+                <Loader2 className="w-4 h-4" />
               </div>
               <Input
                 id="password"
                 type="password"
+                placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="bg-zinc-900 border-zinc-800 focus-visible:ring-red-500"
+                className="bg-zinc-900/50 border-zinc-800 focus:border-red-500/50 focus:ring-red-500/20 pl-10 h-12 rounded-xl transition-all"
               />
             </div>
+          </div>
 
-            {error && (
-              <div className="p-3 rounded-lg bg-red-900/30 border border-red-500/50 text-red-300 text-sm">
-                {error}
-              </div>
-            )}
-
-            <Button
-              type="submit"
-              className="w-full bg-red-600 hover:bg-red-700 text-white mt-2"
-              disabled={isLoading}
+          {error && (
+            <motion.div 
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm"
             >
-              {isLoading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Authenticating...
-                </>
-              ) : (
-                <>
-                  Secure Sign In <ArrowRight className="ml-2 w-4 h-4" />
-                </>
-              )}
-            </Button>
-          </form>
+              {error}
+            </motion.div>
+          )}
 
-          <div className="mt-8 pt-6 border-t border-zinc-800/50 text-center">
-            <p className="text-xs text-zinc-500 flex items-center justify-center gap-2">
-              <ShieldAlert className="w-3 h-3" />
-              Restricted Access Only
-            </p>
-          </div>
-          </div>
+          <Button
+            type="submit"
+            className="w-full h-12 bg-red-600 hover:bg-red-500 text-white font-semibold rounded-xl transition-all shadow-lg shadow-red-600/20 group"
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <Loader2 className="w-5 h-5 animate-spin" />
+            ) : (
+              <span className="flex items-center">
+                Access Panel <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              </span>
+            )}
+          </Button>
+        </form>
+
+        <div className="text-center">
+          <Link 
+            href="/" 
+            className="text-sm text-zinc-500 hover:text-white transition-colors flex items-center justify-center gap-1 group"
+          >
+            <Home className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform" />
+            Return to User Interface
+          </Link>
         </div>
-      </motion.div>
-    </div>
+      </div>
+    </AuthSplitLayout>
   )
 }

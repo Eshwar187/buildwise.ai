@@ -4,29 +4,26 @@ import { useState, useEffect, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 import { Button } from "@/components/ui/button"
-import { Volume2, VolumeX, ChevronDown } from "lucide-react"
+import { Volume2, VolumeX, ChevronDown, Sparkles, Shield, Zap, ArrowRight } from "lucide-react"
 import Link from "next/link"
 import { HomeHeader } from "@/components/home-header"
-import { useAuth } from "@/contexts/auth-context"
+import { useAuth } from "@/components/auth-provider"
 
 export default function Home() {
   const router = useRouter()
-  const { user, loading } = useAuth()
+  const { user, isLoaded } = useAuth()
   const isSignedIn = !!user
-  const isLoaded = !loading
   const [isMuted, setIsMuted] = useState(true)
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const [currentSection, setCurrentSection] = useState(0)
   const [isVisible, setIsVisible] = useState(false)
 
-  // Define functions before any conditional returns
   const toggleMute = () => setIsMuted(!isMuted)
 
   const scrollToFeatures = () => {
     document.getElementById("features")?.scrollIntoView({ behavior: "smooth" })
   }
 
-  // All useEffect hooks must be called unconditionally
   useEffect(() => {
     if (isLoaded && isSignedIn) {
       window.location.href = '/dashboard'
@@ -48,139 +45,168 @@ export default function Home() {
     return () => clearInterval(timer)
   }, [])
 
-  // Don't render anything until we know if the user is signed in
   if (!isLoaded) {
     return (
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-cyan-500"></div>
+      <div className="min-h-screen bg-[#020617] flex items-center justify-center">
+        <div className="relative">
+          <div className="w-16 h-16 border-4 border-cyan-500/20 border-t-cyan-500 rounded-full animate-spin"></div>
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="w-8 h-8 bg-cyan-500/10 rounded-full blur-sm"></div>
+          </div>
+        </div>
       </div>
     )
   }
 
   const container = {
     hidden: { opacity: 0 },
-    show: { opacity: 1, transition: { staggerChildren: 0.3 } },
+    show: { opacity: 1, transition: { staggerChildren: 0.2 } },
   }
 
   const item = {
     hidden: { opacity: 0, y: 20 },
-    show: { opacity: 1, y: 0, transition: { duration: 0.8 } },
+    show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
   }
 
   const heroSections = [
     {
-      title: "AI-Powered Floor Plans",
-      description: "Transform your ideas into detailed floor plans with cutting-edge AI technology",
-      image: "/first.jpg",
+      title: "AI-Powered Architecture",
+      description: "Visionary design meets generative intelligence. Construct detailed floor plans with BuildWise.ai.",
+      image: "https://images.unsplash.com/photo-1503387762-592dea58ef23?auto=format&fit=crop&q=80&w=2000",
     },
     {
-      title: "Smart Material Planning",
-      description: "Get real-time cost estimates and sustainable material recommendations for your project",
-      image: "/second.jpg",
+      title: "Precision Material Estimation",
+      description: "Real-time cost analysis and sustainable selections tailored to your specific project needs.",
+      image: "https://images.unsplash.com/photo-1541888946425-d81bb19480c5?auto=format&fit=crop&q=80&w=2000",
     },
     {
-      title: "Local Expert Network",
-      description: "Connect with top designers and contractors in your area for seamless collaboration",
-      image: "/third.jpg",
+      title: "Seamless Expert Synergy",
+      description: "Collaborate with top-tier contractors and designers in a unified digital ecosystem.",
+      image: "https://images.unsplash.com/photo-1581094794329-c8112a89af12?auto=format&fit=crop&q=80&w=2000",
     },
   ]
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-900 to-slate-800 text-white">
+    <div className="min-h-screen bg-[#020617] text-slate-200 selection:bg-cyan-500/30 selection:text-white overflow-x-hidden">
       <audio ref={audioRef} src="/song.mp3" loop autoPlay muted={isMuted} />
       <HomeHeader />
-      <div className="absolute top-24 right-4 z-10">
-        <Button variant="ghost" size="icon" onClick={toggleMute} className="text-white hover:bg-white/10">
-          {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
+
+      <div className="fixed bottom-8 right-8 z-50">
+        <Button 
+          variant="secondary" 
+          size="icon" 
+          onClick={toggleMute} 
+          className="rounded-full bg-slate-900/40 backdrop-blur-md border border-white/10 hover:bg-slate-800/60 shadow-xl transition-all"
+        >
+          {isMuted ? <VolumeX className="w-5 h-5 text-slate-400" /> : <Volume2 className="w-5 h-5 text-cyan-400" />}
         </Button>
       </div>
 
       {/* Hero Section */}
-      <section className="relative h-screen flex items-center overflow-hidden">
+      <section className="relative h-screen flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
           <AnimatePresence mode="wait">
             <motion.div
               key={currentSection}
-              initial={{ opacity: 0, scale: 1.1 }}
+              initial={{ opacity: 0, scale: 1.05 }}
               animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              transition={{ duration: 1 }}
-              className="w-full h-full"
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={{ duration: 1.2, ease: "easeInOut" }}
+              className="absolute inset-0"
             >
               <div
-                className="w-full h-full bg-cover bg-center"
+                className="w-full h-full bg-cover bg-center transition-transform duration-[5000ms]"
                 style={{
                   backgroundImage: `url(${heroSections[currentSection].image})`,
-                  filter: "brightness(0.4)",
                 }}
               />
+              <div className="absolute inset-0 bg-gradient-to-b from-[#020617]/80 via-[#020617]/40 to-[#020617]" />
             </motion.div>
           </AnimatePresence>
         </div>
 
-        <div className="container mx-auto px-4 z-10 relative">
+        <div className="container mx-auto px-6 z-10 text-center">
           <AnimatePresence mode="wait">
             <motion.div
               key={currentSection}
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.5 }}
-              className="max-w-3xl"
+              exit={{ opacity: 0, y: -30 }}
+              transition={{ duration: 0.8, ease: "circOut" }}
+              className="max-w-4xl mx-auto"
             >
-              <h1 className="text-5xl md:text-7xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-teal-400">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.2 }}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-sm font-medium mb-8 backdrop-blur-sm shadow-[0_0_20px_rgba(34,211,238,0.1)]"
+              >
+                <Sparkles className="w-4 h-4" />
+                <span>Next-Gen Construction Intel</span>
+              </motion.div>
+
+              <motion.h1 
+                className="text-6xl md:text-8xl font-bold mb-6 tracking-tight bg-clip-text text-transparent bg-gradient-to-b from-white to-slate-400"
+              >
                 {heroSections[currentSection].title}
-              </h1>
-              <p className="text-xl md:text-2xl text-gray-300 mb-8">{heroSections[currentSection].description}</p>
-              <div className="flex flex-col sm:flex-row gap-4">
+              </motion.h1>
+              
+              <motion.p 
+                className="text-lg md:text-xl text-slate-400 mb-10 max-w-2xl mx-auto leading-relaxed"
+              >
+                {heroSections[currentSection].description}
+              </motion.p>
+
+              <motion.div 
+                className="flex flex-col sm:flex-row gap-5 justify-center"
+              >
                 <Button
                   size="lg"
-                  className="bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-600 hover:to-teal-600 text-white"
+                  className="h-14 px-8 bg-cyan-500 hover:bg-cyan-400 text-slate-900 font-semibold rounded-full shadow-[0_0_30px_rgba(34,211,238,0.3)] transition-all group"
                   onClick={() => router.push("/sign-up")}
                 >
-                  Get Started
+                  Start Building
+                  <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </Button>
                 <Button
                   size="lg"
                   variant="outline"
-                  className="border-cyan-500 text-cyan-400 hover:bg-cyan-950"
+                  className="h-14 px-8 border-slate-700 bg-white/5 backdrop-blur-md hover:bg-white/10 text-white rounded-full transition-all"
                   onClick={scrollToFeatures}
                 >
-                  Learn More
+                  Explore Capabilities
                 </Button>
-              </div>
+              </motion.div>
             </motion.div>
           </AnimatePresence>
 
-          <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2">
+          <div className="absolute bottom-12 left-1/2 -translate-x-1/2">
             <motion.div
-              animate={{ y: [0, 10, 0] }}
-              transition={{ repeat: Number.POSITIVE_INFINITY, duration: 2 }}
+              animate={{ y: [0, 8, 0] }}
+              transition={{ repeat: Infinity, duration: 2.5 }}
+              className="p-3 bg-white/5 backdrop-blur-sm rounded-full border border-white/10 cursor-pointer hover:bg-white/10 transition-colors"
               onClick={scrollToFeatures}
-              className="cursor-pointer"
             >
-              <ChevronDown size={30} className="text-white/70" />
+              <ChevronDown className="w-5 h-5 text-slate-400" />
             </motion.div>
           </div>
         </div>
       </section>
 
       {/* Features Section */}
-      <section id="features" className="py-20 bg-slate-800/50">
-        <div className="container mx-auto px-4">
+      <section id="features" className="py-32 relative">
+        <div className="container mx-auto px-6 relative z-10">
           <motion.div
-            initial={{ opacity: 0, y: -20 }}
+            initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
             viewport={{ once: true }}
-            className="text-center mb-16"
+            className="text-center mb-24"
           >
-            <h2 className="text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-teal-400">
-              Next-Gen Construction Platform
+            <h2 className="text-4xl md:text-5xl font-bold mb-6 text-white tracking-tight">
+              Engineered for Excellence
             </h2>
-            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-              ConstructHub.ai combines artificial intelligence with construction expertise to revolutionize how you
-              plan, design, and build.
+            <p className="text-lg text-slate-400 max-w-2xl mx-auto leading-relaxed">
+              BuildWise.ai integrates high-performance AI frameworks with deep architectural knowledge to streamline your workflow.
             </p>
           </motion.div>
 
@@ -189,170 +215,79 @@ export default function Home() {
             initial="hidden"
             whileInView="show"
             viewport={{ once: true }}
-            className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-6xl mx-auto"
+            className="grid grid-cols-1 md:grid-cols-3 gap-8"
           >
-            <motion.div
-              variants={item}
-              className="bg-white/10 backdrop-blur-lg p-8 rounded-xl transform transition-transform hover:scale-105"
-            >
-              <div className="h-14 w-14 rounded-full bg-gradient-to-r from-cyan-500 to-teal-500 flex items-center justify-center mb-6">
-                <img
-                  src="https://images.unsplash.com/photo-1580582932707-520aed4e4027?ixlib=rb-4.0.3&auto=format&fit=crop&w=32&h=32&q=80"
-                  alt="AI Floor Plans"
-                  className="h-8 w-8 object-cover rounded-full"
-                />
-              </div>
-              <h3 className="text-2xl font-bold mb-4 text-cyan-400">Gemini & Groq Powered</h3>
-              <p className="text-gray-300">
-                Generate detailed floor plans in seconds using Gemini and Groq AI. Customize dimensions, rooms, and styles to create your perfect space.
-              </p>
-            </motion.div>
-
-            <motion.div
-              variants={item}
-              className="bg-white/10 backdrop-blur-lg p-8 rounded-xl transform transition-transform hover:scale-105"
-            >
-              <div className="h-14 w-14 rounded-full bg-gradient-to-r from-cyan-500 to-teal-500 flex items-center justify-center mb-6">
-                <img
-                  src="https://images.unsplash.com/photo-1551288049-b1bd52206d22?ixlib=rb-4.0.3&auto=format&fit=crop&w=32&h=32&q=80"
-                  alt="Sustainable Materials"
-                  className="h-8 w-8 object-cover rounded-full"
-                />
-              </div>
-              <h3 className="text-2xl font-bold mb-4 text-cyan-400">Sustainable Materials</h3>
-              <p className="text-gray-300">
-                Get smart recommendations for eco-friendly, cost-effective building materials based on your location and budget.
-              </p>
-            </motion.div>
-
-            <motion.div
-              variants={item}
-              className="bg-white/10 backdrop-blur-lg p-8 rounded-xl transform transition-transform hover:scale-105"
-            >
-              <div className="h-14 w-14 rounded-full bg-gradient-to-r from-cyan-500 to-teal-500 flex items-center justify-center mb-6">
-                <img
-                  src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?ixlib=rb-4.0.3&auto=format&fit=crop&w=32&h=32&q=80"
-                  alt="Local Designers"
-                  className="h-8 w-8 object-cover rounded-full"
-                />
-              </div>
-              <h3 className="text-2xl font-bold mb-4 text-cyan-400">Local Designers</h3>
-              <p className="text-gray-300">
-                Connect with top-rated architects and designers in your area who can bring your floor plans to life with professional expertise.
-              </p>
-            </motion.div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* How It Works Section */}
-      <section className="py-20">
-        <div className="container mx-auto px-4">
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-teal-400">
-              How It Works
-            </h2>
-            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-              Our platform simplifies the construction process from planning to completion
-            </p>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 max-w-6xl mx-auto">
             {[
               {
-                step: "01",
-                title: "Create Project",
-                description: "Define your project dimensions, budget, and room preferences",
+                icon: <Zap className="w-6 h-6" />,
+                title: "Gemini High-Speed Engine",
+                description: "Leverage Google's Gemini models for rapid design iteration and real-time architectural insights.",
+                gradient: "from-cyan-500/20 to-teal-500/20",
+                border: "hover:border-cyan-500/40"
               },
               {
-                step: "02",
-                title: "Generate Floor Plans",
-                description: "Use Gemini and Groq AI to create detailed floor plans with room layouts",
+                icon: <Shield className="w-6 h-6" />,
+                title: "Sustainable Sourcing",
+                description: "AI-curated material recommendations that balance ecological impact with project cost efficiency.",
+                gradient: "from-teal-500/20 to-emerald-500/20",
+                border: "hover:border-teal-500/40"
               },
               {
-                step: "03",
-                title: "Explore Materials",
-                description: "Get sustainable material recommendations based on your location and budget",
-              },
-              {
-                step: "04",
-                title: "Connect with Designers",
-                description: "Find local professionals to bring your vision to life",
-              },
-            ].map((item, index) => (
+                icon: <Sparkles className="w-6 h-6" />,
+                title: "Precision Matching",
+                description: "Our proprietary algorithm connects you with certified local designers who match your aesthetic profile.",
+                gradient: "from-purple-500/20 to-cyan-500/20",
+                border: "hover:border-purple-500/40"
+              }
+            ].map((feature, idx) => (
               <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                viewport={{ once: true }}
-                className="relative"
+                key={idx}
+                variants={item}
+                whileHover={{ y: -8 }}
+                className={`p-10 rounded-3xl bg-slate-900/50 backdrop-blur-xl border border-white/5 ${feature.border} transition-all group`}
               >
-                <div className="text-6xl font-bold text-cyan-500/20 absolute -top-6 left-0">{item.step}</div>
-                <h3 className="text-xl font-bold mb-2 text-white mt-6">{item.title}</h3>
-                <p className="text-gray-400">{item.description}</p>
-                {index < 3 && (
-                  <div className="hidden md:block absolute top-10 right-0 transform translate-x-1/2">
-                    <svg width="40" height="12" viewBox="0 0 40 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path
-                        d="M39.5303 6.53033C39.8232 6.23744 39.8232 5.76256 39.5303 5.46967L34.7574 0.696699C34.4645 0.403806 33.9896 0.403806 33.6967 0.696699C33.4038 0.989593 33.4038 1.46447 33.6967 1.75736L37.9393 6L33.6967 10.2426C33.4038 10.5355 33.4038 11.0104 33.6967 1
-1.3033C33.9896 11.5962 34.4645 11.5962 34.7574 11.3033L39.5303 6.53033ZM0 6.75H39V5.25H0V6.75Z"
-                        fill="#0891B2"
-                      />
-                    </svg>
-                  </div>
-                )}
+                <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${feature.gradient} flex items-center justify-center mb-8 border border-white/10 group-hover:scale-110 transition-transform`}>
+                  {feature.icon}
+                </div>
+                <h3 className="text-2xl font-bold mb-4 text-white group-hover:text-cyan-400 transition-colors">{feature.title}</h3>
+                <p className="text-slate-400 leading-relaxed group-hover:text-slate-300 transition-colors">{feature.description}</p>
               </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-r from-cyan-900/30 to-teal-900/30">
-        <div className="container mx-auto px-4 text-center">
+      <section className="py-32 relative overflow-hidden">
+        <div className="absolute inset-0 bg-cyan-500/5 blur-[120px] rounded-full -translate-y-1/2" />
+        <div className="container mx-auto px-6 relative z-10 text-center">
           <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
+            initial={{ opacity: 0, scale: 0.95 }}
             whileInView={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5 }}
             viewport={{ once: true }}
-            className="max-w-3xl mx-auto"
+            className="max-w-4xl mx-auto p-16 rounded-[3rem] bg-slate-900/30 backdrop-blur-2xl border border-white/5 shadow-2xl"
           >
-            <h2 className="text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-teal-400">
-              Ready to Create Your Perfect Floor Plan?
+            <h2 className="text-4xl md:text-6xl font-bold mb-8 text-white tracking-tight">
+              Construct Your Vision
             </h2>
-            <p className="text-xl text-gray-300 mb-8">
-              Join thousands of homeowners and professionals who are using BuildWise.ai to design smarter, more sustainable spaces
+            <p className="text-xl text-slate-400 mb-12 max-w-2xl mx-auto leading-relaxed">
+              Join the elite circle of builders and designers defining the next era of construction with BuildWise.ai.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="flex flex-col sm:flex-row gap-6 justify-center">
               <Button
                 size="lg"
-                className="bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-600 hover:to-teal-600 text-white"
+                className="h-16 px-10 bg-white hover:bg-slate-200 text-slate-900 font-bold rounded-full transition-all shadow-xl shadow-white/5"
                 onClick={() => router.push("/sign-up")}
               >
-                Sign Up Free
+                Architect Your Account
               </Button>
               <Button
                 size="lg"
                 variant="outline"
-                className="border-cyan-500 text-cyan-400 hover:bg-cyan-950"
+                className="h-16 px-10 border-slate-700 bg-slate-900/40 backdrop-blur-md hover:bg-slate-800 text-white rounded-full transition-all"
                 onClick={() => router.push("/sign-in")}
               >
-                User Login
-              </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                className="border-teal-500 text-teal-400 hover:bg-teal-950"
-                onClick={() => router.push("/admin/sign-in")}
-              >
-                Admin Login
+                Sign In
               </Button>
             </div>
           </motion.div>
@@ -360,83 +295,44 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-slate-900 py-10 border-t border-slate-800">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="mb-6 md:mb-0">
-              <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-teal-400">
-                BuildWise.ai
-              </h2>
-              <p className="text-slate-400 mt-2">Building the future with AI</p>
+      <footer className="py-20 border-t border-white/5 bg-[#020617]/50">
+        <div className="container mx-auto px-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-16 mb-20">
+            <div className="col-span-1 md:col-span-1">
+              <Link href="/" className="inline-flex items-center gap-2 mb-6 group">
+                <div className="w-10 h-10 bg-cyan-500 rounded-xl flex items-center justify-center shadow-lg shadow-cyan-500/20 group-hover:scale-110 transition-transform">
+                  <span className="text-slate-900 font-black text-xl">B</span>
+                </div>
+                <span className="text-2xl font-bold text-white tracking-tight">BuildWise<span className="text-cyan-500">.ai</span></span>
+              </Link>
+              <p className="text-slate-500 leading-relaxed">
+                Empowering the modern architect with generative intelligence and precision tools.
+              </p>
             </div>
-            <div className="flex flex-col md:flex-row gap-8">
-              <div>
-                <h3 className="text-white font-medium mb-2">Platform</h3>
-                <ul className="space-y-1">
-                  <li>
-                    <Link href="#" className="text-slate-400 hover:text-cyan-400 transition-colors">
-                      Features
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="#" className="text-slate-400 hover:text-cyan-400 transition-colors">
-                      Pricing
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="#" className="text-slate-400 hover:text-cyan-400 transition-colors">
-                      FAQ
-                    </Link>
-                  </li>
+            {["Platform", "Resources", "Company"].map((title, i) => (
+              <div key={i}>
+                <h4 className="text-sm font-bold text-slate-300 uppercase tracking-widest mb-6">{title}</h4>
+                <ul className="space-y-4">
+                  {["Link One", "Link Two", "Link Three"].map((link, j) => (
+                    <li key={j}>
+                      <Link href="#" className="text-slate-500 hover:text-cyan-400 transition-colors text-sm font-medium">{link}</Link>
+                    </li>
+                  ))}
                 </ul>
               </div>
-              <div>
-                <h3 className="text-white font-medium mb-2">Company</h3>
-                <ul className="space-y-1">
-                  <li>
-                    <Link href="#" className="text-slate-400 hover:text-cyan-400 transition-colors">
-                      About
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="#" className="text-slate-400 hover:text-cyan-400 transition-colors">
-                      Blog
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="#" className="text-slate-400 hover:text-cyan-400 transition-colors">
-                      Careers
-                    </Link>
-                  </li>
-                </ul>
-              </div>
-              <div>
-                <h3 className="text-white font-medium mb-2">Legal</h3>
-                <ul className="space-y-1">
-                  <li>
-                    <Link href="#" className="text-slate-400 hover:text-cyan-400 transition-colors">
-                      Privacy
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="#" className="text-slate-400 hover:text-cyan-400 transition-colors">
-                      Terms
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="#" className="text-slate-400 hover:text-cyan-400 transition-colors">
-                      Security
-                    </Link>
-                  </li>
-                </ul>
-              </div>
-            </div>
+            ))}
           </div>
-          <div className="mt-10 pt-6 border-t border-slate-800 text-center text-slate-500">
-            <p>© {new Date().getFullYear()} BuildWise.ai. All rights reserved.</p>
+          <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-8">
+            <p className="text-slate-600 text-sm">© {new Date().getFullYear()} BuildWise.ai. Built for the future.</p>
+            <div className="flex gap-8">
+              {["Terms", "Privacy", "Security"].map((legal, i) => (
+                <Link key={i} href="#" className="text-slate-600 hover:text-slate-400 transition-colors text-sm">{legal}</Link>
+              ))}
+            </div>
           </div>
         </div>
       </footer>
     </div>
   )
+}
 }

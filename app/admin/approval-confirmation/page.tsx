@@ -7,7 +7,17 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { CheckCircle, XCircle } from "lucide-react"
 import Link from "next/link"
 
+import { Suspense } from "react"
+
 export default function ApprovalConfirmationPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-gradient-to-b from-slate-900 to-slate-800 flex items-center justify-center p-4"><div className="w-8 h-8 rounded-full border-4 border-emerald-500 border-t-transparent animate-spin"></div></div>}>
+      <ApprovalConfirmationContent />
+    </Suspense>
+  )
+}
+
+function ApprovalConfirmationContent() {
   const searchParams = useSearchParams()
   const status = searchParams.get("status")
 
