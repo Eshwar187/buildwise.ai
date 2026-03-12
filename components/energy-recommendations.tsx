@@ -19,7 +19,7 @@ import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { EnergyRecommendation } from "@/lib/mongodb-models"
+import { EnergyRecommendation } from "@/lib/types"
 
 interface EnergyRecommendationsProps {
   recommendations: EnergyRecommendation[]
@@ -33,15 +33,24 @@ export function EnergyRecommendations({
   currency 
 }: EnergyRecommendationsProps) {
   const [activeCategory, setActiveCategory] = useState<string>("all")
+
+  // Normalize each recommendation to always have the camelCase fields the component expects
+  const normalizedRecs = recommendations.map(r => ({
+    ...r,
+    imageUrl: r.imageUrl ?? r.image_url,
+    savingsEstimate: r.savingsEstimate ?? r.savings_estimate,
+    implementationCost: r.implementationCost ?? r.implementation_cost,
+    applicableRegions: r.applicableRegions ?? r.applicable_regions,
+  }))
   
-  // Filter recommendations by category
+  // Filter normalized recommendations by category
   const filteredRecommendations = activeCategory === "all" 
-    ? recommendations 
-    : recommendations.filter(rec => rec.category.toLowerCase() === activeCategory.toLowerCase())
+    ? normalizedRecs 
+    : normalizedRecs.filter(rec => rec.category.toLowerCase() === activeCategory.toLowerCase())
   
   // Get all unique categories
   const categories = Array.from(
-    new Set(recommendations.map(rec => rec.category))
+    new Set(normalizedRecs.map(rec => rec.category))
   )
 
   // Get category icon

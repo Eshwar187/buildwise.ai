@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
-import fetch from 'node-fetch';
+// Native fetch is available in Next.js 13+ / Node.js 18+
 
 /**
  * Save an image to the public folder

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { getAdminRequestByToken, updateAdminRequestStatus } from "@/lib/mongodb-models"
+import { createClient } from "@/lib/supabase/server"
 import { sendAdminEmail, generateAdminApprovalNotificationEmail } from "@/lib/email-service"
 
 export async function GET(request: Request) {
@@ -12,9 +12,16 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: "Invalid request" }, { status: 400 })
     }
 
-    // Get the admin request
-    const adminRequest = await getAdminRequestByToken(token)
-    if (!adminRequest) {
+    const supabase = await createClient()
+
+    // Get the admin request by token
+    const { data: adminRequest, error: fetchError } = await supabase
+      .from('admin_requests')
+      .select('*')
+      .eq('approval_token', token)
+      .single()
+
+    if (fetchError || !adminRequest) {
       return NextResponse.json({ error: "Invalid token" }, { status: 400 })
     }
 
@@ -24,16 +31,32 @@ export async function GET(request: Request) {
 
     // Update the admin request status
     const status = action === "approve" ? "approved" : "denied"
-    await updateAdminRequestStatus(token, status)
+    const { error: updateError } = await supabase
+      .from('admin_requests')
+      .update({ status })
+      .eq('approval_token', token)
 
-    // Send an email to the user using Resend
+    if (updateError) {
+      console.error("Error updating admin request:", updateError)
+      return NextResponse.json({ error: "Failed to update request" }, { status: 500 })
+    }
+
+    // If approved, also update the user's admin status in the users table
+    if (status === "approved") {
+      await supabase
+        .from('users')
+        .update({ is_admin: true, is_approved: true })
+        .eq('email', adminRequest.email)
+    }
+
+    // Send notification email to the user
     const { subject, html } = generateAdminApprovalNotificationEmail(adminRequest.username, status === "approved")
 
     await sendAdminEmail({
       to: adminRequest.email,
       subject,
       html,
-      from: "ConstructHub.ai <jeshwar2009@gmail.com>", // Explicitly set the from address
+      from: "ConstructHub.ai <jeshwar2009@gmail.com>",
     })
 
     // Redirect to a confirmation page
@@ -43,4 +66,3 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }
-

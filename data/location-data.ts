@@ -235,12 +235,16 @@ export const cities: { [stateCode: string]: string[] } = {
   "RI": ["Providence", "Warwick", "Cranston", "Pawtucket", "East Providence", "Woonsocket", "Coventry", "Cumberland", "North Providence", "South Kingstown"],
   "SC": ["Columbia", "Charleston", "North Charleston", "Mount Pleasant", "Rock Hill", "Greenville", "Summerville", "Sumter", "Goose Creek", "Hilton Head Island"],
   "SD": ["Sioux Falls", "Rapid City", "Aberdeen", "Brookings", "Watertown", "Mitchell", "Yankton", "Pierre", "Huron", "Vermillion"],
-  "TN": ["Nashville", "Memphis", "Knoxville", "Chattanooga", "Clarksville", "Murfreesboro", "Franklin", "Jackson", "Johnson City", "Bartlett"],
+  "TN": ["Nashville", "Memphis", "Knoxville", "Chattanooga", "Clarksville", "Murfreesboro", "Franklin", "Jackson", "Johnson City", "Bartlett",
+         // India - Tamil Nadu
+         "Chennai", "Coimbatore", "Madurai", "Tiruchirappalli", "Salem", "Tirunelveli", "Tiruppur", "Vellore", "Erode", "Thoothukudi"],
   "TX": ["Houston", "San Antonio", "Dallas", "Austin", "Fort Worth", "El Paso", "Arlington", "Corpus Christi", "Plano", "Lubbock"],
   "UT": ["Salt Lake City", "West Valley City", "Provo", "West Jordan", "Orem", "Sandy", "Ogden", "St. George", "Layton", "South Jordan"],
   "VT": ["Burlington", "South Burlington", "Rutland", "Barre", "Montpelier", "Winooski", "St. Albans", "Newport", "Vergennes", "Brattleboro"],
   "VA": ["Virginia Beach", "Norfolk", "Chesapeake", "Richmond", "Newport News", "Alexandria", "Hampton", "Roanoke", "Portsmouth", "Suffolk"],
-  "WA": ["Seattle", "Spokane", "Tacoma", "Vancouver", "Bellevue", "Kent", "Everett", "Renton", "Yakima", "Federal Way"],
+  "WA": ["Seattle", "Spokane", "Tacoma", "Vancouver", "Bellevue", "Kent", "Everett", "Renton", "Yakima", "Federal Way",
+         // Australia - Western Australia
+         "Perth", "Bunbury", "Geraldton", "Kalgoorlie", "Albany", "Broome", "Karratha", "Port Hedland", "Esperance", "Mandurah"],
   "WV": ["Charleston", "Huntington", "Morgantown", "Parkersburg", "Wheeling", "Weirton", "Fairmont", "Beckley", "Clarksburg", "Martinsburg"],
   "WI": ["Milwaukee", "Madison", "Green Bay", "Kenosha", "Racine", "Appleton", "Waukesha", "Eau Claire", "Oshkosh", "Janesville"],
   "WY": ["Cheyenne", "Casper", "Laramie", "Gillette", "Rock Springs", "Sheridan", "Green River", "Evanston", "Riverton", "Jackson"],
@@ -258,7 +262,9 @@ export const cities: { [stateCode: string]: string[] } = {
   "NL": ["St. John's", "Mount Pearl", "Corner Brook", "Conception Bay South", "Grand Falls-Windsor", "Paradise", "Gander", "Carbonear", "Stephenville", "Torbay"],
   "PE": ["Charlottetown", "Summerside", "Stratford", "Cornwall", "Montague", "Kensington", "Souris", "Alberton", "Georgetown", "Tignish"],
   "YT": ["Whitehorse", "Dawson City", "Watson Lake", "Haines Junction", "Mayo", "Faro", "Carmacks", "Teslin", "Ross River", "Carcross"],
-  "NT": ["Yellowknife", "Hay River", "Inuvik", "Fort Smith", "Norman Wells", "Fort Simpson", "Behchoko", "Fort Liard", "Tuktoyaktuk", "Fort Providence"],
+  "NT": ["Yellowknife", "Hay River", "Inuvik", "Fort Smith", "Norman Wells", "Fort Simpson", "Behchoko", "Fort Liard", "Tuktoyaktuk", "Fort Providence",
+         // Australia - Northern Territory
+         "Darwin", "Alice Springs", "Palmerston", "Katherine", "Tennant Creek", "Nhulunbuy", "Jabiru", "Yulara", "Alyangula", "Elliott"],
   "NU": ["Iqaluit", "Rankin Inlet", "Arviat", "Baker Lake", "Cambridge Bay", "Igloolik", "Pond Inlet", "Pangnirtung", "Kugluktuk", "Gjoa Haven"],
 
   // UK
@@ -272,16 +278,13 @@ export const cities: { [stateCode: string]: string[] } = {
   "VIC": ["Melbourne", "Geelong", "Ballarat", "Bendigo", "Shepparton", "Melton", "Mildura", "Warrnambool", "Wodonga", "Traralgon"],
   "QLD": ["Brisbane", "Gold Coast", "Sunshine Coast", "Townsville", "Cairns", "Toowoomba", "Mackay", "Rockhampton", "Bundaberg", "Hervey Bay"],
   "SA": ["Adelaide", "Mount Gambier", "Whyalla", "Port Augusta", "Port Lincoln", "Victor Harbor", "Port Pirie", "Murray Bridge", "Gawler", "Mount Barker"],
-  "WA": ["Perth", "Bunbury", "Geraldton", "Kalgoorlie", "Albany", "Broome", "Karratha", "Port Hedland", "Esperance", "Mandurah"],
   "TAS": ["Hobart", "Launceston", "Devonport", "Burnie", "Ulverstone", "Kingston", "Sorell", "New Norfolk", "Wynyard", "George Town"],
-  "NT": ["Darwin", "Alice Springs", "Palmerston", "Katherine", "Tennant Creek", "Nhulunbuy", "Jabiru", "Yulara", "Alyangula", "Elliott"],
   "ACT": ["Canberra", "Queanbeyan", "Belconnen", "Tuggeranong", "Woden Valley", "Gungahlin", "Weston Creek", "Molonglo Valley", "Hall", "Tharwa"],
 
   // India
   "MH": ["Mumbai", "Pune", "Nagpur", "Thane", "Nashik", "Aurangabad", "Solapur", "Amravati", "Kolhapur", "Sangli"],
   "DL": ["New Delhi", "Delhi", "Noida", "Gurgaon", "Faridabad", "Ghaziabad", "Greater Noida", "Rohini", "Dwarka", "Janakpuri"],
   "KA": ["Bangalore", "Mysore", "Hubli", "Mangalore", "Belgaum", "Gulbarga", "Davanagere", "Bellary", "Bijapur", "Shimoga"],
-  "TN": ["Chennai", "Coimbatore", "Madurai", "Tiruchirappalli", "Salem", "Tirunelveli", "Tiruppur", "Vellore", "Erode", "Thoothukudi"],
   "WB": ["Kolkata", "Howrah", "Durgapur", "Asansol", "Siliguri", "Bardhaman", "Malda", "Baharampur", "Habra", "Kharagpur"],
 
   // Germany

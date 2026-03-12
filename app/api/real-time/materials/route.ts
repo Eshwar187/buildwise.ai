@@ -104,7 +104,7 @@ IMPORTANT: Your response must be a valid JSON array only, with no additional tex
         console.error("Gemini API error:", errorData)
         throw new Error(`Gemini API error: ${errorData.error?.message || "Unknown error"}`)
       }
-    } catch (fetchError) {
+    } catch (fetchError: any) {
       // Clear the timeout
       clearTimeout(timeoutId);
 

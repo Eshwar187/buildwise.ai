@@ -21,7 +21,7 @@ import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Designer } from "@/lib/mongodb-models"
+import { Designer } from "@/lib/types"
 
 interface DesignerRecommendationsProps {
   designers: Designer[]
@@ -358,7 +358,7 @@ export function DesignerRecommendations({
                                       <div className="flex items-center">
                                         <Avatar className="h-8 w-8 mr-2">
                                           <AvatarFallback className="bg-slate-600 text-slate-200 text-xs">
-                                            {review.userId.substring(0, 2).toUpperCase()}
+                                            {(review.userId ?? review.user_id ?? "??").substring(0, 2).toUpperCase()}
                                           </AvatarFallback>
                                         </Avatar>
                                         <div className="flex items-center">

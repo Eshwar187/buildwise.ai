@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server"
 import { getAuthFromCookies } from "@/lib/auth"
-import { getProjectById, updateProject } from "@/lib/mongodb-models"
+import { createClient } from "@/lib/supabase/server"
 
 // POST endpoint to add a designer to a project's recommendations
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const userId = await getAuthFromCookies()
@@ -13,18 +13,25 @@ export async function POST(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    const projectId = params.id
+    const { id: projectId } = await params
     if (!projectId) {
       return NextResponse.json({ error: "Project ID is required" }, { status: 400 })
     }
 
+    const supabase = await createClient()
+
     // Get the project to verify ownership
-    const project = await getProjectById(projectId)
-    if (!project) {
+    const { data: project, error: projError } = await supabase
+      .from('projects')
+      .select('id, user_id, designer_recommendations')
+      .eq('id', projectId)
+      .single()
+
+    if (projError || !project) {
       return NextResponse.json({ error: "Project not found" }, { status: 404 })
     }
 
-    if (project.userId !== userId) {
+    if (project.user_id !== userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 403 })
     }
 
@@ -35,13 +42,21 @@ export async function POST(
     }
 
     // Add the designer to the project's recommendations if not already added
-    const designerRecommendations = project.designerRecommendations || []
+    const designerRecommendations: string[] = project.designer_recommendations || []
     if (!designerRecommendations.includes(designerId)) {
       designerRecommendations.push(designerId)
     }
 
     // Update the project
-    await updateProject(projectId, { designerRecommendations })
+    const { error: updateError } = await supabase
+      .from('projects')
+      .update({ designer_recommendations: designerRecommendations })
+      .eq('id', projectId)
+
+    if (updateError) {
+      console.error("Error updating project:", updateError)
+      return NextResponse.json({ error: "Failed to update project" }, { status: 500 })
+    }
 
     return NextResponse.json({
       success: true,
@@ -59,7 +74,7 @@ export async function POST(
 // DELETE endpoint to remove a designer from a project's recommendations
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const userId = await getAuthFromCookies()
@@ -67,45 +82,64 @@ export async function DELETE(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    const projectId = params.id
+    const { id: projectId } = await params
     if (!projectId) {
       return NextResponse.json({ error: "Project ID is required" }, { status: 400 })
     }
 
+    const supabase = await createClient()
+
     // Get the project to verify ownership
-    const project = await getProjectById(projectId)
-    if (!project) {
+    const { data: project, error: projError } = await supabase
+      .from('projects')
+      .select('id, user_id, designer_recommendations')
+      .eq('id', projectId)
+      .single()
+
+    if (projError || !project) {
       return NextResponse.json({ error: "Project not found" }, { status: 404 })
     }
 
-    if (project.userId !== userId) {
+    if (project.user_id !== userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 403 })
     }
 
-    // Get designer ID from request
+    // Get designer ID from query param or body
     const url = new URL(req.url)
-    const designerId = url.searchParams.get("designerId")
+    let designerId = url.searchParams.get("designerId")
 
     if (!designerId) {
-      // Try to get from request body
-      const body = await req.json()
-      if (!body.designerId) {
-        return NextResponse.json({ error: "Designer ID is required" }, { status: 400 })
+      try {
+        const body = await req.json()
+        designerId = body.designerId
+      } catch {
+        // no body
       }
     }
 
+    if (!designerId) {
+      return NextResponse.json({ error: "Designer ID is required" }, { status: 400 })
+    }
+
     // Remove the designer from the project's recommendations
-    const designerRecommendations = project.designerRecommendations || []
-    const updatedRecommendations: string[] = designerRecommendations.filter(
+    const designerRecommendations: string[] = (project.designer_recommendations || []).filter(
       (id: string) => id !== designerId
     )
 
     // Update the project
-    await updateProject(projectId, { designerRecommendations: updatedRecommendations })
+    const { error: updateError } = await supabase
+      .from('projects')
+      .update({ designer_recommendations: designerRecommendations })
+      .eq('id', projectId)
+
+    if (updateError) {
+      console.error("Error updating project:", updateError)
+      return NextResponse.json({ error: "Failed to update project" }, { status: 500 })
+    }
 
     return NextResponse.json({
       success: true,
-      designerRecommendations: updatedRecommendations
+      designerRecommendations
     }, { status: 200 })
   } catch (error: any) {
     console.error("Error removing designer recommendation:", error)

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { getAuthFromCookies } from "@/lib/auth"
-import { createProject } from "@/lib/mongodb-models"
+import { createClient } from "@/lib/supabase/server"
 import { v4 as uuidv4 } from "uuid"
 import fs from "fs"
 import path from "path"
@@ -8,7 +8,6 @@ import path from "path"
 // Function to copy a floor plan template to a project
 function copyFloorPlanTemplate(templateId: string, projectId: string) {
   try {
-    // Get the template
     const templatesDir = path.join(process.cwd(), 'public', 'uploads', 'floor-plans')
     const templateDir = path.join(templatesDir, templateId)
 
@@ -17,7 +16,6 @@ function copyFloorPlanTemplate(templateId: string, projectId: string) {
       return null
     }
 
-    // Find the template image
     const templateFiles = fs.readdirSync(templateDir)
     const svgFile = templateFiles.find(file => file.endsWith('.svg'))
 
@@ -28,20 +26,16 @@ function copyFloorPlanTemplate(templateId: string, projectId: string) {
 
     const templateImagePath = path.join(templateDir, svgFile)
 
-    // Create the project directory if it doesn't exist
     const projectDir = path.join(templatesDir, projectId)
     if (!fs.existsSync(projectDir)) {
       fs.mkdirSync(projectDir, { recursive: true })
     }
 
-    // Generate a new filename
     const filename = `floor-plan-${uuidv4()}${path.extname(templateImagePath)}`
     const newImagePath = path.join(projectDir, filename)
 
-    // Copy the image
     fs.copyFileSync(templateImagePath, newImagePath)
 
-    // Return the relative URL
     return `/uploads/floor-plans/${projectId}/${filename}`
   } catch (error) {
     console.error('Error copying floor plan template:', error)
@@ -52,96 +46,98 @@ function copyFloorPlanTemplate(templateId: string, projectId: string) {
 // POST endpoint to create a project
 export async function POST(req: NextRequest) {
   try {
-    // Get the authenticated user ID
     const userId = await getAuthFromCookies()
     console.log('POST /api/project-create - Auth userId:', userId)
 
     if (!userId) {
-      console.log('POST /api/project-create - No userId found in auth')
       return NextResponse.json({ error: "Unauthorized. Please sign in to create a project." }, { status: 401 })
     }
-
-    console.log('POST /api/project-create - Authenticated userId:', userId)
 
     const body = await req.json()
     console.log('Received project data:', body)
 
-    // Create a new project with the authenticated user's ID
-    console.log('POST /api/project-create - Creating project for userId:', userId)
-
-    // Ensure we have a valid userId as a string
-    const userIdStr = String(userId)
-    console.log('POST /api/project-create - Converted userId to string:', userIdStr)
+    const supabase = await createClient()
 
     // Calculate total area if not provided
     const length = parseFloat(body.landDimensions.length) || 0
     const width = parseFloat(body.landDimensions.width) || 0
     const totalArea = parseFloat(body.landDimensions.totalArea) || (length * width)
 
-    const projectData = {
-      userId: userIdStr, // Use the authenticated user's ID as a string
-      name: body.name,
-      description: body.description,
-      landDimensions: {
-        length: length,
-        width: width,
-        totalArea: totalArea
-      },
-      landUnit: body.landUnit,
-      budget: parseFloat(body.budget) || 0,
-      currency: body.currency,
-      location: body.location,
-      preferences: body.preferences,
-      status: "Planning",
-      // Initialize floorPlans array if we have a generated floor plan
-      floorPlans: body.floorPlan ? [body.floorPlan] : []
+    const { data: project, error } = await supabase
+      .from('projects')
+      .insert({
+        user_id: userId,
+        name: body.name,
+        description: body.description,
+        land_dimensions: {
+          length,
+          width,
+          totalArea
+        },
+        land_unit: body.landUnit,
+        budget: parseFloat(body.budget) || 0,
+        currency: body.currency,
+        location: body.location,
+        preferences: body.preferences,
+        status: "Planning",
+      })
+      .select()
+      .single()
+
+    if (error) {
+      console.error("Error creating project:", error)
+      return NextResponse.json({
+        success: false,
+        error: error.message || "Failed to create project"
+      }, { status: 500 })
     }
 
-    console.log('POST /api/project-create - Project data prepared:', {
-      userId: projectData.userId,
-      name: projectData.name,
-      dimensions: projectData.landDimensions,
-    })
+    console.log("Project created with ID:", project.id, "for user:", userId)
 
-    const project = await createProject(projectData)
+    // Handle floor plan template if selected
+    if (body.floorPlanTemplateId && project.id) {
+      console.log(`Copying floor plan template ${body.floorPlanTemplateId} to project ${project.id}`)
 
-    console.log("Project created with ID:", project._id, "for user:", userId)
-
-    // Check if a floor plan template was selected
-    if (body.floorPlanTemplateId) {
-      console.log(`Copying floor plan template ${body.floorPlanTemplateId} to project ${project._id.toString()}`)
-
-      // Copy the floor plan template to the project
-      const imageUrl = copyFloorPlanTemplate(body.floorPlanTemplateId, project._id.toString())
+      const imageUrl = copyFloorPlanTemplate(body.floorPlanTemplateId, project.id)
 
       if (imageUrl) {
-        console.log(`Template copied successfully, image URL: ${imageUrl}`)
+        console.log(`Template copied, saving floor plan record`)
 
-        // Add the floor plan to the project
-        if (project._id) {
-          const floorPlan = {
-            projectId: project._id.toString(),
-            userId: userId, // Use the authenticated user's ID
-            imageUrl,
-            aiPrompt: "Template floor plan",
+        const { error: fpError } = await supabase
+          .from('floor_plans')
+          .insert({
+            project_id: project.id,
+            user_id: userId,
+            image_url: imageUrl,
+            ai_prompt: "Template floor plan",
             description: `Floor plan based on template ${body.floorPlanTemplateId}`,
-            generatedBy: "gemini", // Using gemini as the generator type
-            createdAt: new Date()
-          }
+            generated_by: "gemini",
+          })
 
-          // Add the floor plan to the project's floorPlans array
-          if (!project.floorPlans) {
-            project.floorPlans = []
-          }
-
-          project.floorPlans.push(floorPlan)
-
-          console.log(`Floor plan added to project`)
+        if (fpError) {
+          console.warn("Warning: could not save floor plan record:", fpError.message)
         }
       }
     }
 
-    console.log('POST /api/project-create - Returning successful response with project ID:', project._id)
+    // Handle inline floor plan data
+    if (body.floorPlan && project.id) {
+      const { error: fpError } = await supabase
+        .from('floor_plans')
+        .insert({
+          project_id: project.id,
+          user_id: userId,
+          image_url: body.floorPlan.imageUrl || '',
+          ai_prompt: body.floorPlan.aiPrompt || '',
+          description: body.floorPlan.description || '',
+          generated_by: body.floorPlan.generatedBy || "gemini",
+        })
+
+      if (fpError) {
+        console.warn("Warning: could not save inline floor plan:", fpError.message)
+      }
+    }
+
     return NextResponse.json({
       success: true,
       project,

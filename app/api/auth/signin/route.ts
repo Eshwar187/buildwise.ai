@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server"
-import { comparePassword, signToken, AUTH_COOKIE_NAME } from "@/lib/auth"
-import { connectToDatabase } from "@/lib/mongodb"
+import { createClient } from "@/lib/supabase/server"
 
 export async function POST(request: Request) {
   try {
@@ -15,67 +14,40 @@ export async function POST(request: Request) {
       )
     }
 
-    const { db } = await connectToDatabase()
+    const supabase = await createClient()
 
-    // Find user by email
-    const user = await db
-      .collection("users")
-      .findOne({ email: email.toLowerCase() })
+    // Sign in with Supabase Auth
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: email.toLowerCase(),
+      password,
+    })
 
-    if (!user) {
+    if (error) {
+      console.error("Supabase signin error:", error.message)
+      return NextResponse.json(
+        { error: error.message === "Invalid login credentials"
+            ? "Invalid email or password"
+            : error.message },
+        { status: 401 }
+      )
+    }
+
+    if (!data.user) {
       return NextResponse.json(
         { error: "Invalid email or password" },
         { status: 401 }
       )
     }
 
-    // Check password
-    if (!user.passwordHash) {
-      return NextResponse.json(
-        {
-          error:
-            "This account was created with Clerk. Please sign up again with a password.",
-        },
-        { status: 401 }
-      )
-    }
-
-    const isValid = await comparePassword(password, user.passwordHash)
-    if (!isValid) {
-      return NextResponse.json(
-        { error: "Invalid email or password" },
-        { status: 401 }
-      )
-    }
-
-    // Update last active
-    await db
-      .collection("users")
-      .updateOne(
-        { _id: user._id },
-        { $set: { lastActive: new Date(), updatedAt: new Date() } }
-      )
-
-    // Sign JWT
-    const token = await signToken({
-      userId: user.clerkId,
-      email: user.email,
+    // Return user info (Supabase session is set via cookies automatically)
+    return NextResponse.json({
+      user: {
+        id: data.user.id,
+        email: data.user.email,
+        firstName: data.user.user_metadata?.first_name,
+        lastName: data.user.user_metadata?.last_name,
+      },
     })
-
-    // Return user (without passwordHash)
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { passwordHash: _passwordHash, ...safeUser } = user
-    const response = NextResponse.json({ user: safeUser })
-
-    response.cookies.set(AUTH_COOKIE_NAME, token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: 60 * 60 * 24 * 7, // 7 days
-      path: "/",
-    })
-
-    return response
   } catch (error) {
     console.error("Signin error:", error)
     return NextResponse.json(

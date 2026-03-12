@@ -1,7 +1,5 @@
 import { NextResponse } from "next/server"
-import { hashPassword, signToken, AUTH_COOKIE_NAME } from "@/lib/auth"
-import { connectToDatabase } from "@/lib/mongodb"
-import crypto from "crypto"
+import { createClient } from "@/lib/supabase/server"
 
 export async function POST(request: Request) {
   try {
@@ -23,59 +21,65 @@ export async function POST(request: Request) {
       )
     }
 
-    const { db } = await connectToDatabase()
+    const supabase = await createClient()
 
-    // Check if user already exists
-    const existingUser = await db
-      .collection("users")
-      .findOne({ email: email.toLowerCase() })
-    if (existingUser) {
+    // Sign up with Supabase Auth
+    const { data, error } = await supabase.auth.signUp({
+      email: email.toLowerCase(),
+      password,
+      options: {
+        data: {
+          first_name: firstName || "",
+          last_name: lastName || "",
+          username: email.split("@")[0],
+        },
+      },
+    })
+
+    if (error) {
+      console.error("Supabase signup error:", error.message)
+      if (error.message.includes("already registered")) {
+        return NextResponse.json(
+          { error: "An account with this email already exists" },
+          { status: 409 }
+        )
+      }
+      return NextResponse.json({ error: error.message }, { status: 400 })
+    }
+
+    if (!data.user) {
       return NextResponse.json(
-        { error: "An account with this email already exists" },
-        { status: 409 }
+        { error: "Failed to create account" },
+        { status: 500 }
       )
     }
 
-    // Hash password and create user
-    const passwordHash = await hashPassword(password)
-    const now = new Date()
-    const clerkId = crypto.randomUUID() // Generate a unique ID (replaces Clerk's ID)
+    // Also create a row in the users table for app-level data
+    const { error: insertError } = await supabase
+      .from('users')
+      .insert({
+        id: data.user.id,
+        email: email.toLowerCase(),
+        username: email.split("@")[0],
+        first_name: firstName || null,
+        last_name: lastName || null,
+        is_admin: false,
+        is_approved: false,
+      })
 
-    const user = {
-      clerkId,
-      username: email.split("@")[0],
-      email: email.toLowerCase(),
-      firstName: firstName || undefined,
-      lastName: lastName || undefined,
-      passwordHash,
-      isAdmin: false,
-      isAdminApproved: false,
-      createdAt: now,
-      updatedAt: now,
-      lastActive: now,
+    if (insertError) {
+      // User might already exist via a trigger – that's fine
+      console.warn("Insert users row warning:", insertError.message)
     }
 
-    const result = await db.collection("users").insertOne(user)
-
-    // Sign JWT
-    const token = await signToken({ userId: clerkId, email: user.email })
-
-    // Set the cookie and return user (without passwordHash)
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { passwordHash: _passwordHash, ...safeUser } = user
-    const response = NextResponse.json({
-      user: { ...safeUser, _id: result.insertedId },
+    return NextResponse.json({
+      user: {
+        id: data.user.id,
+        email: data.user.email,
+        firstName,
+        lastName,
+      },
     })
-
-    response.cookies.set(AUTH_COOKIE_NAME, token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: 60 * 60 * 24 * 7, // 7 days
-      path: "/",
-    })
-
-    return response
   } catch (error) {
     console.error("Signup error:", error)
     return NextResponse.json(

@@ -1,7 +1,5 @@
-import type { ObjectId } from "mongodb"
-
 export interface Project {
-  _id?: ObjectId | string
+  _id?: string
   userId: string
   name: string
   description: string

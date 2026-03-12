@@ -19,7 +19,7 @@ function mapProjectToFrontend(p: any) {
   }
 }
 
-export async function GET(request: Request, { params }: { params: { id: string } }) {
+export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const userId = await getAuthFromCookies()
 
@@ -27,7 +27,7 @@ export async function GET(request: Request, { params }: { params: { id: string }
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    const projectId = params.id
+    const { id: projectId } = await params
     const supabase = await createClient()
 
     const { data: project, error: projectError } = await supabase
@@ -52,7 +52,7 @@ export async function GET(request: Request, { params }: { params: { id: string }
   }
 }
 
-export async function DELETE(request: Request, { params }: { params: { id: string } }) {
+export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const userId = await getAuthFromCookies()
 
@@ -60,7 +60,7 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    const projectId = params.id
+    const { id: projectId } = await params
     const supabase = await createClient()
 
     const { data: project, error: projectError } = await supabase

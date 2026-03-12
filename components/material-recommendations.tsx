@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import Image from "next/image"
 import { motion } from "framer-motion"
 import {
@@ -18,7 +18,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
-import { Material } from "@/lib/mongodb-models"
+import { Material } from "@/lib/types"
 
 interface MaterialRecommendationsProps {
   materials: Material[]
@@ -38,31 +38,30 @@ export function MaterialRecommendations({
   isLoading = false
 }: MaterialRecommendationsProps) {
   const [activeTab, setActiveTab] = useState("all")
-  const [filteredMaterials, setFilteredMaterials] = useState<Material[]>(materials)
   const [sortBy, setSortBy] = useState<"cost" | "sustainability" | "durability">("cost")
 
-  // Filter and sort materials when dependencies change
-  useEffect(() => {
-    let filtered = [...materials]
+  // Normalize materials to always have the camelCase fields the component expects
+  const normalizedMaterials = materials.map(m => ({
+    ...m,
+    costPerUnit: m.costPerUnit ?? m.cost_per_unit,
+    energyEfficiency: m.energyEfficiency ?? m.energy_efficiency,
+    locallyAvailable: m.locallyAvailable ?? m.locally_available,
+    imageUrl: m.imageUrl ?? m.image_url,
+  }))
 
-    // Apply category filter
+  // Filter and sort
+  const filteredMaterials = (() => {
+    let filtered = [...normalizedMaterials]
     if (activeTab !== "all") {
       filtered = filtered.filter(material => material.category.toLowerCase() === activeTab.toLowerCase())
     }
-
-    // Apply sorting
     filtered.sort((a, b) => {
-      if (sortBy === "cost") {
-        return a.costPerUnit - b.costPerUnit
-      } else if (sortBy === "sustainability") {
-        return b.sustainability - a.sustainability
-      } else {
-        return b.durability - a.durability
-      }
+      if (sortBy === "cost") return (a.costPerUnit ?? 0) - (b.costPerUnit ?? 0)
+      if (sortBy === "sustainability") return b.sustainability - a.sustainability
+      return b.durability - a.durability
     })
-
-    setFilteredMaterials(filtered)
-  }, [materials, activeTab, sortBy])
+    return filtered
+  })()
 
   // Group materials by category
   const categories = Array.from(new Set(materials.map(material => material.category)))

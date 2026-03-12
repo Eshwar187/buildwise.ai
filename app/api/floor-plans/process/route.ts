@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
     fs.writeFileSync(inputPath, buffer)
 
     // Process the floor plan
-    let result;
+    let result: any;
     try {
       result = await processFloorPlan({
         inputPath,

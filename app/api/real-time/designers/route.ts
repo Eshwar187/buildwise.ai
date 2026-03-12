@@ -1,15 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest, NextResponse } from "next/server"
 
-// Function to fetch real-time designers using Google Maps Platform API
+// Function to fetch real-time designers using OpenStreetMap Nominatim and Overpass API
 async function fetchDesigners(location: string) {
   try {
     console.log(`Fetching designers for location: ${location}`);
-
-    // Get the Google Maps API key from environment variables
-    const GOOGLE_MAPS_API_KEY = process.env.GOOGLE_MAPS_API_KEY;
-    if (!GOOGLE_MAPS_API_KEY) {
-      throw new Error("GOOGLE_MAPS_API_KEY is not defined in environment variables");
-    }
 
     // Extract city and state from location
     const locationParts = location.split(',').map(part => part.trim());
@@ -21,129 +16,131 @@ async function fetchDesigners(location: string) {
     const searchLocation = city + (state ? `, ${state}` : '') + (country ? `, ${country}` : '');
     console.log(`Searching for designers in: ${searchLocation}`);
 
-    // First, use the Geocoding API to get the coordinates of the location
-    const geocodeUrl = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(searchLocation)}&key=${GOOGLE_MAPS_API_KEY}`;
+    // First, use Nominatim API to get the bounding box or coordinates of the location
+    const geocodeUrl = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(searchLocation)}&format=json&limit=1`;
+    
+    // Respect Nominatim Usage Policy by providing a User-Agent
+    const headers = {
+      'User-Agent': 'BuildWiseApp/1.0 (contact@buildwise.ai)'
+    };
 
-    const geocodeResponse = await fetch(geocodeUrl);
+    const geocodeResponse = await fetch(geocodeUrl, { headers });
     const geocodeData = await geocodeResponse.json();
 
-    console.log('Geocoding API response status:', geocodeData.status);
-
-    if (geocodeData.status !== 'OK' || !geocodeData.results || geocodeData.results.length === 0) {
-      console.error('Geocoding API error:', geocodeData);
+    if (!geocodeData || geocodeData.length === 0) {
+      console.error('Nominatim API error or no results for:', searchLocation);
       throw new Error(`Could not find coordinates for ${searchLocation}`);
     }
 
-    const { lat, lng } = geocodeData.results[0].geometry.location;
-    console.log(`Found coordinates for ${searchLocation}: ${lat}, ${lng}`);
+    const { lat, lon } = geocodeData[0];
+    console.log(`Found coordinates for ${searchLocation}: ${lat}, ${lon}`);
 
-    // Now use the Places API to search for interior designers and architects
-    // We'll search for both interior designers and architects in the area
-    const placesUrl = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=interior+designer+OR+architect+in+${encodeURIComponent(city)}&location=${lat},${lng}&radius=50000&key=${GOOGLE_MAPS_API_KEY}`;
+    // Determine bounding box around the point (roughly 50km radius)
+    // 1 degree is approx 111km. 50km is about 0.45 degrees.
+    const radiusDeg = 0.45;
+    const minLat = parseFloat(lat) - radiusDeg;
+    const minLon = parseFloat(lon) - Math.abs(radiusDeg / Math.cos(parseFloat(lat) * Math.PI / 180));
+    const maxLat = parseFloat(lat) + radiusDeg;
+    const maxLon = parseFloat(lon) + Math.abs(radiusDeg / Math.cos(parseFloat(lat) * Math.PI / 180));
 
-    console.log('Calling Places API with URL:', placesUrl.substring(0, 100) + '...');
+    // Now use Overpass API to search for interior designers and architects
+    const overpassQuery = `
+      [out:json][timeout:25];
+      (
+        node["office"="architect"](${minLat},${minLon},${maxLat},${maxLon});
+        way["office"="architect"](${minLat},${minLon},${maxLat},${maxLon});
+        relation["office"="architect"](${minLat},${minLon},${maxLat},${maxLon});
+        node["shop"="interior_decoration"](${minLat},${minLon},${maxLat},${maxLon});
+        way["shop"="interior_decoration"](${minLat},${minLon},${maxLat},${maxLon});
+        relation["shop"="interior_decoration"](${minLat},${minLon},${maxLat},${maxLon});
+      );
+      out center;
+    `;
 
-    const placesResponse = await fetch(placesUrl);
-    const placesData = await placesResponse.json();
+    const overpassUrl = 'https://overpass-api.de/api/interpreter';
+    
+    console.log('Calling Overpass API');
 
-    console.log('Places API response status:', placesData.status);
-    console.log('Places API found results:', placesData.results ? placesData.results.length : 0);
+    const overpassResponse = await fetch(overpassUrl, {
+      method: 'POST',
+      body: overpassQuery,
+      headers: { ...headers, 'Content-Type': 'application/x-www-form-urlencoded' }
+    });
+    
+    const overpassData = await overpassResponse.json();
+
+    console.log('Overpass API found results:', overpassData.elements ? overpassData.elements.length : 0);
 
     // If we don't get any results, try a different query
-    if (placesData.status !== 'OK' || !placesData.results || placesData.results.length === 0) {
-      console.log('No places found with first query, trying alternative query');
-
-      // Try a more general query for home design businesses
-      const altPlacesUrl = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=home+design+OR+interior+design+in+${encodeURIComponent(city)}&location=${lat},${lng}&radius=50000&key=${GOOGLE_MAPS_API_KEY}`;
-
-      const altPlacesResponse = await fetch(altPlacesUrl);
-      const altPlacesData = await altPlacesResponse.json();
-
-      console.log('Alternative Places API response status:', altPlacesData.status);
-      console.log('Alternative Places API found results:', altPlacesData.results ? altPlacesData.results.length : 0);
-
-      if (altPlacesData.status !== 'OK' || !altPlacesData.results || altPlacesData.results.length === 0) {
-        console.log('No places found with alternative query, generating designers instead');
-        return generateDesigners(searchLocation, city, state, country);
-      }
-
-      // Use the alternative results
-      placesData.results = altPlacesData.results;
+    if (!overpassData.elements || overpassData.elements.length === 0) {
+      console.log('No places found, generating designers instead');
+      return generateDesigners(searchLocation, city, state, country);
     }
 
-    // Transform the Places API data into our designer format
-    const designers = await Promise.all(placesData.results.slice(0, 5).map(async (place: any, index: number) => {
-      // For each place, fetch additional details if available
-      let details = place;
+    // Filter elements with a name tag
+    const namedElements = overpassData.elements.filter((el: any) => el.tags && el.tags.name);
+    
+    if (namedElements.length === 0) {
+      console.log('No named places found, generating designers instead');
+      return generateDesigners(searchLocation, city, state, country);
+    }
 
-      try {
-        if (place.place_id) {
-          const detailsUrl = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${place.place_id}&fields=name,formatted_address,formatted_phone_number,website,rating,photos,types,opening_hours,url&key=${GOOGLE_MAPS_API_KEY}`;
-
-          const detailsResponse = await fetch(detailsUrl);
-          const detailsData = await detailsResponse.json();
-
-          if (detailsData.status === 'OK' && detailsData.result) {
-            details = { ...place, ...detailsData.result };
-            console.log(`Got details for ${place.name}`);
-          }
-        }
-      } catch (detailsError) {
-        console.error(`Error fetching details for place ${place.name}:`, detailsError);
-      }
-
-      // Generate a photo URL if available
-      let photoUrl = '';
-      if (details.photos && details.photos.length > 0) {
-        const photoReference = details.photos[0].photo_reference;
-        photoUrl = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${photoReference}&key=${GOOGLE_MAPS_API_KEY}`;
-        console.log(`Got photo for ${place.name}`);
-      }
-
+    // Transform the Overpass API data into our designer format
+    const designers = await Promise.all(namedElements.slice(0, 5).map(async (place: any, index: number) => {
+      const name = place.tags.name;
+      
       // Extract phone and website
-      const phone = details.formatted_phone_number || "";
-      const website = details.website || "";
-
+      const phone = place.tags.phone || place.tags['contact:phone'] || "";
+      const website = place.tags.website || place.tags['contact:website'] || "";
+      
       // Generate an email based on the company name
-      const companyName = details.name.toLowerCase().replace(/[^a-z0-9]/g, '');
-      const email = `info@${companyName}.com`;
+      const emailObj = place.tags.email || place.tags['contact:email'];
+      const companyName = name.toLowerCase().replace(/[^a-z0-9]/g, '');
+      const email = emailObj || `info@${companyName}.com`;
 
       // Extract the full address
-      const address = details.formatted_address || details.vicinity || `${city}${state ? `, ${state}` : ''}`;
+      const housenumber = place.tags['addr:housenumber'] || "";
+      const street = place.tags['addr:street'] || "";
+      const addrCity = place.tags['addr:city'] || city;
+      let address = "";
+      if (housenumber && street) {
+        address = `${housenumber} ${street}, ${addrCity}`;
+      } else {
+        address = `${addrCity}${state ? `, ${state}` : ''}`;
+      }
 
       // Generate a random experience value between 5-25 years
       const experience = Math.floor(Math.random() * 20) + 5;
 
-      // Determine specialization based on types or name
+      // Determine specialization based on tags
       let specialization = "Interior Design";
-      if (details.types && details.types.length > 0) {
-        const types = details.types.join(' ').toLowerCase();
-        if (types.includes("architect")) {
-          specialization = "Architecture";
-        } else if (types.includes("interior_design") || types.includes("home_goods_store")) {
-          specialization = "Interior Design";
-        }
+      if (place.tags.office === "architect") {
+        specialization = "Architecture";
+      } else if (place.tags.shop === "interior_decoration") {
+        specialization = "Interior Design";
       }
 
-      if (details.name.toLowerCase().includes("modern")) {
+      if (name.toLowerCase().includes("modern")) {
         specialization = "Modern Design";
-      } else if (details.name.toLowerCase().includes("traditional")) {
+      } else if (name.toLowerCase().includes("traditional")) {
         specialization = "Traditional Design";
       }
 
       // Create a bio based on available information
-      const bio = `${details.name} is a professional ${specialization.toLowerCase()} firm with ${experience} years of experience, located in ${city}${state ? `, ${state}` : ''}.`;
+      const bio = `${name} is a professional ${specialization.toLowerCase()} firm with ${experience} years of experience, located in ${addrCity}.`;
 
       // Create a portfolio description
-      const portfolio = `Specializes in ${specialization.toLowerCase()} projects throughout ${city} and surrounding areas. Known for quality craftsmanship and attention to detail.`;
+      const portfolio = `Specializes in ${specialization.toLowerCase()} projects throughout ${addrCity} and surrounding areas. Known for quality craftsmanship and attention to detail.`;
 
-      // Google Maps URL
-      const mapsUrl = details.url || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(details.name)}&query_place_id=${details.place_id}`;
+      const plat = place.lat || (place.center && place.center.lat) || lat;
+      const plon = place.lon || (place.center && place.center.lon) || lon;
+      // Map URL
+      const mapsUrl = `https://www.openstreetmap.org/?mlat=${plat}&mlon=${plon}#map=17/${plat}/${plon}`;
 
       return {
-        id: details.place_id || `designer-${index + 1}`,
-        name: details.name,
-        company: details.name,
+        id: place.id.toString() || `designer-${index + 1}`,
+        name: name,
+        company: name,
         experience,
         specialization,
         bio,
@@ -153,17 +150,25 @@ async function fetchDesigners(location: string) {
         address,
         location: address,
         portfolio,
-        rating: details.rating || (4 + Math.random()).toFixed(1),
-        imageUrl: photoUrl,
+        rating: (4 + Math.random()).toFixed(1),
+        imageUrl: '', // Will be handled by the UI
         mapsUrl,
         projects: Math.floor(Math.random() * 100) + 50
       };
     }));
 
     console.log(`Successfully processed ${designers.length} designers for ${city}`);
+    
+    // Supplement with generated if fewer than 5
+    if (designers.length < 5) {
+      const generated = await generateDesigners(location, city, state, country);
+      const needed = 5 - designers.length;
+      designers.push(...generated.slice(0, needed));
+    }
+
     return designers;
   } catch (error) {
-    console.error("Error fetching designers from Google Maps API:", error);
+    console.error("Error fetching designers from OSM API:", error);
     // Fall back to generating designers
     const locationParts = location.split(',').map(part => part.trim());
     const city = locationParts[0] || 'New York';

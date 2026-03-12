@@ -1,0 +1,35 @@
+﻿app/api/floor-plans/process/route.ts(79,30): error TS2339: Property 'visualization3D' does not exist on type 'Object'.
+app/api/floor-plans/process/route.ts(80,54): error TS2339: Property 'visualization3D' does not exist on type 'Object'.
+app/api/floor-plans/process/route.ts(91,30): error TS2339: Property 'data' does not exist on type 'Object'.
+app/api/floor-plans/process/route.ts(92,30): error TS2339: Property 'data' does not exist on type 'Object'.
+app/api/floor-plans/process/route.ts(99,32): error TS2339: Property 'visualization3D' does not exist on type 'Object'.
+app/api/floor-plans/process/route.ts(100,30): error TS2339: Property 'visualization3D' does not exist on type 'Object'.
+app/api/floor-plans/process/route.ts(102,32): error TS2339: Property 'floorPlanData' does not exist on type 'Object'.
+app/api/floor-plans/process/route.ts(103,30): error TS2339: Property 'floorPlanData' does not exist on type 'Object'.
+app/dashboard/ai-tools/page.tsx(144,32): error TS7006: Parameter 'material' implicitly has an 'any' type.
+app/dashboard/ai-tools/page.tsx(145,16): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{}'.
+app/dashboard/ai-tools/page.tsx(146,13): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{}'.
+app/dashboard/ai-tools/page.tsx(148,11): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{}'.
+app/dashboard/ai-tools/page.tsx(154,11): error TS18046: 'materials' is of type 'unknown'.
+app/dashboard/ai-tools/page.tsx(154,29): error TS7006: Parameter 'material' implicitly has an 'any' type.
+app/dashboard/ai-tools/page.tsx(168,67): error TS18046: 'error' is of type 'unknown'.
+app/dashboard/page.tsx(122,75): error TS2339: Property 'firstName' does not exist on type 'AuthUser'.
+app/dashboard/page.tsx(122,94): error TS2339: Property 'username' does not exist on type 'AuthUser'.
+app/dashboard/page.tsx(188,23): error TS2322: Type 'Project' is not assignable to type '{ id?: string | undefined; _id?: string | { toString(): string; } | undefined; name: string; description: string; landArea?: string | undefined; landUnit?: string | undefined; budget?: string | undefined; ... 4 more ...; owner?: string | undefined; }'.
+  Types of property 'budget' are incompatible.
+    Type 'string | number' is not assignable to type 'string | undefined'.
+      Type 'number' is not assignable to type 'string'.
+app/dashboard/projects/[id]/page.tsx(412,8): error TS2322: Type '{ children: Element; heading: string; text: string; }' is not assignable to type 'IntrinsicAttributes'.
+  Property 'children' does not exist on type 'IntrinsicAttributes'.
+app/dashboard/projects/page.tsx(193,8): error TS2322: Type '{ children: Element; heading: string; text: string; }' is not assignable to type 'IntrinsicAttributes'.
+  Property 'children' does not exist on type 'IntrinsicAttributes'.
+components/floor-plan-display.tsx(47,27): error TS2551: Property 'imageUrl' does not exist on type 'FloorPlan'. Did you mean 'image_url'?
+components/floor-plan-display.tsx(60,26): error TS2551: Property 'imageUrl' does not exist on type 'FloorPlan'. Did you mean 'image_url'?
+components/floor-plan-display.tsx(67,47): error TS2551: Property 'imageUrl' does not exist on type 'FloorPlan'. Did you mean 'image_url'?
+components/floor-plan-display.tsx(177,45): error TS2551: Property 'generatedBy' does not exist on type 'FloorPlan'. Did you mean 'generated_by'?
+components/floor-plan-display.tsx(180,41): error TS2551: Property 'createdAt' does not exist on type 'FloorPlan'. Did you mean 'created_at'?
+components/floor-plan-display.tsx(278,26): error TS2551: Property 'imageUrl' does not exist on type 'FloorPlan'. Did you mean 'image_url'?
+hooks/use-toast.ts(9,8): error TS2307: Cannot find module '@/components/ui/toast' or its corresponding type declarations.
+hooks/use-toast.ts(161,22): error TS7006: Parameter 'open' implicitly has an 'any' type.
+lib/auth-edge.ts(1,36): error TS2307: Cannot find module 'jose' or its corresponding type declarations.
+lib/image-storage.ts(4,19): error TS2307: Cannot find module 'node-fetch' or its corresponding type declarations.

@@ -60,7 +60,7 @@ export const localDb = {
           let result = data;
 
           if (Object.keys(query).length > 0) {
-            result = data.filter(item => {
+            result = data.filter((item: any) => {
               return Object.entries(query).every(([key, value]) => {
                 return item[key] === value;
               });
@@ -73,7 +73,7 @@ export const localDb = {
     }),
     findOne: async (query = {}) => {
       const data = readCollection(name);
-      return data.find(item => {
+      return data.find((item: any) => {
         return Object.entries(query).every(([key, value]) => {
           return item[key] === value;
         });
@@ -94,7 +94,7 @@ export const localDb = {
       const data = readCollection(name);
       let modifiedCount = 0;
 
-      const updatedData = data.map(item => {
+      const updatedData = data.map((item: any) => {
         if (Object.entries(query).every(([key, value]) => item[key] === value)) {
           modifiedCount++;
           if (update.$set) {
@@ -111,7 +111,7 @@ export const localDb = {
       const data = readCollection(name);
       const initialLength = data.length;
 
-      const filteredData = data.filter(item => {
+      const filteredData = data.filter((item: any) => {
         return !Object.entries(query).every(([key, value]) => {
           return item[key] === value;
         });
@@ -126,7 +126,7 @@ export const localDb = {
         return data.length;
       }
 
-      return data.filter(item => {
+      return data.filter((item: any) => {
         return Object.entries(query).every(([key, value]) => {
           return item[key] === value;
         });
@@ -146,7 +146,7 @@ export const localDb = {
           const groupKey = groupConfig._id;
           const groups: Record<string, any> = {};
 
-          data.forEach(item => {
+          data.forEach((item: any) => {
             let key = '';
             if (typeof groupKey === 'string' && groupKey.startsWith('$')) {
               // Simple field grouping

@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/server"
 // POST endpoint to add a material to a project's recommendations
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const userId = await getAuthFromCookies()
@@ -13,7 +13,7 @@ export async function POST(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    const projectId = params.id
+    const { id: projectId } = await params
     if (!projectId) {
       return NextResponse.json({ error: "Project ID is required" }, { status: 400 })
     }
@@ -73,7 +73,7 @@ export async function POST(
 // DELETE endpoint to remove a material from a project's recommendations
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const userId = await getAuthFromCookies()
@@ -81,7 +81,7 @@ export async function DELETE(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    const projectId = params.id
+    const { id: projectId } = await params
     if (!projectId) {
       return NextResponse.json({ error: "Project ID is required" }, { status: 400 })
     }

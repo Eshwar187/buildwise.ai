@@ -1,13 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { getAuthFromCookies } from "@/lib/auth"
-import { 
-  getDesignerById, 
-  getDesignersByLocation, 
-  getAllDesigners, 
-  createDesigner,
-  updateDesigner,
-  deleteDesigner
-} from "@/lib/mongodb-models"
+import { createClient } from "@/lib/supabase/server"
 
 // GET endpoint to retrieve designers
 export async function GET(req: NextRequest) {
@@ -17,6 +10,8 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
+    const supabase = await createClient()
+
     const url = new URL(req.url)
     const designerId = url.searchParams.get("id")
     const country = url.searchParams.get("country")
@@ -25,8 +20,13 @@ export async function GET(req: NextRequest) {
 
     // If designerId is provided, return that specific designer
     if (designerId) {
-      const designer = await getDesignerById(designerId)
-      if (!designer) {
+      const { data: designer, error } = await supabase
+        .from('designers')
+        .select('*')
+        .eq('id', designerId)
+        .single()
+
+      if (error || !designer) {
         return NextResponse.json({ error: "Designer not found" }, { status: 404 })
       }
       return NextResponse.json({ designer }, { status: 200 })
@@ -34,13 +34,36 @@ export async function GET(req: NextRequest) {
 
     // If location parameters are provided, return designers for that location
     if (country && state) {
-      const designers = await getDesignersByLocation(country, state, city || undefined)
-      return NextResponse.json({ designers }, { status: 200 })
+      let query = supabase
+        .from('designers')
+        .select('*')
+        .eq('country', country)
+        .eq('state', state)
+
+      if (city) {
+        query = query.eq('city', city)
+      }
+
+      const { data: designers, error } = await query
+
+      if (error) {
+        console.error("Error fetching designers by location:", error)
+        return NextResponse.json({ designers: [] }, { status: 200 })
+      }
+      return NextResponse.json({ designers: designers || [] }, { status: 200 })
     }
 
     // Otherwise, return all designers
-    const designers = await getAllDesigners()
-    return NextResponse.json({ designers }, { status: 200 })
+    const { data: designers, error } = await supabase
+      .from('designers')
+      .select('*')
+      .order('created_at', { ascending: false })
+
+    if (error) {
+      console.error("Error fetching all designers:", error)
+      return NextResponse.json({ designers: [] }, { status: 200 })
+    }
+    return NextResponse.json({ designers: designers || [] }, { status: 200 })
   } catch (error: any) {
     console.error("Error retrieving designers:", error)
     return NextResponse.json(
@@ -58,11 +81,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    // Check if user is admin (in a real app, you would check the user's role)
-    // For now, we'll assume they can proceed
-
     const designerData = await req.json()
-    
+
     // Validate required fields
     const requiredFields = ["name", "email", "phone", "specialization", "experience", "location", "availability"]
     for (const field of requiredFields) {
@@ -79,8 +99,31 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Create the designer
-    const designer = await createDesigner(designerData)
+    const supabase = await createClient()
+
+    const { data: designer, error } = await supabase
+      .from('designers')
+      .insert({
+        name: designerData.name,
+        email: designerData.email,
+        phone: designerData.phone,
+        specialization: designerData.specialization,
+        experience: designerData.experience,
+        country: designerData.location.country,
+        state: designerData.location.state,
+        city: designerData.location.city,
+        availability: designerData.availability,
+        portfolio: designerData.portfolio || null,
+        rating: designerData.rating || null,
+      })
+      .select()
+      .single()
+
+    if (error) {
+      console.error("Error creating designer:", error)
+      return NextResponse.json({ error: "Failed to create designer" }, { status: 500 })
+    }
+
     return NextResponse.json({ success: true, designer }, { status: 201 })
   } catch (error: any) {
     console.error("Error creating designer:", error)
@@ -99,27 +142,51 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    // Check if user is admin (in a real app, you would check the user's role)
-    // For now, we'll assume they can proceed
-
     const { id, ...updateData } = await req.json()
     if (!id) {
       return NextResponse.json({ error: "Missing designer ID" }, { status: 400 })
     }
 
+    const supabase = await createClient()
+
     // Verify the designer exists
-    const designer = await getDesignerById(id)
-    if (!designer) {
+    const { data: existing, error: fetchError } = await supabase
+      .from('designers')
+      .select('id')
+      .eq('id', id)
+      .single()
+
+    if (fetchError || !existing) {
       return NextResponse.json({ error: "Designer not found" }, { status: 404 })
     }
 
-    // Update the designer
-    const result = await updateDesigner(id, updateData)
-    if (result.modifiedCount === 0) {
+    // Build update payload – flatten location if present
+    const payload: Record<string, any> = {}
+    if (updateData.name) payload.name = updateData.name
+    if (updateData.email) payload.email = updateData.email
+    if (updateData.phone) payload.phone = updateData.phone
+    if (updateData.specialization) payload.specialization = updateData.specialization
+    if (updateData.experience) payload.experience = updateData.experience
+    if (updateData.availability) payload.availability = updateData.availability
+    if (updateData.portfolio) payload.portfolio = updateData.portfolio
+    if (updateData.rating) payload.rating = updateData.rating
+    if (updateData.location) {
+      if (updateData.location.country) payload.country = updateData.location.country
+      if (updateData.location.state) payload.state = updateData.location.state
+      if (updateData.location.city) payload.city = updateData.location.city
+    }
+
+    const { error: updateError } = await supabase
+      .from('designers')
+      .update(payload)
+      .eq('id', id)
+
+    if (updateError) {
+      console.error("Error updating designer:", updateError)
       return NextResponse.json({ error: "Failed to update designer" }, { status: 500 })
     }
 
-    return NextResponse.json({ success: true, modifiedCount: result.modifiedCount }, { status: 200 })
+    return NextResponse.json({ success: true, modifiedCount: 1 }, { status: 200 })
   } catch (error: any) {
     console.error("Error updating designer:", error)
     return NextResponse.json(
@@ -137,28 +204,36 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    // Check if user is admin (in a real app, you would check the user's role)
-    // For now, we'll assume they can proceed
-
     const url = new URL(req.url)
     const id = url.searchParams.get("id")
     if (!id) {
       return NextResponse.json({ error: "Missing designer ID" }, { status: 400 })
     }
 
+    const supabase = await createClient()
+
     // Verify the designer exists
-    const designer = await getDesignerById(id)
-    if (!designer) {
+    const { data: existing, error: fetchError } = await supabase
+      .from('designers')
+      .select('id')
+      .eq('id', id)
+      .single()
+
+    if (fetchError || !existing) {
       return NextResponse.json({ error: "Designer not found" }, { status: 404 })
     }
 
-    // Delete the designer
-    const result = await deleteDesigner(id)
-    if (result.deletedCount === 0) {
+    const { error: deleteError } = await supabase
+      .from('designers')
+      .delete()
+      .eq('id', id)
+
+    if (deleteError) {
+      console.error("Error deleting designer:", deleteError)
       return NextResponse.json({ error: "Failed to delete designer" }, { status: 500 })
     }
 
-    return NextResponse.json({ success: true, deletedCount: result.deletedCount }, { status: 200 })
+    return NextResponse.json({ success: true, deletedCount: 1 }, { status: 200 })
   } catch (error: any) {
     console.error("Error deleting designer:", error)
     return NextResponse.json(

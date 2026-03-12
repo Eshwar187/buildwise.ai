@@ -1,13 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { getAuthFromCookies } from "@/lib/auth"
-import { 
-  getRegionByLocation, 
-  getAllRegions, 
-  createRegion,
-  getCountries,
-  getStatesByCountry,
-  getCitiesByState
-} from "@/lib/mongodb-models"
+import { createClient } from "@/lib/supabase/server"
 
 // GET endpoint to retrieve regions
 export async function GET(req: NextRequest) {
@@ -17,33 +10,73 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
+    const supabase = await createClient()
+
     const url = new URL(req.url)
     const country = url.searchParams.get("country")
     const state = url.searchParams.get("state")
     const city = url.searchParams.get("city")
     const type = url.searchParams.get("type")
 
-    // If type is "countries", return all countries
+    // If type is "countries", return all distinct countries
     if (type === "countries") {
-      const countries = await getCountries()
+      const { data, error } = await supabase
+        .from('regions')
+        .select('country')
+      if (error) {
+        console.error("Error fetching countries:", error)
+        return NextResponse.json({ countries: [] }, { status: 200 })
+      }
+      const countries = [...new Set((data || []).map((r: any) => r.country))]
       return NextResponse.json({ countries }, { status: 200 })
     }
 
     // If type is "states" and country is provided, return states for that country
     if (type === "states" && country) {
-      const states = await getStatesByCountry(country)
+      const { data, error } = await supabase
+        .from('regions')
+        .select('state')
+        .eq('country', country)
+      if (error) {
+        console.error("Error fetching states:", error)
+        return NextResponse.json({ states: [] }, { status: 200 })
+      }
+      const states = [...new Set((data || []).map((r: any) => r.state))]
       return NextResponse.json({ states }, { status: 200 })
     }
 
-    // If type is "cities" and country and state are provided, return cities for that state
+    // If type is "cities" and country and state are provided, return cities
     if (type === "cities" && country && state) {
-      const cities = await getCitiesByState(country, state)
+      const { data, error } = await supabase
+        .from('regions')
+        .select('city')
+        .eq('country', country)
+        .eq('state', state)
+      if (error) {
+        console.error("Error fetching cities:", error)
+        return NextResponse.json({ cities: [] }, { status: 200 })
+      }
+      const cities = [...new Set((data || []).map((r: any) => r.city))]
       return NextResponse.json({ cities }, { status: 200 })
     }
 
     // If country, state, and optionally city are provided, return that specific region
     if (country && state) {
-      const region = await getRegionByLocation(country, state, city || undefined)
+      let query = supabase
+        .from('regions')
+        .select('*')
+        .eq('country', country)
+        .eq('state', state)
+
+      if (city) {
+        query = query.eq('city', city)
+      }
+
+      const { data: region, error } = await query.maybeSingle()
+      if (error) {
+        console.error("Error fetching region:", error)
+        return NextResponse.json({ error: "Region not found" }, { status: 404 })
+      }
       if (!region) {
         return NextResponse.json({ error: "Region not found" }, { status: 404 })
       }
@@ -51,8 +84,18 @@ export async function GET(req: NextRequest) {
     }
 
     // Otherwise, return all regions
-    const regions = await getAllRegions()
-    return NextResponse.json({ regions }, { status: 200 })
+    const { data: regions, error } = await supabase
+      .from('regions')
+      .select('*')
+      .order('country')
+      .order('state')
+      .order('city')
+
+    if (error) {
+      console.error("Error fetching all regions:", error)
+      return NextResponse.json({ regions: [] }, { status: 200 })
+    }
+    return NextResponse.json({ regions: regions || [] }, { status: 200 })
   } catch (error: any) {
     console.error("Error retrieving regions:", error)
     return NextResponse.json(
@@ -70,11 +113,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    // Check if user is admin (in a real app, you would check the user's role)
-    // For now, we'll assume they can proceed
-
     const regionData = await req.json()
-    
+
     // Validate required fields
     const requiredFields = ["country", "countryCode", "state", "city", "localCurrency"]
     for (const field of requiredFields) {
@@ -83,22 +123,44 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    const supabase = await createClient()
+
     // Check if region already exists
-    const existingRegion = await getRegionByLocation(
-      regionData.country, 
-      regionData.state, 
-      regionData.city
-    )
-    
-    if (existingRegion) {
+    const { data: existing } = await supabase
+      .from('regions')
+      .select('id')
+      .eq('country', regionData.country)
+      .eq('state', regionData.state)
+      .eq('city', regionData.city)
+      .maybeSingle()
+
+    if (existing) {
       return NextResponse.json(
-        { error: "Region already exists" }, 
+        { error: "Region already exists" },
         { status: 409 }
       )
     }
 
     // Create the region
-    const region = await createRegion(regionData)
+    const { data: region, error } = await supabase
+      .from('regions')
+      .insert({
+        country: regionData.country,
+        country_code: regionData.countryCode,
+        state: regionData.state,
+        city: regionData.city,
+        local_currency: regionData.localCurrency,
+        material_cost_index: regionData.materialCostIndex || null,
+        labor_cost_index: regionData.laborCostIndex || null,
+      })
+      .select()
+      .single()
+
+    if (error) {
+      console.error("Error creating region:", error)
+      return NextResponse.json({ error: "Failed to create region" }, { status: 500 })
+    }
+
     return NextResponse.json({ success: true, region }, { status: 201 })
   } catch (error: any) {
     console.error("Error creating region:", error)
