@@ -15,7 +15,7 @@ export async function updateSession(request: NextRequest) {
           return request.cookies.getAll()
         },
         setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) => request.cookies.set(name, value))
+          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
           supabaseResponse = NextResponse.next({
             request,
           })
@@ -40,8 +40,39 @@ export async function updateSession(request: NextRequest) {
                       request.nextUrl.pathname.startsWith('/sign-up') ||
                       request.nextUrl.pathname.startsWith('/admin/sign-in');
 
-  const isProtectedRoute = request.nextUrl.pathname.startsWith('/dashboard') || 
-                           request.nextUrl.pathname.startsWith('/admin') && !request.nextUrl.pathname.startsWith('/admin/sign-in');
+  const isAdminRoute = request.nextUrl.pathname.startsWith('/admin') &&
+                       !request.nextUrl.pathname.startsWith('/admin/sign-in');
+  const isProtectedRoute = request.nextUrl.pathname.startsWith('/dashboard') || isAdminRoute;
+  const adminEmail = (process.env.ADMIN_EMAIL || 'eshwar09052005@gmail.com').toLowerCase()
+  let isAdmin = false
+
+  if (user) {
+    try {
+      const { data: profile } = await supabase
+        .from('users')
+        .select('is_admin, is_approved, role')
+        .eq('id', user.id)
+        .maybeSingle()
+
+      isAdmin = Boolean(
+        profile?.is_admin ||
+        profile?.role === 'admin' ||
+        user.email?.toLowerCase() === adminEmail
+      )
+
+      const isApproved = profile?.is_approved !== false
+
+      if (isAdminRoute && (!isAdmin || !isApproved)) {
+        const redirectUrl = new URL('/dashboard', request.url)
+        return NextResponse.redirect(redirectUrl)
+      }
+    } catch {
+      if (isAdminRoute) {
+        const redirectUrl = new URL('/dashboard', request.url)
+        return NextResponse.redirect(redirectUrl)
+      }
+    }
+  }
 
   if (isProtectedRoute && !user) {
     const redirectUrl = request.nextUrl.pathname.startsWith('/admin') 
@@ -55,7 +86,6 @@ export async function updateSession(request: NextRequest) {
 
   if (isAuthRoute && user) {
     // Determine where to send them based on role if logged in
-    const isAdmin = user.email === 'admin@buildwise.ai' // Replace with proper role check later
     return NextResponse.redirect(new URL(isAdmin ? '/admin' : '/dashboard', request.url))
   }
 

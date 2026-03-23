@@ -39,7 +39,7 @@ function NavItem({ href, label, icon: Icon, active }: NavItemProps) {
         {active && (
           <motion.div 
             layoutId="activeNav"
-            className="absolute left-0 w-1 h-6 bg-indigo-500 rounded-r-full"
+            className="absolute left-0 w-1.5 h-6 bg-gradient-to-b from-indigo-500 to-violet-500 rounded-r-full shadow-[0_0_15px_rgba(99,102,241,0.5)]"
           />
         )}
       </div>
@@ -115,11 +115,12 @@ export function Sidebar() {
       </div>
 
       <div className="p-4 mt-auto">
-        <div className="p-4 rounded-2xl bg-gradient-to-b from-slate-800 to-slate-900 border border-slate-700/50">
-          <h4 className="text-sm font-semibold text-slate-200 mb-1">Upgrade Plans</h4>
-          <p className="text-xs text-slate-500 mb-3">Get access to professional AI features.</p>
-          <button className="w-full py-2 px-4 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition-all shadow-lg shadow-indigo-900/20">
-            Upgrade Pro
+        <div className="p-5 rounded-2xl bg-slate-900/60 border border-slate-800 backdrop-blur-sm relative overflow-hidden group">
+          <div className="absolute -right-4 -top-4 w-16 h-16 bg-indigo-500/10 blur-2xl rounded-full group-hover:bg-indigo-500/20 transition-colors duration-500" />
+          <h4 className="text-sm font-bold text-white mb-1 relative z-10">Upgrade to Pro</h4>
+          <p className="text-[11px] text-slate-400 mb-4 leading-relaxed relative z-10">Get access to professional AI designer tools & advanced materials.</p>
+          <button className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white text-xs font-bold transition-all shadow-lg shadow-indigo-900/20 active:scale-95 relative z-10">
+            Learn More
           </button>
         </div>
       </div>

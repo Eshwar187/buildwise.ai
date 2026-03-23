@@ -1,6 +1,6 @@
-import { NextResponse } from "next/server"
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
+import { errorResponse, successResponse } from "@/lib/api"
 
 export async function GET() {
   try {
@@ -20,12 +20,12 @@ export async function GET() {
     const { data: { user }, error } = await supabase.auth.getUser()
 
     if (error || !user) {
-      return NextResponse.json({ user: null }, { status: 401 })
+      return errorResponse("Unauthorized", 401, "unauthorized", { user: null })
     }
 
-    return NextResponse.json({ user })
+    return successResponse({ user })
   } catch (error) {
     console.error("Auth me error:", error)
-    return NextResponse.json({ user: null }, { status: 401 })
+    return errorResponse("Unauthorized", 401, "unauthorized", { user: null })
   }
 }

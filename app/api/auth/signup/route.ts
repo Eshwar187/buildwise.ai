@@ -1,32 +1,47 @@
-import { NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
+import { errorResponse, successResponse } from "@/lib/api"
+import { authSignUpSchema } from "@/lib/validation"
+
+function deriveNameParts(input: {
+  firstName?: string
+  lastName?: string
+  name?: string
+}) {
+  const fullName = input.name?.trim()
+  const firstName = input.firstName?.trim() || fullName?.split(/\s+/)[0] || ""
+  const lastName =
+    input.lastName?.trim() ||
+    fullName
+      ?.split(/\s+/)
+      .slice(1)
+      .join(" ")
+      .trim() ||
+    ""
+
+  return { firstName, lastName }
+}
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json()
-    const { firstName, lastName, email, password } = body
+    const parsedBody = await request.json().catch(() => null)
+    const body = authSignUpSchema.safeParse(parsedBody)
 
-    // Validate required fields
-    if (!email || !password) {
-      return NextResponse.json(
-        { error: "Email and password are required" },
-        { status: 400 }
-      )
-    }
-
-    if (password.length < 6) {
-      return NextResponse.json(
-        { error: "Password must be at least 6 characters" },
-        { status: 400 }
+    if (!body.success) {
+      return errorResponse(
+        body.error.issues[0]?.message || "Email and password are required",
+        400,
+        "validation_error",
+        body.error.flatten()
       )
     }
 
     const supabase = await createClient()
+    const { firstName, lastName } = deriveNameParts(body.data)
+    const email = body.data.email.toLowerCase()
 
-    // Sign up with Supabase Auth
     const { data, error } = await supabase.auth.signUp({
-      email: email.toLowerCase(),
-      password,
+      email,
+      password: body.data.password,
       options: {
         data: {
           first_name: firstName || "",
@@ -39,52 +54,43 @@ export async function POST(request: Request) {
     if (error) {
       console.error("Supabase signup error:", error.message)
       if (error.message.includes("already registered")) {
-        return NextResponse.json(
-          { error: "An account with this email already exists" },
-          { status: 409 }
-        )
+        return errorResponse("An account with this email already exists", 409, "conflict")
       }
-      return NextResponse.json({ error: error.message }, { status: 400 })
+      return errorResponse(error.message, 400, "registration_failed")
     }
 
     if (!data.user) {
-      return NextResponse.json(
-        { error: "Failed to create account" },
-        { status: 500 }
-      )
+      return errorResponse("Failed to create account", 500, "registration_failed")
     }
 
-    // Also create a row in the users table for app-level data
-    const { error: insertError } = await supabase
-      .from('users')
-      .insert({
-        id: data.user.id,
-        email: email.toLowerCase(),
-        username: email.split("@")[0],
-        first_name: firstName || null,
-        last_name: lastName || null,
-        is_admin: false,
-        is_approved: false,
-      })
+    const { error: insertError } = await supabase.from("users").insert({
+      id: data.user.id,
+      email,
+      username: email.split("@")[0],
+      first_name: firstName || null,
+      last_name: lastName || null,
+      is_admin: false,
+      is_approved: false,
+    })
 
     if (insertError) {
-      // User might already exist via a trigger – that's fine
-      console.warn("Insert users row warning:", insertError.message)
+      const code = (insertError as { code?: string }).code
+      if (code !== "PGRST205") {
+        console.warn("Insert users row warning:", insertError.message)
+      }
     }
 
-    return NextResponse.json({
+    return successResponse({
       user: {
         id: data.user.id,
         email: data.user.email,
         firstName,
         lastName,
       },
+      needsVerification: !data.session,
     })
   } catch (error) {
     console.error("Signup error:", error)
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    )
+    return errorResponse("Internal server error", 500)
   }
 }

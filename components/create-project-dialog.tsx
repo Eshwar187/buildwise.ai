@@ -109,10 +109,9 @@ export function CreateProjectDialog({
 }: CreateProjectDialogProps) {
   const [step, setStep] = useState(1);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [floorPlanTemplates, setFloorPlanTemplates] = useState<any[]>([]);
-  const [isLoadingTemplates, setIsLoadingTemplates] = useState(false);
   const [designers, setDesigners] = useState<any[]>([]);
   const [isLoadingDesigners, setIsLoadingDesigners] = useState(false);
+  const [autoGenerationAttempted, setAutoGenerationAttempted] = useState(false);
   const [projectData, setProjectData] = useState<ProjectData>({
     name: "",
     description: "",
@@ -151,18 +150,7 @@ export function CreateProjectDialog({
   });
 
   // State to track the active tab in step 5
-  const [activeTab, setActiveTab] = useState("templates");
-
-  // Fetch data when the dialog opens or tab changes
-  useEffect(() => {
-    if (open && step === 5) {
-      if (activeTab === "templates") {
-        fetchFloorPlanTemplates();
-      } else if (activeTab === "designers") {
-        fetchDesigners();
-      }
-    }
-  }, [open, step, activeTab]);
+  const [activeTab, setActiveTab] = useState("ai");
 
   // Fetch designers when location changes or when we reach step 5 and the designers tab is active
   useEffect(() => {
@@ -174,87 +162,6 @@ export function CreateProjectDialog({
       }
     }
   }, [projectData.location.city, projectData.location.state, projectData.location.country, step, activeTab]);
-
-  // Function to fetch floor plan templates
-  const fetchFloorPlanTemplates = async () => {
-    try {
-      setIsLoadingTemplates(true);
-      console.log('Fetching floor plan templates...');
-
-      // Use the new API endpoint that doesn't require authentication
-      const response = await fetch('/api/templates');
-      const data = await response.json();
-
-      console.log('API response:', data);
-
-      if (data.success && data.templates && data.templates.length > 0) {
-        setFloorPlanTemplates(data.templates);
-        console.log('Loaded templates:', data.templates);
-      } else {
-        console.warn('No templates returned from API, using fallback templates');
-        // Fallback to hardcoded templates
-        setFloorPlanTemplates([
-          {
-            projectId: 'project-1',
-            name: 'Modern House Floor Plan',
-            style: 'modern',
-            imageUrl: '/uploads/floor-plans/project-1/modern-floor-plan.svg',
-            bedrooms: 3,
-            bathrooms: 2
-          },
-          {
-            projectId: 'project-2',
-            name: 'Farmhouse Floor Plan',
-            style: 'farmhouse',
-            imageUrl: '/uploads/floor-plans/project-2/farmhouse-floor-plan.svg',
-            bedrooms: 4,
-            bathrooms: 3
-          },
-          {
-            projectId: 'project-3',
-            name: 'Cottage Floor Plan',
-            style: 'cottage',
-            imageUrl: '/uploads/floor-plans/project-3/cottage-floor-plan.svg',
-            bedrooms: 2,
-            bathrooms: 1
-          }
-        ]);
-      }
-    } catch (error) {
-      console.error('Error fetching floor plan templates:', error);
-      toast.error('Failed to load floor plan templates');
-
-      // Fallback to hardcoded templates on error
-      setFloorPlanTemplates([
-        {
-          projectId: 'project-1',
-          name: 'Modern House Floor Plan',
-          style: 'modern',
-          imageUrl: '/uploads/floor-plans/project-1/modern-floor-plan.svg',
-          bedrooms: 3,
-          bathrooms: 2
-        },
-        {
-          projectId: 'project-2',
-          name: 'Farmhouse Floor Plan',
-          style: 'farmhouse',
-          imageUrl: '/uploads/floor-plans/project-2/farmhouse-floor-plan.svg',
-          bedrooms: 4,
-          bathrooms: 3
-        },
-        {
-          projectId: 'project-3',
-          name: 'Cottage Floor Plan',
-          style: 'cottage',
-          imageUrl: '/uploads/floor-plans/project-3/cottage-floor-plan.svg',
-          bedrooms: 2,
-          bathrooms: 1
-        }
-      ]);
-    } finally {
-      setIsLoadingTemplates(false);
-    }
-  };
 
   // Function to fetch real-time designers based on location
   const fetchDesigners = async () => {
@@ -288,77 +195,13 @@ export function CreateProjectDialog({
         console.log('Loaded designers:', data.designers);
         toast.success(`Found ${data.designers.length} designers in ${locationString || 'your area'}`);
       } else {
-        console.warn('No designers returned from API, using fallback designers');
-        // Set fallback designers
-        setDesigners([
-          {
-            id: "designer-1",
-            name: "Sarah Johnson",
-            company: "Modern Space Designs",
-            experience: 12,
-            specialization: "Modern",
-            bio: "Award-winning designer with a passion for creating functional, beautiful spaces. Sarah has worked on projects across the country and brings a unique perspective to each design.",
-            phone: "(212) 555-1234",
-            email: "sarah@modernspacedesigns.com",
-            portfolio: "Specializes in open-concept living spaces with clean lines and sustainable materials.",
-            imageUrl: "/uploads/designers/designer-1.jpg"
-          },
-          {
-            id: "designer-2",
-            name: "Michael Chen",
-            company: "Harmony Interiors",
-            experience: 15,
-            specialization: "Contemporary",
-            bio: "Michael blends Eastern and Western design philosophies to create harmonious living spaces. His work emphasizes balance, flow, and connection to nature.",
-            phone: "(212) 555-5678",
-            email: "michael@harmonyinteriors.com",
-            portfolio: "Known for innovative use of natural light and indoor gardens.",
-            imageUrl: "/uploads/designers/designer-2.jpg"
-          },
-          {
-            id: "designer-3",
-            name: "Emily Rodriguez",
-            company: "Classic Revival",
-            experience: 8,
-            specialization: "Traditional",
-            bio: "Emily specializes in breathing new life into traditional design elements. She has a keen eye for detail and a deep appreciation for craftsmanship.",
-            phone: "(212) 555-9012",
-            email: "emily@classicrevival.com",
-            portfolio: "Focuses on elegant, timeless interiors with modern functionality.",
-            imageUrl: "/uploads/designers/designer-3.jpg"
-          }
-        ]);
-        toast.info('Using sample designers for demonstration');
+        console.warn('No designers returned from API');
+        setDesigners([]);
       }
     } catch (error) {
       console.error('Error fetching designers:', error);
       toast.error('Failed to load designers for your area');
-
-      // Set fallback designers on error
-      setDesigners([
-        {
-          id: "designer-1",
-          name: "Sarah Johnson",
-          company: "Modern Space Designs",
-          experience: 12,
-          specialization: "Modern",
-          bio: "Award-winning designer with a passion for creating functional, beautiful spaces.",
-          phone: "(212) 555-1234",
-          email: "sarah@modernspacedesigns.com",
-          imageUrl: "/uploads/designers/designer-1.jpg"
-        },
-        {
-          id: "designer-2",
-          name: "Michael Chen",
-          company: "Harmony Interiors",
-          experience: 15,
-          specialization: "Contemporary",
-          bio: "Michael blends Eastern and Western design philosophies to create harmonious living spaces.",
-          phone: "(212) 555-5678",
-          email: "michael@harmonyinteriors.com",
-          imageUrl: "/uploads/designers/designer-2.jpg"
-        }
-      ]);
+      setDesigners([]);
     } finally {
       setIsLoadingDesigners(false);
     }
@@ -639,64 +482,24 @@ export function CreateProjectDialog({
       console.log('Creating project with data:', finalProjectData);
       toast.info('Creating your project...');
 
-      // Try to create the project using our new API
-      try {
-        const response = await fetch('/api/project-create', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(finalProjectData),
-        });
+      const response = await fetch('/api/projects', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(finalProjectData),
+      });
 
-        const data = await response.json();
-
-        if (data.success) {
-          console.log('Project created successfully via direct API:', data.project);
-          toast.success('Project created successfully!');
-
-          // Redirect to the projects page to see the new project
-          console.log('Redirecting to projects page...');
-
-          // First, try to verify the project was created by calling the debug API
-          try {
-            const verifyResponse = await fetch('/api/debug/projects');
-            if (verifyResponse.ok) {
-              const verifyData = await verifyResponse.json();
-              console.log('Verify projects response:', verifyData);
-
-              if (verifyData.projects && verifyData.projects.length > 0) {
-                console.log(`Verified ${verifyData.projects.length} projects exist in database`);
-              } else {
-                console.warn('No projects found in database after creation');
-
-                // Try to fix projects
-                const fixResponse = await fetch('/api/debug/fix-projects');
-                if (fixResponse.ok) {
-                  const fixData = await fixResponse.json();
-                  console.log('Fix projects response:', fixData);
-                }
-              }
-            }
-          } catch (verifyError) {
-            console.error('Error verifying project creation:', verifyError);
-          }
-
-          // Add a small delay to ensure the project is saved before redirecting
-          setTimeout(() => {
-            // Force a hard refresh to ensure the projects list is updated
-            window.location.href = '/dashboard/projects?refresh=' + new Date().getTime();
-          }, 2000);
-        } else {
-          console.error('Error creating project via direct API:', data.error);
-          // Fall back to the original method
-          onSubmit(finalProjectData);
-        }
-      } catch (error) {
-        console.error('Error creating project via direct API:', error);
-        // Fall back to the original method
-        onSubmit(finalProjectData);
+      const data = await response.json().catch(() => null);
+      if (!response.ok) {
+        throw new Error(data?.error || 'Failed to create project');
       }
+
+      console.log('Project created successfully:', data?.project);
+      toast.success('Project created successfully!');
+      setTimeout(() => {
+        window.location.href = '/dashboard/projects?refresh=' + new Date().getTime();
+      }, 500);
 
       // Reset form
       setStep(1);
@@ -741,7 +544,7 @@ export function CreateProjectDialog({
       console.error('Error in handleSubmit:', error);
       toast.error('Failed to create project. Please try again.');
     }
-  }, [projectData, onSubmit, onOpenChange]);
+  }, [projectData, onOpenChange]);
 
   // State to track the generated floor plan for display in the preview tab
 
@@ -760,7 +563,6 @@ export function CreateProjectDialog({
           ...projectData.landDimensions,
           totalArea,
         },
-        userId: "anonymous", // Use anonymous user ID for now
       };
 
       console.log('Generating real-time floor plan with data:', aiProjectData);
@@ -775,9 +577,9 @@ export function CreateProjectDialog({
         body: JSON.stringify(aiProjectData),
       });
 
-      const data = await response.json();
+      const data = await response.json().catch(() => null);
 
-      if (data.success) {
+      if (response.ok && data?.success) {
         console.log('Floor plan generated successfully:', data.floorPlan);
         toast.success('Floor plan generated successfully!');
 
@@ -793,8 +595,8 @@ export function CreateProjectDialog({
         // Switch to the preview tab to show the generated floor plan
         setActiveTab("preview");
       } else {
-        console.error('Error generating floor plan:', data.error);
-        toast.error('Failed to generate floor plan. Please try again.');
+        console.error('Error generating floor plan:', data?.error);
+        toast.error(data?.error || 'Failed to generate floor plan. Please try again.');
       }
     } catch (error) {
       console.error('Error in handleGenerateAI:', error);
@@ -803,6 +605,22 @@ export function CreateProjectDialog({
       setIsGenerating(false);
     }
   }, [projectData, setActiveTab]);
+
+  useEffect(() => {
+    if (!open || step !== 5) return;
+    if (projectData.floorPlan || isGenerating || autoGenerationAttempted) return;
+
+    setAutoGenerationAttempted(true);
+    setActiveTab("ai");
+    handleGenerateAI();
+  }, [open, step, projectData.floorPlan, isGenerating, autoGenerationAttempted, handleGenerateAI]);
+
+  useEffect(() => {
+    if (!open) {
+      setAutoGenerationAttempted(false);
+      setActiveTab("ai");
+    }
+  }, [open]);
 
   const stepVariants = {
     hidden: { opacity: 0, x: 20 },
@@ -1361,23 +1179,17 @@ export function CreateProjectDialog({
                     Project Created Successfully!
                   </h3>
                   <p className="text-slate-400">
-                    Choose a floor plan template or generate an AI floor plan
+                    Your floor plan will be generated automatically using AI
                   </p>
                 </div>
 
-                <Tabs defaultValue="templates" className="w-full" value={activeTab} onValueChange={setActiveTab}>
+                <Tabs defaultValue="ai" className="w-full" value={activeTab} onValueChange={setActiveTab}>
                   <TabsList className="bg-slate-700 border border-slate-600">
                     <TabsTrigger
                       value="preview"
                       className="data-[state=active]:bg-slate-600"
                     >
                       <Building2 className="mr-2 h-4 w-4" /> Preview
-                    </TabsTrigger>
-                    <TabsTrigger
-                      value="templates"
-                      className="data-[state=active]:bg-slate-600"
-                    >
-                      <Building2 className="mr-2 h-4 w-4" /> Templates
                     </TabsTrigger>
                     <TabsTrigger
                       value="ai"
@@ -1464,71 +1276,6 @@ export function CreateProjectDialog({
                             onClick={() => setActiveTab("ai")}
                           >
                             Generate Floor Plan
-                          </Button>
-                        </div>
-                      )}
-                    </div>
-                  </TabsContent>
-
-                  <TabsContent value="templates" className="mt-4 space-y-4">
-                    <div className="bg-slate-700 p-4 rounded-md">
-                      <div className="flex justify-between items-center mb-4">
-                        <h4 className="text-white font-medium">
-                          Floor Plan Templates
-                        </h4>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="text-slate-300 hover:text-white"
-                          onClick={fetchFloorPlanTemplates}
-                        >
-                          <RefreshCw className="h-4 w-4 mr-2" /> Refresh
-                        </Button>
-                      </div>
-
-                      {isLoadingTemplates ? (
-                        <div className="flex justify-center items-center py-8">
-                          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-teal-500"></div>
-                        </div>
-                      ) : floorPlanTemplates.length > 0 ? (
-                        <div className="grid grid-cols-2 gap-4">
-                          {floorPlanTemplates.map((template) => (
-                            <div
-                              key={template.projectId}
-                              className={`relative border-2 rounded-md overflow-hidden cursor-pointer transition-all ${projectData.floorPlanTemplateId === template.projectId ? 'border-teal-500 ring-2 ring-teal-500/50' : 'border-slate-600 hover:border-slate-500'}`}
-                              onClick={() => setProjectData(prev => ({ ...prev, floorPlanTemplateId: template.projectId }))}
-                            >
-                              <div className="relative h-40 w-full">
-                                <Image
-                                  src={template.imageUrl}
-                                  alt={template.name || 'Floor plan template'}
-                                  fill
-                                  style={{ objectFit: 'cover' }}
-                                />
-                              </div>
-                              <div className="p-2 bg-slate-800">
-                                <p className="text-sm text-white truncate">{template.style} Style</p>
-                                <p className="text-xs text-slate-400">{template.bedrooms} bed, {template.bathrooms} bath</p>
-                              </div>
-                              {projectData.floorPlanTemplateId === template.projectId && (
-                                <div className="absolute top-2 right-2 bg-teal-500 text-white p-1 rounded-full">
-                                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                                  </svg>
-                                </div>
-                              )}
-                            </div>
-                          ))}
-                        </div>
-                      ) : (
-                        <div className="text-center py-8">
-                          <p className="text-slate-400 mb-4">No floor plan templates available</p>
-                          <Button
-                            variant="outline"
-                            className="border-slate-600 text-slate-300"
-                            onClick={fetchFloorPlanTemplates}
-                          >
-                            <RefreshCw className="h-4 w-4 mr-2" /> Try Again
                           </Button>
                         </div>
                       )}

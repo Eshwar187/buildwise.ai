@@ -1,13 +1,15 @@
-import { NextRequest, NextResponse } from "next/server"
+import { NextRequest } from "next/server"
 import { getAuthFromCookies } from "@/lib/auth"
 import { createClient } from "@/lib/supabase/server"
+import { errorResponse, successResponse } from "@/lib/api"
+import { materialCreateSchema, materialUpdateSchema } from "@/lib/validation"
 
 // GET endpoint to retrieve materials
 export async function GET(req: NextRequest) {
   try {
     const userId = await getAuthFromCookies()
     if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+      return errorResponse("Unauthorized", 401, "unauthorized")
     }
 
     const supabase = await createClient()
@@ -25,9 +27,9 @@ export async function GET(req: NextRequest) {
         .single()
         
       if (error || !material) {
-        return NextResponse.json({ error: "Material not found" }, { status: 404 })
+        return errorResponse("Material not found", 404, "not_found")
       }
-      return NextResponse.json({ material }, { status: 200 })
+      return successResponse({ material })
     }
 
     // If category is provided, return materials for that category
@@ -40,7 +42,7 @@ export async function GET(req: NextRequest) {
       if (error) {
         throw error
       }
-      return NextResponse.json({ materials: materials || [] }, { status: 200 })
+      return successResponse({ materials: materials || [] })
     }
 
     // Otherwise, return all materials
@@ -52,13 +54,10 @@ export async function GET(req: NextRequest) {
     if (error) {
       throw error
     }
-    return NextResponse.json({ materials: materials || [] }, { status: 200 })
+    return successResponse({ materials: materials || [] })
   } catch (error: any) {
     console.error("Error retrieving materials:", error)
-    return NextResponse.json(
-      { error: error.message || "Failed to retrieve materials" },
-      { status: 500 }
-    )
+    return errorResponse(error.message || "Failed to retrieve materials", 500)
   }
 }
 
@@ -67,46 +66,36 @@ export async function POST(req: NextRequest) {
   try {
     const userId = await getAuthFromCookies()
     if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+      return errorResponse("Unauthorized", 401, "unauthorized")
     }
 
-    const materialData = await req.json()
+    const parsedBody = await req.json().catch(() => null)
+    const materialData = materialCreateSchema.safeParse(parsedBody)
     const supabase = await createClient()
-    
-    // Validate required fields
-    const requiredFields = [
-      "name", 
-      "category", 
-      "description", 
-      "costPerUnit", 
-      "unit", 
-      "currency", 
-      "sustainability", 
-      "durability", 
-      "energyEfficiency", 
-      "locallyAvailable"
-    ]
-    
-    for (const field of requiredFields) {
-      if (materialData[field] === undefined) {
-        return NextResponse.json({ error: `Missing required field: ${field}` }, { status: 400 })
-      }
+
+    if (!materialData.success) {
+      return errorResponse(
+        materialData.error.issues[0]?.message || "Missing required material fields",
+        400,
+        "validation_error",
+        materialData.error.flatten()
+      )
     }
 
     // Create the material
     const { data: material, error } = await supabase
       .from("materials")
       .insert([{
-        name: materialData.name,
-        category: materialData.category,
-        description: materialData.description,
-        cost_per_unit: materialData.costPerUnit,
-        unit: materialData.unit,
-        currency: materialData.currency,
-        sustainability: materialData.sustainability,
-        durability: materialData.durability,
-        energy_efficiency: materialData.energyEfficiency,
-        locally_available: materialData.locallyAvailable,
+        name: materialData.data.name,
+        category: materialData.data.category,
+        description: materialData.data.description,
+        cost_per_unit: materialData.data.costPerUnit,
+        unit: materialData.data.unit,
+        currency: materialData.data.currency,
+        sustainability: materialData.data.sustainability,
+        durability: materialData.data.durability,
+        energy_efficiency: materialData.data.energyEfficiency,
+        locally_available: materialData.data.locallyAvailable,
         created_by: userId,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
@@ -118,13 +107,10 @@ export async function POST(req: NextRequest) {
       throw error
     }
       
-    return NextResponse.json({ success: true, material }, { status: 201 })
+    return successResponse({ material }, { status: 201 })
   } catch (error: any) {
     console.error("Error creating material:", error)
-    return NextResponse.json(
-      { error: error.message || "Failed to create material" },
-      { status: 500 }
-    )
+    return errorResponse(error.message || "Failed to create material", 500)
   }
 }
 
@@ -133,15 +119,23 @@ export async function PUT(req: NextRequest) {
   try {
     const userId = await getAuthFromCookies()
     if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+      return errorResponse("Unauthorized", 401, "unauthorized")
     }
 
-    const { id, ...updateData } = await req.json()
+    const parsedBody = await req.json().catch(() => null)
+    const body = materialUpdateSchema.safeParse(parsedBody)
     const supabase = await createClient()
 
-    if (!id) {
-      return NextResponse.json({ error: "Missing material ID" }, { status: 400 })
+    if (!body.success) {
+      return errorResponse(
+        body.error.issues[0]?.message || "Missing material ID",
+        400,
+        "validation_error",
+        body.error.flatten()
+      )
     }
+
+    const { id, ...updateData } = body.data
 
     // Map camelCase to snake_case for Supabase
     const supabaseUpdateData: any = {
@@ -170,16 +164,13 @@ export async function PUT(req: NextRequest) {
     }
     
     if (!data || data.length === 0) {
-      return NextResponse.json({ error: "Material not found or update failed" }, { status: 404 })
+      return errorResponse("Material not found or update failed", 404, "not_found")
     }
 
-    return NextResponse.json({ success: true, modifiedCount: data.length }, { status: 200 })
+    return successResponse({ modifiedCount: data.length })
   } catch (error: any) {
     console.error("Error updating material:", error)
-    return NextResponse.json(
-      { error: error.message || "Failed to update material" },
-      { status: 500 }
-    )
+    return errorResponse(error.message || "Failed to update material", 500)
   }
 }
 
@@ -188,7 +179,7 @@ export async function DELETE(req: NextRequest) {
   try {
     const userId = await getAuthFromCookies()
     if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+      return errorResponse("Unauthorized", 401, "unauthorized")
     }
 
     const url = new URL(req.url)
@@ -196,7 +187,7 @@ export async function DELETE(req: NextRequest) {
     const supabase = await createClient()
 
     if (!id) {
-      return NextResponse.json({ error: "Missing material ID" }, { status: 400 })
+      return errorResponse("Missing material ID", 400, "validation_error")
     }
 
     const { error, count } = await supabase
@@ -209,15 +200,12 @@ export async function DELETE(req: NextRequest) {
     }
     
     if (count === 0) {
-      return NextResponse.json({ error: "Material not found" }, { status: 404 })
+      return errorResponse("Material not found", 404, "not_found")
     }
 
-    return NextResponse.json({ success: true, deletedCount: count }, { status: 200 })
+    return successResponse({ deletedCount: count })
   } catch (error: any) {
     console.error("Error deleting material:", error)
-    return NextResponse.json(
-      { error: error.message || "Failed to delete material" },
-      { status: 500 }
-    )
+    return errorResponse(error.message || "Failed to delete material", 500)
   }
 }

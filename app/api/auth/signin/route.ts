@@ -1,16 +1,18 @@
-import { NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
+import { errorResponse, successResponse } from "@/lib/api"
+import { authSignInSchema } from "@/lib/validation"
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json()
-    const { email, password } = body
+    const parsedBody = await request.json().catch(() => null)
+    const body = authSignInSchema.safeParse(parsedBody)
 
-    // Validate required fields
-    if (!email || !password) {
-      return NextResponse.json(
-        { error: "Email and password are required" },
-        { status: 400 }
+    if (!body.success) {
+      return errorResponse(
+        body.error.issues[0]?.message || "Email and password are required",
+        400,
+        "validation_error",
+        body.error.flatten()
       )
     }
 
@@ -18,29 +20,25 @@ export async function POST(request: Request) {
 
     // Sign in with Supabase Auth
     const { data, error } = await supabase.auth.signInWithPassword({
-      email: email.toLowerCase(),
-      password,
+      email: body.data.email.toLowerCase(),
+      password: body.data.password,
     })
 
     if (error) {
       console.error("Supabase signin error:", error.message)
-      return NextResponse.json(
-        { error: error.message === "Invalid login credentials"
-            ? "Invalid email or password"
-            : error.message },
-        { status: 401 }
+      return errorResponse(
+        error.message === "Invalid login credentials" ? "Invalid email or password" : error.message,
+        401,
+        "authentication_failed"
       )
     }
 
     if (!data.user) {
-      return NextResponse.json(
-        { error: "Invalid email or password" },
-        { status: 401 }
-      )
+      return errorResponse("Invalid email or password", 401, "authentication_failed")
     }
 
     // Return user info (Supabase session is set via cookies automatically)
-    return NextResponse.json({
+    return successResponse({
       user: {
         id: data.user.id,
         email: data.user.email,
@@ -50,9 +48,6 @@ export async function POST(request: Request) {
     })
   } catch (error) {
     console.error("Signin error:", error)
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    )
+    return errorResponse("Internal server error", 500)
   }
 }

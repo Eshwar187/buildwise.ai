@@ -1,338 +1,514 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
-import { useRouter } from "next/navigation"
-import { motion, AnimatePresence } from "framer-motion"
-import { Button } from "@/components/ui/button"
-import { Volume2, VolumeX, ChevronDown, Sparkles, Shield, Zap, ArrowRight } from "lucide-react"
 import Link from "next/link"
+import { motion } from "framer-motion"
+import {
+  ArrowRight,
+  Building2,
+  CheckCircle2,
+  Cpu,
+  Globe,
+  Shield,
+  Sparkles,
+  Target,
+  TrendingUp,
+  Users2,
+  Zap,
+} from "lucide-react"
+import type { LucideIcon } from "lucide-react"
+import { Button } from "@/components/ui/button"
 import { HomeHeader } from "@/components/home-header"
-import { useAuth } from "@/components/auth-provider"
 
-export default function Home() {
-  const router = useRouter()
-  const { user, isLoaded } = useAuth()
-  const isSignedIn = !!user
-  const [isMuted, setIsMuted] = useState(true)
-  const audioRef = useRef<HTMLAudioElement | null>(null)
-  const [currentSection, setCurrentSection] = useState(0)
-  const [isVisible, setIsVisible] = useState(false)
+type Tone = "indigo" | "violet" | "cyan" | "emerald" | "amber" | "rose" | "fuchsia"
 
-  const toggleMute = () => setIsMuted(!isMuted)
+type ToneStyle = {
+  glow: string
+  iconBg: string
+  iconBorder: string
+  iconText: string
+}
 
-  const scrollToFeatures = () => {
-    document.getElementById("features")?.scrollIntoView({ behavior: "smooth" })
-  }
+type Feature = {
+  title: string
+  desc: string
+  kicker: string
+  icon: LucideIcon
+  tone: Tone
+}
 
-  useEffect(() => {
-    if (isLoaded && isSignedIn) {
-      window.location.href = '/dashboard'
-    }
-  }, [isLoaded, isSignedIn])
+type WorkflowStep = {
+  title: string
+  desc: string
+  icon: LucideIcon
+}
 
-  useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.volume = 0.2
-      audioRef.current.muted = isMuted
-    }
-  }, [isMuted])
+type Signal = {
+  label: string
+  value: string
+  detail: string
+  icon: LucideIcon
+  tone: Tone
+}
 
-  useEffect(() => {
-    setIsVisible(true)
-    const timer = setInterval(() => {
-      setCurrentSection((prev) => (prev + 1) % 3)
-    }, 5000)
-    return () => clearInterval(timer)
-  }, [])
+const toneStyles: Record<Tone, ToneStyle> = {
+  indigo: {
+    glow: "from-indigo-500/20 via-indigo-500/5 to-transparent",
+    iconBg: "bg-indigo-500/10",
+    iconBorder: "border-indigo-400/20",
+    iconText: "text-indigo-300",
+  },
+  violet: {
+    glow: "from-violet-500/20 via-violet-500/5 to-transparent",
+    iconBg: "bg-violet-500/10",
+    iconBorder: "border-violet-400/20",
+    iconText: "text-violet-300",
+  },
+  cyan: {
+    glow: "from-cyan-500/20 via-cyan-500/5 to-transparent",
+    iconBg: "bg-cyan-500/10",
+    iconBorder: "border-cyan-400/20",
+    iconText: "text-cyan-300",
+  },
+  emerald: {
+    glow: "from-emerald-500/20 via-emerald-500/5 to-transparent",
+    iconBg: "bg-emerald-500/10",
+    iconBorder: "border-emerald-400/20",
+    iconText: "text-emerald-300",
+  },
+  amber: {
+    glow: "from-amber-500/20 via-amber-500/5 to-transparent",
+    iconBg: "bg-amber-500/10",
+    iconBorder: "border-amber-400/20",
+    iconText: "text-amber-300",
+  },
+  rose: {
+    glow: "from-rose-500/20 via-rose-500/5 to-transparent",
+    iconBg: "bg-rose-500/10",
+    iconBorder: "border-rose-400/20",
+    iconText: "text-rose-300",
+  },
+  fuchsia: {
+    glow: "from-fuchsia-500/20 via-fuchsia-500/5 to-transparent",
+    iconBg: "bg-fuchsia-500/10",
+    iconBorder: "border-fuchsia-400/20",
+    iconText: "text-fuchsia-300",
+  },
+}
 
-  if (!isLoaded) {
-    return (
-      <div className="min-h-screen bg-[#020617] flex items-center justify-center">
-        <div className="relative">
-          <div className="w-16 h-16 border-4 border-cyan-500/20 border-t-cyan-500 rounded-full animate-spin"></div>
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="w-8 h-8 bg-cyan-500/10 rounded-full blur-sm"></div>
-          </div>
-        </div>
-      </div>
-    )
-  }
+const heroBullets = [
+  {
+    title: "Generative layout",
+    copy: "Explore options around constraints, circulation, and daylight without losing speed.",
+  },
+  {
+    title: "Cost awareness",
+    copy: "Keep budget and material tradeoffs visible as the plan evolves.",
+  },
+  {
+    title: "Team-ready outputs",
+    copy: "Share clean context with designers, builders, and owners in one workspace.",
+  },
+]
 
-  const container = {
-    hidden: { opacity: 0 },
-    show: { opacity: 1, transition: { staggerChildren: 0.2 } },
-  }
+const dashboardSignals: Signal[] = [
+  {
+    label: "Risk confidence",
+    value: "98.4%",
+    detail: "verified against current scope and delivery assumptions",
+    icon: TrendingUp,
+    tone: "emerald",
+  },
+  {
+    label: "Active collaborators",
+    value: "12 teams",
+    detail: "coordinating in one shared environment",
+    icon: Users2,
+    tone: "indigo",
+  },
+  {
+    label: "Scope to review",
+    value: "45 min",
+    detail: "to the first polished, shareable plan",
+    icon: Building2,
+    tone: "violet",
+  },
+]
 
-  const item = {
-    hidden: { opacity: 0, y: 20 },
-    show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
-  }
+const workflowSteps: WorkflowStep[] = [
+  {
+    title: "Shape the brief",
+    desc: "Capture goals, constraints, and references in one clear starting point.",
+    icon: Sparkles,
+  },
+  {
+    title: "Model the tradeoffs",
+    desc: "Generate options, compare risk, and surface the consequences before approval.",
+    icon: Target,
+  },
+  {
+    title: "Deliver with confidence",
+    desc: "Hand off a coordinated plan that designers, builders, and owners can act on.",
+    icon: Users2,
+  },
+]
 
-  const heroSections = [
-    {
-      title: "AI-Powered Architecture",
-      description: "Visionary design meets generative intelligence. Construct detailed floor plans with BuildWise.ai.",
-      image: "https://images.unsplash.com/photo-1503387762-592dea58ef23?auto=format&fit=crop&q=80&w=2000",
-    },
-    {
-      title: "Precision Material Estimation",
-      description: "Real-time cost analysis and sustainable selections tailored to your specific project needs.",
-      image: "https://images.unsplash.com/photo-1541888946425-d81bb19480c5?auto=format&fit=crop&q=80&w=2000",
-    },
-    {
-      title: "Seamless Expert Synergy",
-      description: "Collaborate with top-tier contractors and designers in a unified digital ecosystem.",
-      image: "https://images.unsplash.com/photo-1581094794329-c8112a89af12?auto=format&fit=crop&q=80&w=2000",
-    },
-  ]
+const proofStats = [
+  {
+    value: "2,500+",
+    label: "projects modeled",
+    detail: "across planning, design, and delivery",
+  },
+  {
+    value: "$420M",
+    label: "cost preserved",
+    detail: "through earlier risk and scope decisions",
+  },
+  {
+    value: "65%",
+    label: "risk reduction",
+    detail: "when teams follow platform recommendations",
+  },
+  {
+    value: "3x",
+    label: "faster iteration",
+    detail: "between concept and review-ready output",
+  },
+]
 
+const features: Feature[] = [
+  {
+    title: "Generative Design",
+    desc: "Explore thousands of optimized design possibilities based on your specific requirements and constraints.",
+    kicker: "Design intelligence",
+    icon: Cpu,
+    tone: "indigo",
+  },
+  {
+    title: "Predictive Analytics",
+    desc: "Identify potential delays and cost overruns before they occur with advanced risk-modeling engines.",
+    kicker: "Risk modeling",
+    icon: Target,
+    tone: "fuchsia",
+  },
+  {
+    title: "Unified AEC Data",
+    desc: "Connect BIM, scheduling, and financial data into a single source of truth for seamless collaboration.",
+    kicker: "Shared context",
+    icon: Globe,
+    tone: "cyan",
+  },
+  {
+    title: "Eco-Optimization",
+    desc: "Reduce the carbon footprint of your projects through AI-driven material and energy analysis.",
+    kicker: "Sustainability",
+    icon: Zap,
+    tone: "emerald",
+  },
+  {
+    title: "Smart Compliance",
+    desc: "Automate regulatory checks and ensure your projects meet local codes and standards instantly.",
+    kicker: "Code readiness",
+    icon: Shield,
+    tone: "amber",
+  },
+  {
+    title: "Real-time Insight",
+    desc: "Dynamic dashboards that provide a pulse on every aspect of your project lifecycle.",
+    kicker: "Live operations",
+    icon: TrendingUp,
+    tone: "rose",
+  },
+]
+
+const reveal = {
+  hidden: { opacity: 0, y: 24 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.7, ease: "easeOut" } },
+}
+
+export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-[#020617] text-slate-200 selection:bg-cyan-500/30 selection:text-white overflow-x-hidden">
-      <audio ref={audioRef} src="/song.mp3" loop autoPlay muted={isMuted} />
+    <div className="relative min-h-screen overflow-x-hidden bg-[radial-gradient(circle_at_top,_rgba(79,70,229,0.16),transparent_30%),radial-gradient(circle_at_bottom_right,_rgba(14,165,233,0.1),transparent_28%),linear-gradient(180deg,#020617_0%,#0f172a_100%)] text-white selection:bg-indigo-500/30 selection:text-white">
       <HomeHeader />
 
-      <div className="fixed bottom-8 right-8 z-50">
-        <Button 
-          variant="secondary" 
-          size="icon" 
-          onClick={toggleMute} 
-          className="rounded-full bg-slate-900/40 backdrop-blur-md border border-white/10 hover:bg-slate-800/60 shadow-xl transition-all"
-        >
-          {isMuted ? <VolumeX className="w-5 h-5 text-slate-400" /> : <Volume2 className="w-5 h-5 text-cyan-400" />}
-        </Button>
-      </div>
+      <main>
+        <section id="product" className="relative isolate overflow-hidden pb-20 pt-28 sm:pt-32 md:pt-36 lg:pb-24">
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute left-1/2 top-[-10rem] h-[28rem] w-[28rem] -translate-x-1/2 rounded-full bg-indigo-500/20 blur-[120px]"
+          />
 
-      {/* Hero Section */}
-      <section className="relative h-screen flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 z-0">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={currentSection}
-              initial={{ opacity: 0, scale: 1.05 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              transition={{ duration: 1.2, ease: "easeInOut" }}
-              className="absolute inset-0"
-            >
-              <div
-                className="w-full h-full bg-cover bg-center transition-transform duration-[5000ms]"
-                style={{
-                  backgroundImage: `url(${heroSections[currentSection].image})`,
-                }}
-              />
-              <div className="absolute inset-0 bg-gradient-to-b from-[#020617]/80 via-[#020617]/40 to-[#020617]" />
-            </motion.div>
-          </AnimatePresence>
-        </div>
+          <div className="mx-auto grid w-full max-w-7xl items-center gap-14 px-4 sm:px-6 lg:grid-cols-[1.02fr_0.98fr] lg:px-8">
+            <motion.div variants={reveal} initial="hidden" animate="show" className="relative z-10">
+              <span className="eyebrow">
+                <Sparkles className="size-3.5 text-indigo-300" />
+                AI-native planning for ambitious AEC teams
+              </span>
 
-        <div className="container mx-auto px-6 z-10 text-center">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={currentSection}
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -30 }}
-              transition={{ duration: 0.8, ease: "circOut" }}
-              className="max-w-4xl mx-auto"
-            >
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.2 }}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-sm font-medium mb-8 backdrop-blur-sm shadow-[0_0_20px_rgba(34,211,238,0.1)]"
-              >
-                <Sparkles className="w-4 h-4" />
-                <span>Next-Gen Construction Intel</span>
-              </motion.div>
+              <h1 className="mt-7 max-w-3xl text-5xl font-semibold tracking-tight leading-[1.02] sm:text-6xl lg:text-7xl xl:text-8xl">
+                Turn project complexity into a clear path to build.
+              </h1>
 
-              <motion.h1 
-                className="text-6xl md:text-8xl font-bold mb-6 tracking-tight bg-clip-text text-transparent bg-gradient-to-b from-white to-slate-400"
-              >
-                {heroSections[currentSection].title}
-              </motion.h1>
-              
-              <motion.p 
-                className="text-lg md:text-xl text-slate-400 mb-10 max-w-2xl mx-auto leading-relaxed"
-              >
-                {heroSections[currentSection].description}
-              </motion.p>
+              <p className="mt-6 max-w-2xl section-copy">
+                BuildWise.ai combines generative design, risk intelligence, and material guidance so teams can move from concept to confident execution faster.
+              </p>
 
-              <motion.div 
-                className="flex flex-col sm:flex-row gap-5 justify-center"
-              >
-                <Button
-                  size="lg"
-                  className="h-14 px-8 bg-cyan-500 hover:bg-cyan-400 text-slate-900 font-semibold rounded-full shadow-[0_0_30px_rgba(34,211,238,0.3)] transition-all group"
-                  onClick={() => router.push("/sign-up")}
-                >
-                  Start Building
-                  <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+                <Button asChild size="lg" className="h-12 rounded-full border border-indigo-400/20 bg-indigo-600 px-6 text-base font-semibold text-white shadow-lg shadow-indigo-500/20 hover:bg-indigo-500">
+                  <Link href="/sign-up">
+                    Start your workspace
+                    <ArrowRight className="size-4" />
+                  </Link>
                 </Button>
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="h-14 px-8 border-slate-700 bg-white/5 backdrop-blur-md hover:bg-white/10 text-white rounded-full transition-all"
-                  onClick={scrollToFeatures}
-                >
-                  Explore Capabilities
+                <Button asChild size="lg" variant="outline" className="h-12 rounded-full border-white/10 bg-white/5 px-6 text-base text-white hover:bg-white/10">
+                  <Link href="#features">See the platform</Link>
                 </Button>
-              </motion.div>
-            </motion.div>
-          </AnimatePresence>
+              </div>
 
-          <div className="absolute bottom-12 left-1/2 -translate-x-1/2">
+              <div className="mt-8 grid gap-3 sm:grid-cols-3">
+                {heroBullets.map((bullet, index) => (
+                  <motion.div
+                    key={bullet.title}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.15 + index * 0.08 }}
+                    className="surface-panel rounded-3xl p-4"
+                  >
+                    <div className="flex items-start gap-3">
+                      <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-emerald-400" />
+                      <div>
+                        <p className="text-sm font-medium text-white">{bullet.title}</p>
+                        <p className="mt-1 text-xs leading-5 text-slate-400">{bullet.copy}</p>
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
+
             <motion.div
-              animate={{ y: [0, 8, 0] }}
-              transition={{ repeat: Infinity, duration: 2.5 }}
-              className="p-3 bg-white/5 backdrop-blur-sm rounded-full border border-white/10 cursor-pointer hover:bg-white/10 transition-colors"
-              onClick={scrollToFeatures}
+              variants={reveal}
+              initial="hidden"
+              animate="show"
+              transition={{ delay: 0.12 }}
+              className="relative mx-auto w-full max-w-xl"
             >
-              <ChevronDown className="w-5 h-5 text-slate-400" />
+              <div className="absolute -inset-8 rounded-[2.5rem] bg-[radial-gradient(circle_at_top,_rgba(99,102,241,0.35),transparent_55%),radial-gradient(circle_at_bottom_right,_rgba(45,212,191,0.18),transparent_45%)] blur-3xl" />
+              <div className="surface-panel-strong relative overflow-hidden rounded-[2rem] p-6 sm:p-7">
+                <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.08),transparent_45%),linear-gradient(180deg,rgba(15,23,42,0.12),rgba(15,23,42,0.75))]" />
+
+                <div className="relative inline-flex items-center gap-2 rounded-full border border-white/10 bg-slate-950/75 px-3 py-1.5 text-xs font-medium text-slate-200 backdrop-blur-xl">
+                  <Sparkles className="size-3.5 text-indigo-300" />
+                  Live design ops
+                </div>
+
+                <div className="relative mt-4 hidden rounded-2xl border border-white/10 bg-slate-950/80 px-4 py-3 backdrop-blur-xl sm:block">
+                  <p className="text-[10px] uppercase tracking-[0.22em] text-slate-500">Risk signal</p>
+                  <p className="mt-1 text-sm font-semibold text-emerald-300">98.4% confidence</p>
+                </div>
+
+                <div className="relative mt-4 grid gap-3 sm:grid-cols-3">
+                  {dashboardSignals.map((signal) => {
+                    const tone = toneStyles[signal.tone]
+                    return (
+                      <div key={signal.label} className="rounded-2xl border border-white/10 bg-slate-950/80 p-3 backdrop-blur-xl">
+                        <div className="flex items-center gap-2">
+                          <div className={`flex h-8 w-8 items-center justify-center rounded-xl ${tone.iconBg} ring-1 ${tone.iconBorder}`}>
+                            <signal.icon className={`size-4 ${tone.iconText}`} />
+                          </div>
+                          <div>
+                            <p className="text-[10px] uppercase tracking-[0.22em] text-slate-500">{signal.label}</p>
+                            <p className="text-sm font-semibold text-white">{signal.value}</p>
+                          </div>
+                        </div>
+                        <p className="mt-2 text-xs leading-5 text-slate-400">{signal.detail}</p>
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
             </motion.div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Features Section */}
-      <section id="features" className="py-32 relative">
-        <div className="container mx-auto px-6 relative z-10">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center mb-24"
-          >
-            <h2 className="text-4xl md:text-5xl font-bold mb-6 text-white tracking-tight">
-              Engineered for Excellence
-            </h2>
-            <p className="text-lg text-slate-400 max-w-2xl mx-auto leading-relaxed">
-              BuildWise.ai integrates high-performance AI frameworks with deep architectural knowledge to streamline your workflow.
-            </p>
-          </motion.div>
-
-          <motion.div
-            variants={container}
-            initial="hidden"
-            whileInView="show"
-            viewport={{ once: true }}
-            className="grid grid-cols-1 md:grid-cols-3 gap-8"
-          >
-            {[
-              {
-                icon: <Zap className="w-6 h-6" />,
-                title: "Gemini High-Speed Engine",
-                description: "Leverage Google's Gemini models for rapid design iteration and real-time architectural insights.",
-                gradient: "from-cyan-500/20 to-teal-500/20",
-                border: "hover:border-cyan-500/40"
-              },
-              {
-                icon: <Shield className="w-6 h-6" />,
-                title: "Sustainable Sourcing",
-                description: "AI-curated material recommendations that balance ecological impact with project cost efficiency.",
-                gradient: "from-teal-500/20 to-emerald-500/20",
-                border: "hover:border-teal-500/40"
-              },
-              {
-                icon: <Sparkles className="w-6 h-6" />,
-                title: "Precision Matching",
-                description: "Our proprietary algorithm connects you with certified local designers who match your aesthetic profile.",
-                gradient: "from-purple-500/20 to-cyan-500/20",
-                border: "hover:border-purple-500/40"
-              }
-            ].map((feature, idx) => (
-              <motion.div
-                key={idx}
-                variants={item}
-                whileHover={{ y: -8 }}
-                className={`p-10 rounded-3xl bg-slate-900/50 backdrop-blur-xl border border-white/5 ${feature.border} transition-all group`}
-              >
-                <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${feature.gradient} flex items-center justify-center mb-8 border border-white/10 group-hover:scale-110 transition-transform`}>
-                  {feature.icon}
-                </div>
-                <h3 className="text-2xl font-bold mb-4 text-white group-hover:text-cyan-400 transition-colors">{feature.title}</h3>
-                <p className="text-slate-400 leading-relaxed group-hover:text-slate-300 transition-colors">{feature.description}</p>
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-32 relative overflow-hidden">
-        <div className="absolute inset-0 bg-cyan-500/5 blur-[120px] rounded-full -translate-y-1/2" />
-        <div className="container mx-auto px-6 relative z-10 text-center">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            className="max-w-4xl mx-auto p-16 rounded-[3rem] bg-slate-900/30 backdrop-blur-2xl border border-white/5 shadow-2xl"
-          >
-            <h2 className="text-4xl md:text-6xl font-bold mb-8 text-white tracking-tight">
-              Construct Your Vision
-            </h2>
-            <p className="text-xl text-slate-400 mb-12 max-w-2xl mx-auto leading-relaxed">
-              Join the elite circle of builders and designers defining the next era of construction with BuildWise.ai.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-6 justify-center">
-              <Button
-                size="lg"
-                className="h-16 px-10 bg-white hover:bg-slate-200 text-slate-900 font-bold rounded-full transition-all shadow-xl shadow-white/5"
-                onClick={() => router.push("/sign-up")}
-              >
-                Architect Your Account
-              </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                className="h-16 px-10 border-slate-700 bg-slate-900/40 backdrop-blur-md hover:bg-slate-800 text-white rounded-full transition-all"
-                onClick={() => router.push("/sign-in")}
-              >
-                Sign In
-              </Button>
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="py-20 border-t border-white/5 bg-[#020617]/50">
-        <div className="container mx-auto px-6">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-16 mb-20">
-            <div className="col-span-1 md:col-span-1">
-              <Link href="/" className="inline-flex items-center gap-2 mb-6 group">
-                <div className="w-10 h-10 bg-cyan-500 rounded-xl flex items-center justify-center shadow-lg shadow-cyan-500/20 group-hover:scale-110 transition-transform">
-                  <span className="text-slate-900 font-black text-xl">B</span>
-                </div>
-                <span className="text-2xl font-bold text-white tracking-tight">BuildWise<span className="text-cyan-500">.ai</span></span>
-              </Link>
-              <p className="text-slate-500 leading-relaxed">
-                Empowering the modern architect with generative intelligence and precision tools.
+        <section id="platform" className="border-y border-white/5 bg-white/[0.02] py-8">
+          <div className="mx-auto grid w-full max-w-7xl gap-6 px-4 sm:px-6 lg:grid-cols-[0.85fr_1.15fr] lg:px-8">
+            <div className="space-y-3">
+              <span className="eyebrow">Platform workflow</span>
+              <h2 className="section-title">A focused operating system for every project stage.</h2>
+              <p className="section-copy">
+                From initial feasibility to designer handoff, BuildWise keeps the next decision obvious.
               </p>
             </div>
-            {["Platform", "Resources", "Company"].map((title, i) => (
-              <div key={i}>
-                <h4 className="text-sm font-bold text-slate-300 uppercase tracking-widest mb-6">{title}</h4>
-                <ul className="space-y-4">
-                  {["Link One", "Link Two", "Link Three"].map((link, j) => (
-                    <li key={j}>
-                      <Link href="#" className="text-slate-500 hover:text-cyan-400 transition-colors text-sm font-medium">{link}</Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
-          <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-8">
-            <p className="text-slate-600 text-sm">© {new Date().getFullYear()} BuildWise.ai. Built for the future.</p>
-            <div className="flex gap-8">
-              {["Terms", "Privacy", "Security"].map((legal, i) => (
-                <Link key={i} href="#" className="text-slate-600 hover:text-slate-400 transition-colors text-sm">{legal}</Link>
+
+            <div className="grid gap-4 md:grid-cols-3">
+              {workflowSteps.map((step, index) => (
+                <motion.div
+                  key={step.title}
+                  initial={{ opacity: 0, y: 18 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.4 }}
+                  transition={{ delay: index * 0.08 }}
+                  className="surface-panel card-lift rounded-[1.5rem] p-5"
+                >
+                  <div className="mb-5 flex h-11 w-11 items-center justify-center rounded-2xl border border-white/10 bg-white/5">
+                    <step.icon className="size-5 text-indigo-300" />
+                  </div>
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-slate-500">0{index + 1}</p>
+                  <h3 className="mt-3 text-lg font-semibold text-white">{step.title}</h3>
+                  <p className="mt-2 text-sm leading-6 text-slate-400">{step.desc}</p>
+                </motion.div>
               ))}
             </div>
           </div>
+        </section>
+
+        <section id="proof" className="py-20 md:py-24">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+              <div className="max-w-2xl">
+                <span className="eyebrow">Measured impact</span>
+                <h2 className="mt-5 section-title">Built to show value before the first permit is filed.</h2>
+                <p className="mt-4 section-copy">
+                  The platform surfaces cost, risk, and collaboration signals in a format teams can act on quickly.
+                </p>
+              </div>
+
+              <Button asChild variant="ghost" className="rounded-full border border-white/10 bg-white/5 px-5 text-white hover:bg-white/10 hover:text-white">
+                <Link href="/dashboard">Open the dashboard</Link>
+              </Button>
+            </div>
+
+            <div className="mt-10 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+              {proofStats.map((stat, index) => (
+                <motion.div
+                  key={stat.label}
+                  initial={{ opacity: 0, y: 18 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.35 }}
+                  transition={{ delay: index * 0.08 }}
+                  className="surface-panel card-lift rounded-[1.5rem] p-6"
+                >
+                  <p className="metric-value">{stat.value}</p>
+                  <p className="metric-label mt-4">{stat.label}</p>
+                  <p className="mt-3 text-sm leading-6 text-slate-400">{stat.detail}</p>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section id="features" className="pb-24 md:pb-32">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="max-w-2xl">
+              <span className="eyebrow">Capabilities</span>
+              <h2 className="mt-5 section-title">The tools feel integrated, not assembled.</h2>
+              <p className="mt-4 section-copy">
+                Each module feeds the next one so teams can keep momentum instead of switching context.
+              </p>
+            </div>
+
+            <div className="mt-12 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+              {features.map((feature, index) => {
+                const tone = toneStyles[feature.tone]
+
+                return (
+                  <motion.article
+                    key={feature.title}
+                    initial={{ opacity: 0, y: 18 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, amount: 0.25 }}
+                    transition={{ delay: index * 0.08 }}
+                    className="group surface-panel card-lift relative overflow-hidden rounded-[1.75rem] p-7"
+                  >
+                    <div className={`pointer-events-none absolute inset-0 bg-gradient-to-br ${tone.glow} opacity-0 transition-opacity duration-500 group-hover:opacity-100`} />
+                    <div className={`relative flex h-14 w-14 items-center justify-center rounded-2xl ${tone.iconBg} ring-1 ${tone.iconBorder}`}>
+                      <feature.icon className={`size-7 ${tone.iconText}`} />
+                    </div>
+                    <p className="relative mt-6 text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">
+                      {feature.kicker}
+                    </p>
+                    <h3 className="relative mt-3 text-2xl font-semibold tracking-tight text-white">
+                      {feature.title}
+                    </h3>
+                    <p className="relative mt-3 text-sm leading-6 text-slate-400">
+                      {feature.desc}
+                    </p>
+                  </motion.article>
+                )
+              })}
+            </div>
+          </div>
+        </section>
+
+        <section className="pb-24 md:pb-32">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="surface-panel-strong relative overflow-hidden rounded-[2.25rem] px-6 py-10 sm:px-10 sm:py-12 lg:px-12">
+              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(99,102,241,0.18),transparent_32%),radial-gradient(circle_at_bottom_right,rgba(16,185,129,0.15),transparent_28%)]" />
+              <div className="relative grid gap-8 lg:grid-cols-[1fr_auto] lg:items-center">
+                <div className="max-w-2xl">
+                  <span className="eyebrow">Ready to move faster?</span>
+                  <h2 className="mt-5 text-3xl font-semibold tracking-tight sm:text-4xl lg:text-5xl">
+                    Bring your next project into one calm, high-confidence workspace.
+                  </h2>
+                  <p className="mt-4 section-copy">
+                    Create a sharper handoff between planning, design, and procurement with one shared source of truth.
+                  </p>
+                </div>
+
+                <div className="flex flex-col gap-3 sm:flex-row">
+                  <Button asChild size="lg" className="h-12 rounded-full border border-white/10 bg-white px-6 text-base font-semibold text-slate-950 hover:bg-slate-100">
+                    <Link href="/sign-up">Get started free</Link>
+                  </Button>
+                  <Button asChild size="lg" variant="outline" className="h-12 rounded-full border-white/10 bg-white/5 px-6 text-base text-white hover:bg-white/10">
+                    <Link href="/contact">Talk to sales</Link>
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer className="border-t border-white/5 bg-slate-950/70">
+        <div className="mx-auto grid w-full max-w-7xl gap-8 px-4 py-10 sm:px-6 lg:grid-cols-[1.2fr_0.9fr_0.9fr] lg:px-8">
+          <div>
+            <Link href="/" className="inline-flex items-center">
+              <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1.5 text-sm font-semibold tracking-wide text-white">
+                <span className="h-2.5 w-2.5 rounded-full bg-emerald-400 shadow-[0_0_0_4px_rgba(16,185,129,0.2)]" />
+                BuildWise.ai
+              </span>
+            </Link>
+            <p className="mt-4 max-w-sm text-sm leading-6 text-slate-400">
+              BuildWise.ai helps construction and design teams make confident decisions with clearer planning, faster iteration, and better delivery signals.
+            </p>
+          </div>
+
+          <div>
+            <h3 className="text-sm font-semibold uppercase tracking-[0.22em] text-slate-300">Product</h3>
+            <ul className="mt-4 space-y-3 text-sm text-slate-400">
+              <li><Link href="#product" className="transition-colors hover:text-white">Overview</Link></li>
+              <li><Link href="#platform" className="transition-colors hover:text-white">Workflow</Link></li>
+              <li><Link href="#features" className="transition-colors hover:text-white">Capabilities</Link></li>
+              <li><Link href="/dashboard" className="transition-colors hover:text-white">Dashboard</Link></li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 className="text-sm font-semibold uppercase tracking-[0.22em] text-slate-300">Company</h3>
+            <ul className="mt-4 space-y-3 text-sm text-slate-400">
+              <li><Link href="/about" className="transition-colors hover:text-white">About</Link></li>
+              <li><Link href="/contact" className="transition-colors hover:text-white">Contact</Link></li>
+              <li><Link href="/sign-in" className="transition-colors hover:text-white">Sign In</Link></li>
+              <li><Link href="/sign-up" className="transition-colors hover:text-white">Sign Up</Link></li>
+            </ul>
+          </div>
+        </div>
+
+        <div className="mx-auto flex w-full max-w-7xl flex-col gap-3 border-t border-white/5 px-4 py-5 text-sm text-slate-500 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
+          <p>Copyright {new Date().getFullYear()} BuildWise.ai. All rights reserved.</p>
+          <p>Designed for focused project planning and delivery.</p>
         </div>
       </footer>
     </div>
   )
-}
 }

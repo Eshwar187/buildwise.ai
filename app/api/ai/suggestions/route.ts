@@ -1,24 +1,31 @@
-import { NextResponse } from "next/server"
 import { getAuthFromCookies } from "@/lib/auth"
+import { errorResponse, successResponse } from "@/lib/api"
+import { budgetSuggestionSchema } from "@/lib/validation"
 
 export async function GET(request: Request) {
   try {
     const userId = await getAuthFromCookies()
 
     if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+      return errorResponse("Unauthorized", 401, "unauthorized")
     }
 
     const { searchParams } = new URL(request.url)
-    const budget = searchParams.get("budget")
-    const buildingType = searchParams.get("type") || "residential"
-    const currency = searchParams.get("currency") || "USD"
+    const parsedQuery = budgetSuggestionSchema.safeParse({
+      budget: searchParams.get("budget") ?? undefined,
+      type: searchParams.get("type") ?? undefined,
+      currency: searchParams.get("currency") ?? undefined,
+    })
 
-    if (!budget) {
-      return NextResponse.json({ error: "Budget parameter is required" }, { status: 400 })
+    if (!parsedQuery.success) {
+      return errorResponse(
+        parsedQuery.error.issues[0]?.message || "Budget parameter is required",
+        400,
+        "validation_error",
+        parsedQuery.error.flatten()
+      )
     }
-
-    const budgetNum = Number.parseInt(budget)
+    const { budget: budgetNum, type: buildingType = "residential", currency = "USD" } = parsedQuery.data
 
     // Format currency based on selected currency
     const formatCurrency = (value: number) => {
@@ -189,10 +196,10 @@ export async function GET(request: Request) {
       ]
     }
 
-    return NextResponse.json({ suggestions })
+    return successResponse({ suggestions })
   } catch (error) {
     console.error("Error generating suggestions:", error)
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
+    return errorResponse("Internal server error", 500)
   }
 }
 

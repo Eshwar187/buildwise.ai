@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
-import { DashboardHeader } from "@/components/dashboard-header"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
@@ -26,6 +25,11 @@ export default function AIToolsPage() {
   const [buildingType, setBuildingType] = useState("residential")
   const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false)
   const [currency, setCurrency] = useState("USD")
+  const [designerLocationInput, setDesignerLocationInput] = useState("New York, NY")
+  const [designerLocation, setDesignerLocation] = useState("New York, NY")
+  const [designerResults, setDesignerResults] = useState<any[]>([])
+  const [isLoadingDesigners, setIsLoadingDesigners] = useState(false)
+  const [designerError, setDesignerError] = useState("")
 
   // Fetch budget-based suggestions when budget changes
   useEffect(() => {
@@ -78,6 +82,41 @@ export default function AIToolsPage() {
 
     return () => clearTimeout(timeoutId)
   }, [budget, buildingType, currency])
+
+  useEffect(() => {
+    const fetchDesigners = async () => {
+      if (activeTab !== "designers") return
+
+      const location = designerLocation.trim()
+      if (!location) {
+        setDesignerResults([])
+        setDesignerError("Enter a city, state, or country to find designers.")
+        return
+      }
+
+      setIsLoadingDesigners(true)
+      setDesignerError("")
+
+      try {
+        const response = await fetch(`/api/real-time/designers?location=${encodeURIComponent(location)}`)
+        const data = await response.json().catch(() => null)
+
+        if (!response.ok || !data?.success) {
+          throw new Error(data?.error || "Failed to fetch designers")
+        }
+
+        setDesignerResults(Array.isArray(data.designers) ? data.designers : [])
+      } catch (error) {
+        console.error("Error fetching designers:", error)
+        setDesignerResults([])
+        setDesignerError(error instanceof Error ? error.message : "Failed to fetch designers")
+      } finally {
+        setIsLoadingDesigners(false)
+      }
+    }
+
+    fetchDesigners()
+  }, [activeTab, designerLocation])
 
   const handleGenerateMaterials = async () => {
     if (!materialPrompt) return
@@ -140,8 +179,8 @@ export default function AIToolsPage() {
         let result = `Based on your project description and budget of ${new Intl.NumberFormat('en-US', { style: 'currency', currency: currency }).format(budget)}, here are the recommended materials:\n\n`
 
         // Group materials by category
-        const categorizedMaterials = {}
-        data.materials.forEach(material => {
+        const categorizedMaterials: Record<string, any[]> = {}
+        data.materials.forEach((material: any) => {
           if (!categorizedMaterials[material.category]) {
             categorizedMaterials[material.category] = []
           }
@@ -149,9 +188,9 @@ export default function AIToolsPage() {
         })
 
         // Add each category and its materials
-        for (const [category, materials] of Object.entries(categorizedMaterials)) {
+        for (const [category, materials] of Object.entries(categorizedMaterials) as [string, any[]][]) {
           result += `${category}:\n`
-          materials.forEach(material => {
+          materials.forEach((material) => {
             result += `- ${material.name} (${new Intl.NumberFormat('en-US', { style: 'currency', currency: material.currency }).format(material.costPerUnit)} per ${material.unit})\n`
             result += `  Sustainability: ${material.sustainability}/10, Durability: ${material.durability}/10, Energy Efficiency: ${material.energyEfficiency}/10\n`
           })
@@ -164,8 +203,9 @@ export default function AIToolsPage() {
         throw new Error("No materials returned from API")
       }
     } catch (error) {
-      console.error("Error generating materials:", error)
-      toast.error(`Failed to generate material recommendations: ${error.message || 'Unknown error'}. Please try again.`)
+      const err = error as Error
+      console.error("Error generating materials:", err)
+      toast.error(`Failed to generate material recommendations: ${err.message || 'Unknown error'}. Please try again.`)
       setMaterialResult("")
     } finally {
       setIsGenerating(false)
@@ -191,45 +231,15 @@ export default function AIToolsPage() {
     }
   }
 
-  // Sample designers data
-  const designers = [
-    {
-      id: 1,
-      name: "Sarah Johnson",
-      specialty: "Modern Residential",
-      rating: 4.9,
-      projects: 78,
-      location: "New York, NY",
-      imageUrl: "/placeholder.svg?height=200&width=200&text=SJ",
-    },
-    {
-      id: 2,
-      name: "Michael Chen",
-      specialty: "Sustainable Design",
-      rating: 4.8,
-      projects: 64,
-      location: "San Francisco, CA",
-      imageUrl: "/placeholder.svg?height=200&width=200&text=MC",
-    },
-    {
-      id: 3,
-      name: "Priya Patel",
-      specialty: "Interior Architecture",
-      rating: 4.7,
-      projects: 92,
-      location: "Chicago, IL",
-      imageUrl: "/placeholder.svg?height=200&width=200&text=PP",
-    },
-    {
-      id: 4,
-      name: "David Rodriguez",
-      specialty: "Commercial Spaces",
-      rating: 4.9,
-      projects: 56,
-      location: "Miami, FL",
-      imageUrl: "/placeholder.svg?height=200&width=200&text=DR",
-    },
-  ]
+  const designerCards = designerResults.map((designer: any) => ({
+    id: designer.id,
+    name: designer.name,
+    specialty: designer.specialization || designer.company || "Design",
+    rating: Number(designer.rating) || 0,
+    projects: designer.projects || 0,
+    location: designer.location || [designer.city, designer.state, designer.country].filter(Boolean).join(", "),
+    imageUrl: designer.imageUrl || "/placeholder.svg?height=200&width=200&text=BW",
+  }))
 
   // Icon mapping
   const iconMap: Record<string, any> = {
@@ -240,10 +250,7 @@ export default function AIToolsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-900">
-      <DashboardHeader />
-
-      <main className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-white">AI Tools</h1>
           <p className="text-slate-400">Enhance your construction project with AI-powered tools</p>
@@ -445,24 +452,53 @@ export default function AIToolsPage() {
               <CardContent>
                 <div className="flex flex-col md:flex-row gap-4 mb-6">
                   <Input
+                    value={designerLocationInput}
+                    onChange={(e) => setDesignerLocationInput(e.target.value)}
                     placeholder="Search by location or specialty"
                     className="bg-slate-700 border-slate-600 text-white"
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault()
+                        setDesignerLocation(designerLocationInput.trim())
+                      }
+                    }}
                   />
-                  <Button className="bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-600 hover:to-teal-600 text-white">
+                  <Button
+                    onClick={() => setDesignerLocation(designerLocationInput.trim())}
+                    className="bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-600 hover:to-teal-600 text-white"
+                    disabled={isLoadingDesigners}
+                  >
                     Search
                   </Button>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {designers.map((designer) => (
-                    <DesignerCard key={designer.id} designer={designer} />
-                  ))}
-                </div>
+                {designerError && (
+                  <div className="mb-4 rounded-md border border-amber-700/50 bg-amber-950/30 p-3 text-sm text-amber-200">
+                    {designerError}
+                  </div>
+                )}
+
+                {isLoadingDesigners ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {Array(2).fill(0).map((_, index) => (
+                      <Card key={index} className="border-slate-700 bg-slate-800/50 h-48 animate-pulse" />
+                    ))}
+                  </div>
+                ) : designerCards.length > 0 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {designerCards.map((designer) => (
+                      <DesignerCard key={designer.id} designer={designer} />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="rounded-md border border-slate-700 bg-slate-900/60 p-6 text-center text-slate-400">
+                    No designers found yet. Try a different location.
+                  </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
         </Tabs>
-      </main>
     </div>
   )
 }

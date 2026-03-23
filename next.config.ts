@@ -1,15 +1,29 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  poweredByHeader: false,
   eslint: {
-    // The codebase has many pre-existing lint warnings; keep editor linting
-    // but don't fail production builds on them.
+    // Keep build green while lint debt is addressed incrementally.
     ignoreDuringBuilds: true,
   },
   typescript: {
-    // Pre-existing TS issues (framer-motion types, missing icon exports)
-    // should not block the build.
-    ignoreBuildErrors: true,
+    // Enforce TypeScript safety in production builds.
+    ignoreBuildErrors: false,
+  },
+  async headers() {
+    return [
+      {
+        source: "/(.*)",
+        headers: [
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "X-Frame-Options", value: "DENY" },
+          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+          { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=(), payment=()" },
+          { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
+          { key: "Cross-Origin-Resource-Policy", value: "same-origin" },
+        ],
+      },
+    ];
   },
 };
 

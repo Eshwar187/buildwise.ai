@@ -1,13 +1,15 @@
-import { NextResponse } from "next/server"
 import { sendUserEmail, generateVerificationEmail } from "@/lib/email-service"
+import { errorResponse, successResponse } from "@/lib/api"
+import { asTrimmedString, isValidEmail } from "@/lib/api/validation"
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json()
-    const { username, email } = body
+    const body = await request.json().catch(() => null)
+    const username = asTrimmedString(body?.username, 120)
+    const email = asTrimmedString(body?.email, 320).toLowerCase()
 
-    if (!username || !email) {
-      return NextResponse.json({ error: "Username and email are required" }, { status: 400 })
+    if (!username || !email || !isValidEmail(email)) {
+      return errorResponse("Valid username and email are required", 400, "validation_error")
     }
 
     // Generate a random verification code (this is just for show, Clerk handles the actual verification)
@@ -25,13 +27,13 @@ export async function POST(request: Request) {
     })
 
     if (!result.success) {
-      return NextResponse.json({ error: "Failed to send verification email" }, { status: 500 })
+      return errorResponse("Failed to send verification email", 500, "email_send_failed")
     }
 
-    return NextResponse.json({ success: true })
+    return successResponse({})
   } catch (error) {
     console.error("Error sending verification email:", error)
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
+    return errorResponse("Internal server error", 500)
   }
 }
 

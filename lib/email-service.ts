@@ -1,5 +1,6 @@
 import { Resend } from "resend"
 import Mailjet from "node-mailjet"
+import { escapeHtml, getSafeAppUrl } from "@/lib/security"
 
 // Lazy-initialized clients to avoid throwing during build when env vars are absent
 let _resend: Resend | null = null
@@ -102,6 +103,9 @@ export async function sendUserEmail({
 
 // Email templates
 export function generateVerificationEmail(username: string, verificationCode: string) {
+  const safeUsername = escapeHtml(username)
+  const safeVerificationCode = escapeHtml(verificationCode)
+
   return {
     subject: "Verify your ConstructHub.ai account",
     htmlContent: `
@@ -111,10 +115,10 @@ export function generateVerificationEmail(username: string, verificationCode: st
         </div>
         <div style="padding: 20px; border: 1px solid #e5e7eb; border-top: none;">
           <h2>Verify Your Email</h2>
-          <p>Hello ${username},</p>
+          <p>Hello ${safeUsername},</p>
           <p>Thank you for signing up for ConstructHub.ai. Please use the verification code below to complete your registration:</p>
           <div style="background-color: #f3f4f6; padding: 15px; text-align: center; font-size: 24px; letter-spacing: 5px; margin: 20px 0;">
-            <strong>${verificationCode}</strong>
+            <strong>${safeVerificationCode}</strong>
           </div>
           <p>This code will expire in 30 minutes.</p>
           <p>If you didn't request this verification, please ignore this email.</p>
@@ -149,7 +153,10 @@ export function generateAdminApprovalEmail(
   reason: string,
   approvalToken: string,
 ) {
-  const approvalUrl = `${process.env.NEXT_PUBLIC_APP_URL}/admin/approve?token=${approvalToken}`
+  const approvalUrl = `${getSafeAppUrl()}/admin/approve?token=${encodeURIComponent(approvalToken)}`
+  const safeUsername = escapeHtml(adminUsername)
+  const safeEmail = escapeHtml(adminEmail)
+  const safeReason = escapeHtml(reason)
 
   return {
     subject: "New Admin Registration Request",
@@ -163,9 +170,9 @@ export function generateAdminApprovalEmail(
           <p>A new user has requested admin access to ConstructHub.ai:</p>
           
           <div style="background-color: #f3f4f6; padding: 15px; margin: 20px 0;">
-            <p><strong>Username:</strong> ${adminUsername}</p>
-            <p><strong>Email:</strong> ${adminEmail}</p>
-            <p><strong>Reason:</strong> ${reason}</p>
+            <p><strong>Username:</strong> ${safeUsername}</p>
+            <p><strong>Email:</strong> ${safeEmail}</p>
+            <p><strong>Reason:</strong> ${safeReason}</p>
           </div>
           
           <p>Please review this request and approve or deny access:</p>
@@ -186,6 +193,9 @@ export function generateAdminApprovalEmail(
 }
 
 export function generateAdminApprovalNotificationEmail(username: string, isApproved: boolean) {
+  const safeUsername = escapeHtml(username)
+  const adminSignInUrl = `${getSafeAppUrl()}/admin/sign-in`
+
   return {
     subject: isApproved ? "Your Admin Request Has Been Approved" : "Your Admin Request Has Been Denied",
     html: `
@@ -195,12 +205,12 @@ export function generateAdminApprovalNotificationEmail(username: string, isAppro
         </div>
         <div style="padding: 20px; border: 1px solid #e5e7eb; border-top: none;">
           <h2>${isApproved ? "Admin Request Approved" : "Admin Request Denied"}</h2>
-          <p>Hello ${username},</p>
+          <p>Hello ${safeUsername},</p>
           ${
             isApproved
               ? `<p>Your request for admin access to ConstructHub.ai has been <strong>approved</strong>. You can now log in with your credentials and access the admin dashboard.</p>
                <div style="text-align: center; margin: 30px 0;">
-                 <a href="${process.env.NEXT_PUBLIC_APP_URL}/admin/sign-in" style="background-color: #10b981; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Go to Admin Dashboard</a>
+                 <a href="${adminSignInUrl}" style="background-color: #10b981; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Go to Admin Dashboard</a>
                </div>`
               : `<p>Your request for admin access to ConstructHub.ai has been <strong>denied</strong>. If you believe this is an error, please contact our support team.</p>`
           }

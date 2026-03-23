@@ -4,7 +4,6 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { motion } from "framer-motion"
-import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -18,8 +17,8 @@ export default function SignUpPage() {
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
+  const [needsVerification, setNeedsVerification] = useState(false)
   const router = useRouter()
-  const supabase = createClient()
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -27,34 +26,33 @@ export default function SignUpPage() {
     setError(null)
 
     try {
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            full_name: name,
-          }
-        }
+      const response = await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          password,
+          name,
+        }),
       })
 
-      if (error) {
-        throw error
-      }
+      const data = await response.json().catch(() => null)
 
-      // If successful, user might need to verify email or they might be signed in directly
-      if (data.user?.identities?.length === 0) {
-        setError("User already exists with this email.")
-        setIsLoading(false)
-        return
+      if (!response.ok) {
+        throw new Error(data?.error || "An error occurred during sign up.")
       }
 
       setIsSuccess(true)
-      
-      // Auto redirect after a short delay
-      setTimeout(() => {
-        router.push("/dashboard")
-        router.refresh()
-      }, 2000)
+      setNeedsVerification(Boolean(data?.needsVerification))
+
+      if (!data?.needsVerification) {
+        setTimeout(() => {
+          router.push("/dashboard")
+          router.refresh()
+        }, 2000)
+      }
 
     } catch (error) {
       const err = error as any
@@ -82,10 +80,16 @@ export default function SignUpPage() {
               <h2 className="text-2xl font-bold text-white tracking-tight">Account Created!</h2>
               <p className="text-zinc-400 flex flex-col items-center">
                 <span>Welcome to BuildWise.ai.</span>
-                <span className="mt-4 flex items-center gap-2 text-sm bg-zinc-900/50 backdrop-blur-sm px-4 py-2 rounded-full border border-zinc-800">
-                  <Loader2 className="w-4 h-4 animate-spin text-emerald-400" /> 
-                  Redirecting to dashboard...
-                </span>
+                {needsVerification ? (
+                  <span className="mt-4 text-sm bg-zinc-900/50 backdrop-blur-sm px-4 py-2 rounded-full border border-zinc-800">
+                    Check your email to verify your account, then sign in.
+                  </span>
+                ) : (
+                  <span className="mt-4 flex items-center gap-2 text-sm bg-zinc-900/50 backdrop-blur-sm px-4 py-2 rounded-full border border-zinc-800">
+                    <Loader2 className="w-4 h-4 animate-spin text-emerald-400" /> 
+                    Redirecting to dashboard...
+                  </span>
+                )}
               </p>
             </div>
           </motion.div>

@@ -1,0 +1,45 @@
+[
+  {
+    "name": "Modern Villa",
+    "description": "Sample",
+    "land_dimensions": {
+      "length": 3400,
+      "width": 3200,
+      "totalArea": 10880000
+    },
+    "land_unit": "sq ft",
+    "budget": 25000,
+    "currency": "INR",
+    "location": {
+      "country": "India",
+      "state": "Bihar",
+      "city": "Major City",
+      "region": ""
+    },
+    "preferences": {
+      "rooms": {
+        "bedrooms": 2,
+        "bathrooms": 2,
+        "kitchen": true,
+        "livingRoom": true,
+        "diningRoom": true,
+        "study": false,
+        "garage": false,
+        "additionalRooms": []
+      },
+      "style": "Modern",
+      "stories": 1,
+      "energyEfficient": true,
+      "accessibility": false,
+      "outdoorSpace": true
+    },
+    "status": "Planning",
+    "designer_recommendations": [],
+    "material_recommendations": [],
+    "energy_recommendations": [],
+    "id": "fb801b11-5244-4f54-ac03-0fd0fafb2262",
+    "user_id": "21414e8a-8613-4708-87a8-0fe051d5b1f1",
+    "created_at": "2026-03-22T17:03:54.832Z",
+    "updated_at": "2026-03-22T17:03:54.832Z"
+  }
+]

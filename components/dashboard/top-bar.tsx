@@ -1,7 +1,7 @@
 "use client"
 
 import { useAuth } from "@/components/auth-provider"
-import { Search, Bell, Menu } from "lucide-react"
+import { Search, Bell } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import {
   DropdownMenu,
@@ -24,15 +24,13 @@ export function TopBar() {
   }
 
   return (
-  return (
     <header className="h-20 border-b border-white/5 bg-slate-900/40 backdrop-blur-xl sticky top-0 z-30 px-8 flex items-center justify-between shadow-sm">
-
       <div className="relative w-96 max-w-full hidden md:block">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500 group-focus-within:text-indigo-400 transition-colors" />
         <input 
           type="text" 
           placeholder="Search projects, designers..." 
-          className="w-full bg-slate-800/50 border border-slate-700/50 rounded-xl py-2 pl-10 pr-4 text-sm text-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all"
+          className="w-full bg-slate-950/50 border border-slate-800/50 rounded-2xl py-2.5 pl-11 pr-4 text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500/30 transition-all placeholder:text-slate-600"
         />
       </div>
 
@@ -46,12 +44,12 @@ export function TopBar() {
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button className="flex items-center gap-3 pl-2 pr-1 py-1 rounded-full hover:bg-slate-800 transition-colors">
+            <button className="flex items-center gap-3 pl-2 pr-1 py-1 rounded-full hover:bg-slate-800 transition-colors focus:outline-none">
               <div className="text-right hidden sm:block">
                 <p className="text-xs font-semibold text-white leading-none mb-1">
                   {user?.user_metadata?.first_name || user?.email?.split('@')[0] || "Guest User"}
                 </p>
-                <p className="text-[10px] text-slate-500 leading-none">Pro Plan</p>
+                <p className="text-[10px] text-slate-500 leading-none uppercase tracking-tighter">Pro member</p>
               </div>
               <Avatar className="h-9 w-9 border border-indigo-500/20">
                 <AvatarImage src={user?.user_metadata?.avatar_url} />

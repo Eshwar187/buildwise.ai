@@ -1,14 +1,14 @@
-import { NextResponse } from "next/server"
 import { getAuthFromCookies } from "@/lib/auth"
 import { createClient } from "@/lib/supabase/server"
 import { copyFloorPlanTemplate } from "@/lib/floor-plan-utils"
+import { errorResponse, successResponse } from "@/lib/api"
+import { projectCreateSchema } from "@/lib/validation"
+import { createUserProject, listUserProjects } from "@/lib/project-fallback"
 
-// Add cache headers to improve performance
 const cacheHeaders = {
-  "Cache-Control": "max-age=10, stale-while-revalidate=59"
+  "Cache-Control": "max-age=10, stale-while-revalidate=59",
 }
 
-// Helpers to map Supabase snake_case to frontend camelCase expectations
 function mapProjectToFrontend(p: any) {
   if (!p) return null
   return {
@@ -21,41 +21,44 @@ function mapProjectToFrontend(p: any) {
     updatedAt: p.updated_at,
     designerRecommendations: p.designer_recommendations,
     materialRecommendations: p.material_recommendations,
-    energyRecommendations: p.energy_recommendations
+    energyRecommendations: p.energy_recommendations,
   }
 }
 
-export async function GET(request: Request) {
+function isMissingProjectsTable(error: unknown) {
+  return typeof error === "object" && error !== null && (error as { code?: string }).code === "PGRST205"
+}
+
+export async function GET() {
   try {
     const userId = await getAuthFromCookies()
-    console.log('GET /api/projects - Auth userId:', userId)
 
     if (!userId) {
-      console.log('GET /api/projects - No userId found in auth')
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+      return errorResponse("Unauthorized", 401, "unauthorized")
     }
 
     const supabase = await createClient()
-
-    // Get projects for this user
-    console.log(`GET /api/projects - Getting projects for user ${userId}`)
     const { data: projects, error: projectsError } = await supabase
-      .from('projects')
-      .select('*')
-      .eq('user_id', userId)
-      .order('created_at', { ascending: false })
+      .from("projects")
+      .select("*")
+      .eq("user_id", userId)
+      .order("created_at", { ascending: false })
 
     if (projectsError) {
+      if (isMissingProjectsTable(projectsError)) {
+        console.warn("Supabase table public.projects not found, using local fallback storage.")
+        const fallbackProjects = listUserProjects(userId).map(mapProjectToFrontend)
+        return successResponse({ projects: fallbackProjects }, { headers: cacheHeaders })
+      }
       console.error("Error fetching projects:", projectsError)
-      return NextResponse.json({ projects: [] }, { headers: cacheHeaders })
+      return errorResponse("Failed to fetch projects", 500, "database_error")
     }
 
     const formattedProjects = (projects || []).map(mapProjectToFrontend)
-
-    return NextResponse.json({ projects: formattedProjects }, { headers: cacheHeaders })
+    return successResponse({ projects: formattedProjects }, { headers: cacheHeaders })
   } catch (error) {
     console.error("Error fetching projects:", error)
-    return NextResponse.json({ projects: [] }, { headers: cacheHeaders })
+    return errorResponse("Internal server error", 500)
   }
 }
 
@@ -64,104 +67,108 @@ export async function POST(request: Request) {
     const userId = await getAuthFromCookies()
 
     if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+      return errorResponse("Unauthorized", 401, "unauthorized")
     }
 
-    const body = await request.json()
+    const parsedBody = await request.json().catch(() => null)
+    const body = projectCreateSchema.safeParse(parsedBody)
 
-    // Validate required fields
-    if (!body.name || !body.description) {
-      return NextResponse.json({ error: "Project name and description are required" }, { status: 400 })
+    if (!body.success) {
+      return errorResponse(
+        body.error.issues[0]?.message || "Project name and description are required",
+        400,
+        "validation_error",
+        body.error.flatten()
+      )
     }
 
-    if (!body.landDimensions || !body.landDimensions.length || !body.landDimensions.width) {
-      return NextResponse.json({ error: "Land dimensions are required" }, { status: 400 })
-    }
-
-    if (!body.budget) {
-      return NextResponse.json({ error: "Budget is required" }, { status: 400 })
-    }
-
+    const projectInput = body.data
     const supabase = await createClient()
 
-    // Insert project
     const projectData = {
       user_id: userId,
-      name: body.name,
-      description: body.description,
-      land_dimensions: body.landDimensions,
-      land_unit: body.landUnit || "sq ft",
-      budget: body.budget,
-      currency: body.currency || "USD",
-      location: body.location || {
-        country: "",
-        state: "",
-        city: "",
-      },
-      preferences: body.preferences || {
-        rooms: {
-          bedrooms: 2,
-          bathrooms: 2,
-          kitchen: true,
-          livingRoom: true,
-          diningRoom: true,
-          study: false,
-          garage: false,
-        },
-        style: "Modern",
-        stories: 1,
-        energyEfficient: true,
-        accessibility: false,
-        outdoorSpace: true
-      },
-      status: "Planning"
+      name: projectInput.name,
+      description: projectInput.description,
+      land_dimensions: projectInput.landDimensions,
+      land_unit: projectInput.landUnit || "sq ft",
+      budget: projectInput.budget,
+      currency: projectInput.currency || "USD",
+      location: projectInput.location,
+      preferences: projectInput.preferences,
+      status: "Planning",
     }
 
     const { data: project, error: insertError } = await supabase
-      .from('projects')
+      .from("projects")
       .insert(projectData)
       .select()
       .single()
 
     if (insertError || !project) {
+      if (isMissingProjectsTable(insertError)) {
+        console.warn("Supabase table public.projects not found, saving project to local fallback storage.")
+        const fallbackProject = createUserProject(userId, {
+          name: projectInput.name,
+          description: projectInput.description,
+          land_dimensions: projectInput.landDimensions,
+          land_unit: projectInput.landUnit || "sq ft",
+          budget: projectInput.budget,
+          currency: projectInput.currency || "USD",
+          location: projectInput.location,
+          preferences: projectInput.preferences as Record<string, unknown>,
+          status: "Planning",
+          designer_recommendations: [],
+          material_recommendations: [],
+          energy_recommendations: [],
+        })
+        return successResponse({ project: mapProjectToFrontend(fallbackProject) }, { status: 201 })
+      }
       console.error("Error inserting project:", insertError)
-      return NextResponse.json({ error: "Failed to create project" }, { status: 500 })
+      return errorResponse("Failed to create project", 500, "database_error")
     }
 
-    // Check if a floor plan template was selected
-    if (body.floorPlanTemplateId) {
+    if (projectInput.floorPlanTemplateId) {
       try {
-        console.log(`Copying floor plan template ${body.floorPlanTemplateId} to project ${project.id}`);
+        const imageUrl = copyFloorPlanTemplate(projectInput.floorPlanTemplateId, project.id)
 
-        // Copy the floor plan template to the project
-        const imageUrl = copyFloorPlanTemplate(body.floorPlanTemplateId, project.id);
-        console.log(`Template copied successfully, image URL: ${imageUrl}`);
-        
-        // Create a floor plan record
-        const { error: fpError } = await supabase
-          .from('floor_plans')
-          .insert({
+        if (imageUrl) {
+          const { error: fpError } = await supabase.from("floor_plans").insert({
             project_id: project.id,
             user_id: userId,
             image_url: imageUrl,
             ai_prompt: "Template floor plan",
-            description: `Floor plan based on template ${body.floorPlanTemplateId}`,
-            generated_by: "template"
+            description: `Floor plan based on template ${projectInput.floorPlanTemplateId}`,
+            generated_by: "template",
           })
 
-        if (fpError) {
-          console.error("Error creating floor plan record:", fpError)
+          if (fpError) {
+            console.error("Error creating floor plan record:", fpError)
+          }
         }
       } catch (templateError) {
-        console.error("Error copying floor plan template:", templateError);
+        console.error("Error copying floor plan template:", templateError)
+      }
+    }
+
+    if (projectInput.floorPlan?.imageUrl) {
+      const { error: floorPlanError } = await supabase.from("floor_plans").insert({
+        project_id: project.id,
+        user_id: userId,
+        image_url: projectInput.floorPlan.imageUrl,
+        ai_prompt: projectInput.floorPlan.aiPrompt || "",
+        description: projectInput.floorPlan.description || "",
+        generated_by: projectInput.floorPlan.generatedBy || "gemini",
+      })
+
+      if (floorPlanError) {
+        console.error("Error saving inline floor plan:", floorPlanError)
       }
     }
 
     const formattedProject = mapProjectToFrontend(project)
-    return NextResponse.json({ project: formattedProject })
+    return successResponse({ project: formattedProject }, { status: 201 })
   } catch (error) {
     console.error("Error creating project:", error)
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
+    return errorResponse("Internal server error", 500)
   }
 }
-

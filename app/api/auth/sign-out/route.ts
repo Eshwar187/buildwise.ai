@@ -1,17 +1,14 @@
-import { NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
+import { errorResponse, successResponse } from "@/lib/api"
 
 export async function POST() {
   try {
     const supabase = await createClient()
     await supabase.auth.signOut()
 
-    return NextResponse.json({ success: true })
+    return successResponse({})
   } catch (error) {
     console.error("Sign out error:", error)
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    )
+    return errorResponse("Internal server error", 500)
   }
 }

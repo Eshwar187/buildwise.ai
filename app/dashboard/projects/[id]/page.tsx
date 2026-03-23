@@ -20,8 +20,6 @@ import {
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { DashboardHeader } from "@/components/dashboard-header"
-import { DashboardShell } from "@/components/dashboard-shell"
 import { FloorPlanProcessor } from "@/components/floor-plan-processor"
 import { FloorPlanDisplay } from "@/components/floor-plan-display"
 import { MaterialRecommendations } from "@/components/material-recommendations"
@@ -91,18 +89,20 @@ export default function ProjectDetailPage() {
       try {
         const response = await fetch(`/api/projects/${params.id}`)
         if (!response.ok) {
-          throw new Error("Failed to fetch project")
+          const errorData = await response.json().catch(() => null)
+          throw new Error(errorData?.error || "Failed to fetch project")
         }
         const data = await response.json()
-        setProject(data.project)
+        const projectData = data.project || data
+        setProject(projectData)
 
         // Set saved items
-        if (data.project.designerRecommendations) {
-          setSavedDesigners(data.project.designerRecommendations)
+        if (projectData?.designerRecommendations) {
+          setSavedDesigners(projectData.designerRecommendations)
         }
 
-        if (data.project.materialRecommendations) {
-          setSavedMaterials(data.project.materialRecommendations)
+        if (projectData?.materialRecommendations) {
+          setSavedMaterials(projectData.materialRecommendations)
         }
       } catch (error) {
         console.error("Error fetching project:", error)
@@ -153,7 +153,6 @@ export default function ProjectDetailPage() {
 
       try {
         console.log('Fetching real-time materials for project...')
-        setIsLoading(true)
 
         // Call the real-time materials API with project data
         const response = await fetch("/api/real-time/materials", {
@@ -183,8 +182,6 @@ export default function ProjectDetailPage() {
 
         // No fallback - just set empty array
         setMaterials([])
-      } finally {
-        setIsLoading(false)
       }
     }
 
@@ -379,40 +376,37 @@ export default function ProjectDetailPage() {
 
   if (isLoading) {
     return (
-      <DashboardShell>
-        <div className="flex justify-center items-center h-64">
-          <Loader2 className="h-8 w-8 text-teal-500 animate-spin" />
-        </div>
-      </DashboardShell>
+      <div className="flex justify-center items-center h-64">
+        <Loader2 className="h-8 w-8 text-teal-500 animate-spin" />
+      </div>
     )
   }
 
   if (!project) {
     return (
-      <DashboardShell>
-        <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-8 text-center">
-          <Building2 className="h-12 w-12 text-slate-500 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-white mb-2">Project not found</h3>
-          <p className="text-slate-400 mb-4">
-            The project you're looking for doesn't exist or you don't have access to it.
-          </p>
-          <Button
-            onClick={() => router.push("/dashboard/projects")}
-            className="bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-600 hover:to-teal-600 text-white"
-          >
-            <ArrowLeft className="mr-2 h-4 w-4" /> Back to Projects
-          </Button>
-        </div>
-      </DashboardShell>
+      <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-8 text-center">
+        <Building2 className="h-12 w-12 text-slate-500 mx-auto mb-4" />
+        <h3 className="text-lg font-medium text-white mb-2">Project not found</h3>
+        <p className="text-slate-400 mb-4">
+          The project you're looking for doesn't exist or you don't have access to it.
+        </p>
+        <Button
+          onClick={() => router.push("/dashboard/projects")}
+          className="bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-600 hover:to-teal-600 text-white"
+        >
+          <ArrowLeft className="mr-2 h-4 w-4" /> Back to Projects
+        </Button>
+      </div>
     )
   }
 
   return (
-    <DashboardShell>
-      <DashboardHeader
-        heading={project.name}
-        text={project.description}
-      >
+    <div className="space-y-6">
+      <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-semibold text-white">{project.name}</h1>
+          <p className="text-slate-400">{project.description}</p>
+        </div>
         <div className="flex space-x-2">
           <Button
             variant="outline"
@@ -429,7 +423,7 @@ export default function ProjectDetailPage() {
             <Trash2 className="h-4 w-4" />
           </Button>
         </div>
-      </DashboardHeader>
+      </div>
 
       <div className="space-y-6">
         {/* Project Info */}
@@ -737,6 +731,6 @@ export default function ProjectDetailPage() {
           </TabsContent>
         </Tabs>
       </div>
-    </DashboardShell>
+    </div>
   )
 }

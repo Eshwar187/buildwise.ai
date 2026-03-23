@@ -1,8 +1,8 @@
-import { NextResponse } from "next/server"
 import { getAuthFromCookies } from "@/lib/auth"
 import { createClient } from "@/lib/supabase/server"
+import { errorResponse, successResponse } from "@/lib/api"
+import { deleteUserProject, getUserProject } from "@/lib/project-fallback"
 
-// Helpers to map Supabase snake_case to frontend camelCase expectations
 function mapProjectToFrontend(p: any) {
   if (!p) return null
   return {
@@ -15,8 +15,12 @@ function mapProjectToFrontend(p: any) {
     updatedAt: p.updated_at,
     designerRecommendations: p.designer_recommendations,
     materialRecommendations: p.material_recommendations,
-    energyRecommendations: p.energy_recommendations
+    energyRecommendations: p.energy_recommendations,
   }
+}
+
+function isMissingProjectsTable(error: unknown) {
+  return typeof error === "object" && error !== null && (error as { code?: string }).code === "PGRST205"
 }
 
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -24,31 +28,37 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
     const userId = await getAuthFromCookies()
 
     if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+      return errorResponse("Unauthorized", 401, "unauthorized")
     }
 
     const { id: projectId } = await params
     const supabase = await createClient()
 
     const { data: project, error: projectError } = await supabase
-      .from('projects')
-      .select('*')
-      .eq('id', projectId)
+      .from("projects")
+      .select("*")
+      .eq("id", projectId)
       .single()
 
     if (projectError || !project) {
-      return NextResponse.json({ error: "Project not found" }, { status: 404 })
+      if (isMissingProjectsTable(projectError)) {
+        const fallbackProject = getUserProject(userId, projectId)
+        if (!fallbackProject) {
+          return errorResponse("Project not found", 404, "not_found")
+        }
+        return successResponse({ project: mapProjectToFrontend(fallbackProject) })
+      }
+      return errorResponse("Project not found", 404, "not_found")
     }
 
-    // Check if the user owns this project
     if (project.user_id !== userId) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 })
+      return errorResponse("Forbidden", 403, "forbidden")
     }
 
-    return NextResponse.json(mapProjectToFrontend(project))
+    return successResponse({ project: mapProjectToFrontend(project) })
   } catch (error) {
     console.error("Error fetching project:", error)
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
+    return errorResponse("Internal server error", 500)
   }
 }
 
@@ -57,39 +67,43 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
     const userId = await getAuthFromCookies()
 
     if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+      return errorResponse("Unauthorized", 401, "unauthorized")
     }
 
     const { id: projectId } = await params
     const supabase = await createClient()
 
     const { data: project, error: projectError } = await supabase
-      .from('projects')
-      .select('id, user_id')
-      .eq('id', projectId)
+      .from("projects")
+      .select("id, user_id")
+      .eq("id", projectId)
       .single()
 
     if (projectError || !project) {
-      return NextResponse.json({ error: "Project not found" }, { status: 404 })
+      if (isMissingProjectsTable(projectError)) {
+        const deleted = deleteUserProject(userId, projectId)
+        if (!deleted) {
+          return errorResponse("Project not found", 404, "not_found")
+        }
+        return successResponse({})
+      }
+      return errorResponse("Project not found", 404, "not_found")
     }
 
     if (project.user_id !== userId) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 })
+      return errorResponse("Forbidden", 403, "forbidden")
     }
 
-    const { error: deleteError } = await supabase
-      .from('projects')
-      .delete()
-      .eq('id', projectId)
+    const { error: deleteError } = await supabase.from("projects").delete().eq("id", projectId)
 
     if (deleteError) {
       console.error("Error deleting project:", deleteError)
-      return NextResponse.json({ error: "Failed to delete project" }, { status: 500 })
+      return errorResponse("Failed to delete project", 500, "database_error")
     }
 
-    return NextResponse.json({ success: true })
+    return successResponse({})
   } catch (error) {
     console.error("Error deleting project:", error)
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
+    return errorResponse("Internal server error", 500)
   }
 }

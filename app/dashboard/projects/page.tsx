@@ -6,14 +6,12 @@ import { motion } from "framer-motion"
 import {
   Plus,
   Search,
-  Filter,
   Building2,
   MapPin,
   DollarSign,
   Clock,
   Loader2,
-  RefreshCw,
-  Wrench
+  RefreshCw
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -27,8 +25,6 @@ import {
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { CreateProjectDialog } from "@/components/create-project-dialog"
-import { DashboardHeader } from "@/components/dashboard-header"
-import { DashboardShell } from "@/components/dashboard-shell"
 import { toast } from "sonner"
 
 interface Project {
@@ -71,7 +67,8 @@ export default function ProjectsPage() {
       // Add a cache-busting parameter to avoid caching issues
       const response = await fetch(`/api/projects?t=${new Date().getTime()}`)
       if (!response.ok) {
-        throw new Error("Failed to fetch projects")
+        const errorData = await response.json().catch(() => null)
+        throw new Error(errorData?.error || "Failed to fetch projects")
       }
       const data = await response.json()
       console.log(`Fetched ${data.projects?.length || 0} projects`)
@@ -140,7 +137,8 @@ export default function ProjectsPage() {
       })
 
       if (!response.ok) {
-        throw new Error("Failed to create project")
+        const errorData = await response.json().catch(() => null)
+        throw new Error(errorData?.error || "Failed to create project")
       }
 
       const data = await response.json()
@@ -189,11 +187,12 @@ export default function ProjectsPage() {
   }
 
   return (
-    <DashboardShell>
-      <DashboardHeader
-        heading="Projects"
-        text="Create and manage your floor plan projects."
-      >
+    <div className="space-y-4">
+      <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-semibold text-white">Projects</h1>
+          <p className="text-slate-400">Create and manage your floor plan projects.</p>
+        </div>
         <div className="flex items-center space-x-2">
           <Button
             onClick={fetchProjects}
@@ -204,52 +203,13 @@ export default function ProjectsPage() {
             <RefreshCw className={`mr-2 h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} /> Refresh
           </Button>
           <Button
-            onClick={async () => {
-              toast.info("Checking for projects in database...")
-              try {
-                const response = await fetch('/api/debug/projects')
-                if (response.ok) {
-                  const data = await response.json()
-                  console.log('Debug projects response:', data)
-                  if (data.projects && data.projects.length > 0) {
-                    toast.success(`Found ${data.projects.length} projects in database!`)
-                    // Refresh the projects list
-                    fetchProjects()
-                  } else {
-                    toast.warning("No projects found in database. Trying to fix...")
-                    // Try to fix projects
-                    const fixResponse = await fetch('/api/debug/fix-projects')
-                    if (fixResponse.ok) {
-                      const fixData = await fixResponse.json()
-                      console.log('Fix projects response:', fixData)
-                      if (fixData.fixed > 0) {
-                        toast.success(`Fixed ${fixData.fixed} projects!`)
-                        // Refresh the projects list
-                        fetchProjects()
-                      } else {
-                        toast.error("Could not fix any projects.")
-                      }
-                    }
-                  }
-                }
-              } catch (error) {
-                console.error('Error debugging projects:', error)
-                toast.error("Error checking projects")
-              }
-            }}
-            variant="outline"
-            className="border-slate-700 text-slate-300 hover:bg-slate-700"
-          >
-            <Wrench className="mr-2 h-4 w-4" /> Debug
-          </Button>
-          <Button
             onClick={() => setIsCreateDialogOpen(true)}
             className="bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-600 hover:to-teal-600 text-white"
           >
             <Plus className="mr-2 h-4 w-4" /> New Project
           </Button>
         </div>
-      </DashboardHeader>
+      </div>
 
       <div className="space-y-4">
         {/* Filters */}
@@ -366,6 +326,6 @@ export default function ProjectsPage() {
         onOpenChange={setIsCreateDialogOpen}
         onSubmit={handleCreateProject}
       />
-    </DashboardShell>
+    </div>
   )
 }
